@@ -29,7 +29,11 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		data <- data[order(data[,1]),]
 		tmp <- tmp[order(tmp[,1]),]
 		#Replaces the data column with the simulated data:
-		data[,3] <- tmp[,3]
+        if(simmap.tree == TRUE){
+            data[,3] <- tmp[,2]
+        }else{
+            data[,3] <- tmp[,3]
+        }
 		#Now run OUwie, using the measurement error if it is contained within the data, to estimate the parameters from the simulated data:
 		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn)
 		#Now bind all the relevant output together
