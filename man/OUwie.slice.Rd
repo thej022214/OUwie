@@ -21,6 +21,8 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 }
 \details{
 This function fits various likelihood models for continuous characters evolving under discrete selective regimes that defined by a time slice (i.e., before and after K-P event). Timeslices can be fixed, estimated from the data, or some combination of both. Here it is assumed that the present is T=0 and the root is max(branching.times(phy)). Also note that this function is still under development and so far it seems that when specifying an OU model there is a narrow range of conditions in which meaningful parameter estimates are obtained. Thus, use this function at your own risk.
+
+Also note, when specifying the BMS model be mindful of the root.station flag. When root.station=FALSE, the non-censored model of O'Meara et al. 2006 is invoked (i.e., a single regime at the root is estimated), and when root.station==TRUE the group mean model of Thomas et al. 2006 (i.e., the number of means equals the number of regimes). The latter case appears to be a strange special case of OU, in that it behaves similarly to the OUMV model, but without selection. I would say that this is more consistent with the censored test of O'Meara et al. (2006), as opposed to having any real connection to OU. In any case, more work is clearly needed to understand the behavior of the group means model, and therefore, I recommend setting root.station=FALSE in the BMS case.
 }
 \value{
 \code{OUwie.slice} returns an object of class \code{OUwie.slice}. This is a list with elements:
