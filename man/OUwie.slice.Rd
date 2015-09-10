@@ -5,7 +5,7 @@
 \usage{
 OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
  timeslices=c(NA), scaleHeight=FALSE, root.station=TRUE, mserr="none",
- diagn=FALSE, quiet=FALSE, warn=TRUE)
+ slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -15,6 +15,7 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{slice.lower.bound}{specifies the value of the lower bound when estimating time slices. The default is \code{NULL}, meaning the value is exp(-21).}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}

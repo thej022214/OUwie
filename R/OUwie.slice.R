@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), scaleHeight=FALSE, root.station=TRUE, mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
+OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
 	#Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
@@ -148,6 +148,9 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		if(scaleHeight==TRUE){
 			timeslices = timeslices/max.height
 		}
+        print(timeslices)
+        print(lower)
+        print(upper)
 		phy.sliced<-make.era.map(phy,timeslices)
 		Rate.mat[] <- c(p, 1e-12)[index.mat]
 		N<-length(x[,1])
@@ -183,16 +186,19 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	if(quiet==FALSE){
 		cat("Initializing...", "\n")
 	}
-	
+    if(is.null(slice.lower.bound)){
+        slice.lower.bound = 0.00001
+    }    
 	lb = -20
 	ub = 20
 	lower = rep(lb, np)
 	upper = rep(ub, np)
 	#Update the bounds with estimated timeslices:
-	lower = c(lower, log(rep(0,length(which(is.na(timeslices))))))
-	upper = c(upper, log(rep(max(nodeHeights(phy)),length(which(is.na(timeslices))))))
+	lower = c(lower, rep(-21,length(which(is.na(timeslices)))))
+	upper = c(upper, log(rep(max(nodeHeights(phy))-slice.lower.bound,length(which(is.na(timeslices))))))
 	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
-
+    print(lower)
+    print(upper)
 	if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		#Need to construct a dataset so that we can run OUwie to get starting values:
 		data.tmp <- data.frame(Genus_species=phy$tip.label,reg=rep(1,length(data[,1])),contT=data[,2])
