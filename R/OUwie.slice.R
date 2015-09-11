@@ -148,9 +148,6 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		if(scaleHeight==TRUE){
 			timeslices = timeslices/max.height
 		}
-        print(timeslices)
-        print(lower)
-        print(upper)
 		phy.sliced<-make.era.map(phy,timeslices)
 		Rate.mat[] <- c(p, 1e-12)[index.mat]
 		N<-length(x[,1])
@@ -197,8 +194,6 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	lower = c(lower, rep(-21,length(which(is.na(timeslices)))))
 	upper = c(upper, log(rep(max(nodeHeights(phy))-slice.lower.bound,length(which(is.na(timeslices))))))
 	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
-    print(lower)
-    print(upper)
 	if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		#Need to construct a dataset so that we can run OUwie to get starting values:
 		data.tmp <- data.frame(Genus_species=phy$tip.label,reg=rep(1,length(data[,1])),contT=data[,2])
