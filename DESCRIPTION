@@ -8,3 +8,5 @@ Depends: ape, nloptr
 Imports: numDeriv, corpcor, lattice, grDevices, phytools, phangorn, stats
 Description: Calculates and compares rate differences of continuous character evolution under Brownian motion and a new set of Ornstein-Uhlenbeck-based Hansen models that allow the strength of selection and stochastic motion to vary across selective regimes.
 License: GPL (>= 2)
+Suggests: knitr
+VignetteBuilder: knitr
