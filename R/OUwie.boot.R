@@ -39,6 +39,9 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		#Now bind all the relevant output together
 		res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[,1]))
 	}
+    if(model == "BM1" | model=="BMS"){
+        root.station=FALSE
+    }
 	if(root.station==TRUE){
 		theta.mat<-matrix(t(tmp$theta), 2, length(levels(tmp$tot.states)))
 		rownames(theta.mat)<-c("estimate", "se")
