@@ -37,9 +37,16 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		#Now run OUwie, using the measurement error if it is contained within the data, to estimate the parameters from the simulated data:
 		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn)
 		#Now bind all the relevant output together
-		res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[,1]))
+		if(model == "BM1" | model == "BMS" | model == "OU1"){
+			res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[1,1]))
+		}else{
+			res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[,1]))
+		}
 	}
-    if(model == "BM1" | model=="BMS"){
+    if(model=="BM1" | model=="OU1"){
+        root.station=TRUE
+    }
+    if(model=="BMS"){
         root.station=FALSE
     }
 	if(root.station==TRUE){
@@ -51,7 +58,11 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		if(tmp$simmap.tree==TRUE){
 			colnames(theta.mat) <- c(colnames(tmp$phy$mapped.edge))
 		}
-		colnames(res) <- c(paste("alpha", levels(tmp$tot.states),sep="_"),paste("sigma.sq", levels(tmp$tot.states),sep="_"),paste("theta", colnames(theta.mat),sep="_"))
+		if(model=="BM1" | model=="OU1"){
+			colnames(res) <- c(paste("alpha", levels(tmp$tot.states),sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"), paste("theta", "root", sep="_"))
+		}else{
+			colnames(res) <- c(paste("alpha", levels(tmp$tot.states),sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"), paste("theta", colnames(theta.mat), sep="_"))
+		}
 	}else{
 		theta.mat<-matrix(t(tmp$theta), 2, length(levels(tmp$tot.states))+1)
 		rownames(theta.mat)<-c("estimate", "se")
@@ -61,7 +72,11 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		if(tmp$simmap.tree==TRUE){
 			colnames(theta.mat)<-c("root", colnames(tmp$phy$mapped.edge))
 		}
-		colnames(res) <- c(paste("alpha", levels(tmp$tot.states),sep="_"),paste("sigma.sq", levels(tmp$tot.states),sep="_"),paste("theta", colnames(theta.mat),sep="_"))
+		if(model=="BMS"){
+			colnames(res) <- c(paste("alpha", levels(tmp$tot.states), sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"),paste("theta", "root", sep="_"))
+		}else{
+			colnames(res) <- c(paste("alpha", levels(tmp$tot.states), sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"),paste("theta", colnames(theta.mat), sep="_"))
+		}
 	}
 	class(res) <- "OUwie.boot"
 	return(res)
