@@ -1,9 +1,9 @@
 #JOINT OPTIMIZATION OF REGIMES AND OUwie PARAMETERS.
 
 #written by Jeremy M. Beaulieu
-source("pathLike.R")
-library(corHMM)
-library(OUwie)
+#source("pathLike.R")
+#library(corHMM)
+#library(OUwie)
 #This function is intended as a framework for simultaneously optimizing a discrete character and the continuous character when running OUwie. The idea behind this is that we assume a correlation between the two trait types, but we are not modeling them in that way. In other words, we reconstruct the regimes first, then fit OUwie separately. However, where rates change on a branch may not be optimal without information from how the regimes evolved; where regimes change may not be optimal without information from how rates change. This method should not be confused with the "hypothesis-free" approaches like SURFACE or AUTEUR. Such models are useful, though in my view, the stronger alpha is, the less likely the model will be in reconstructing regimes correctly. Moreover, with methods like Brownie and OUwie, we often go into these analyses with an a priori hypothesis about what might be governing the rates and optima. So hOUwie is intended to meet everyone halfway in this regard, as well as to fix an issue that seems to have gone unnoticed as to how these analyses are conducted (though see Revell 2013).
 #The basic idea is as follows: with the joint reconstruction we can find the likeliest state for each node in the tree using the algorithm of Pupko et al (2000). However, to obtain the true likelihood of a reconstruction, we need to also assess changes along a branch as well as a node. To do so is simple: simply add in a set of nodes of degree 2 down a branch. Unfortunately, there is this strange property where change occurs either at the instant of speciation or right before -- nowhere else. Need to think of a solution for this, as I find it unclear as to whether OUwie can truly provide a pushback when optimizing corHMM. In other words, for a set of parameters the reconstructions could be very similar, which would mean the OUwie estimates are likely to be the same. The obvious fix is to include a parameter for every branch that modulates where changes occur on along branch. Obviously, this is insane. But there has to be a neat trick to deal with this.
 
