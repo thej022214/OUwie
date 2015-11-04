@@ -643,15 +643,15 @@ factorData <- function(data,whichchar=1,charnum){
 }
 
 
-library(phytools)
-library(corHMM)
-library(expm)
-Pr.mat <- matrix(c(0.70, 0.45, 0.30, 0.55), 2, 2)
-Q.mat <- logm(Pr.mat)
-rates <- c(Q.mat[2,1], Q.mat[1,2])
-phy<-read.tree("pupko.tre")
-trait<-read.delim("pupko.data.txt")
-pp <- PathLik(phy, trait, p=rates, ntraits=1, charnum=1, model="ARD", root.p="yang")
+#library(phytools)
+#library(corHMM)
+#library(expm)
+#Pr.mat <- matrix(c(0.70, 0.45, 0.30, 0.55), 2, 2)
+#Q.mat <- logm(Pr.mat)
+#rates <- c(Q.mat[2,1], Q.mat[1,2])
+#phy<-read.tree("pupko.tre")
+#trait<-read.delim("pupko.data.txt")
+#pp <- PathLik(phy, trait, p=rates, ntraits=1, charnum=1, model="ARD", root.p="yang")
 
 
 
