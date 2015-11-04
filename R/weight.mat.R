@@ -189,8 +189,8 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
                         }
                     }
                 }
-                n.cov1[edges[i,3]]=nodevar[i]
-                n.cov2[edges[i,3]]=nodevar[i]
+                n.cov1[edges[i,3]]=nodevar1[i]
+                n.cov2[edges[i,3]]=nodevar2[i]
             }
             w.piece1 <- mat.gen(phy,n.cov1,pp)
             w.piece2 <- mat.gen(phy,n.cov2,pp)

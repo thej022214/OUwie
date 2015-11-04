@@ -88,7 +88,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scale
     
     vcv1 <- mat.gen(phy,n.cov1,pp)
     vcv2 <- mat.gen(phy,n.cov2,pp)
-    # if(abs(diff(alpha)) > 0){
+    #if(abs(diff(alpha)) > 0){
     species.variances <- diag(vcv1)
     species.total.variances <- matrix(0, dim(vcv1)[2], dim(vcv1)[2])
     count=0
@@ -104,7 +104,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scale
     }
     diag(species.total.variances) <- exp(-2 *diag(vcv1))
     vcv <- species.total.variances * vcv2
-    # }else{
+    #}else{
     #vcv<-exp(-2*alpha[1]*max(branching.times(phy)))*vcv2
     #}
     vcv
