@@ -112,7 +112,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
     
     if(assume.station==FALSE){
         W<-matrix(0,ntips,k+1)
-        w.piece.root <- matrix(0, length(phy$tip.labels), length(phy$tip.labels))
+        W.piece.root <- matrix(0, ntips, ntips)
         for(j in 1:k){
             n.cov1=matrix(0, n, 1)
             n.cov2=matrix(0, n, 1)
@@ -195,10 +195,10 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
             w.piece1 <- mat.gen(phy,n.cov1,pp)
             w.piece2 <- mat.gen(phy,n.cov2,pp)
             w.piece <- w.piece1 * w.piece2
-            diag(w.piece.root) <- diag(w.piece.root) + diag(w.piece1)
+            diag(W.piece.root) <- diag(W.piece.root) + diag(w.piece1)
             W[1:(ntips),j+1]<-diag(w.piece)
         }
-        W[,1] = diag(w.piece.root)
+        W[,1] = diag(W.piece.root)
     }
     #Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter
     W <- W/rowSums(W)
