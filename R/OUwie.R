@@ -320,15 +320,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			}else{
 				logl <- -.5*(t(E_a-x)%*%pseudoinverse(V)%*%(E_a-x))-.5*as.numeric(DET)-.5*(N*log(2*pi))
 			}
-		}
-
-#		#Uses multivariate normal rather than calculates logl on its own - faster but often returns errors:
-#		logl<-Inf
-#		try(logl <- dmvnorm(c(x), W%*%theta, V, log=TRUE), silent=TRUE)
-#		if(any(theta==Inf)){
-#			return(10000000)
-#		}		
-		
+		}		
 		#When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
 		if(!is.finite(logl)){
 			return(10000000)
