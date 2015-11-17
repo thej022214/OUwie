@@ -111,7 +111,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
     }
     
     if(assume.station==FALSE){
-        W<-matrix(0,ntips,k+1)
+        W <- matrix(0,ntips,k+1)
         W.piece.root <- matrix(0, ntips, ntips)
         for(j in 1:k){
             n.cov1=matrix(0, n, 1)
@@ -141,8 +141,8 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
                             nodevar2[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
                         }
                         else{
-                            nodevar1[i] = nodevar1[i]
-                            nodevar2[i] = nodevar2[i]
+                            nodevar1[i] <- nodevar1[i]
+                            nodevar2[i] <- nodevar2[i]
                         }
                         oldtime <- newtime
                     }
@@ -163,8 +163,8 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
                             nodevar2[i]=exp(alpha[oldregime]*newtime)-exp(alpha[oldregime]*oldtime)
                         }
                         else{
-                            nodevar1[i]=0
-                            nodevar2[i]=0
+                            nodevar1[i] <- 0
+                            nodevar2[i] <- 0
                         }
                     }
                     else{
@@ -196,7 +196,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
             w.piece2 <- mat.gen(phy,n.cov2,pp)
             w.piece <- w.piece1 * w.piece2
             diag(W.piece.root) <- diag(W.piece.root) + diag(w.piece1)
-            W[1:(ntips),j+1]<-diag(w.piece)
+            W[1:(ntips),j+1] <- diag(w.piece)
         }
         W[,1] = diag(W.piece.root)
     }

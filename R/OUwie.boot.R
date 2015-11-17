@@ -9,7 +9,7 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 	#if alpha is NA set to a really small number -- this is only relevant for BM models:
 	alpha[is.na(alpha)]<-1e-10
 
-	cat("Beginning parametric bootstrap -- performing", nboot, "replicates", "\n")
+    cat("Beginning parametric bootstrap -- performing", nboot, "replicates", "\n")
 	
 	for(i in 1:nboot){
 		tmp.phy<-phy
@@ -24,7 +24,12 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 			}
 		}
 		#This calls the OUwie simulator and simulates datasets:
-		tmp <- OUwie.sim(tmp.phy, data, simmap.tree=simmap.tree, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0)
+        if(mserr == "none"){
+            tmp <- OUwie.sim(tmp.phy, data, simmap.tree=simmap.tree, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0, mserr=mserr)
+        }
+        if(mserr == "known"){
+            tmp <- OUwie.sim(tmp.phy, data[,c(1,2,4)], simmap.tree=simmap.tree, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0, mserr=mserr)
+        }
 		#OUwie.sim outputs the trait file in the order of the tree, but the trait file is likely not to be this way. So I alphabetized the input trait file above, and I do the same to the simulated trait file:
 		data <- data[order(data[,1]),]
 		tmp <- tmp[order(tmp[,1]),]

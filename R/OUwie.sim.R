@@ -17,12 +17,18 @@
 #multiple alphas (OUSMA): alpha=c(0.5,0.1); sigma.sq=c(0.9,0.9); theta0=0; theta=c(1,2)
 #multiple alphas and sigmas (OUSMVA): alpha=c(0.5,0.1); sigma.sq=c(0.45,0.9); theta0=0; theta=c(1,2)
 
-OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alpha, sigma.sq, theta0, theta){
+OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alpha, sigma.sq, theta0, theta, mserr="none"){
 
 	if(simmap.tree==FALSE){
 		#This is annoying, but the second column has to be in there twice otherwise, error.
-		data<-data.frame(data[,2], data[,2], row.names=data[,1])
-		data<-data[phy$tip.label,]
+        if(mserr=="none"){
+            data <- data.frame(data[,2], data[,2], row.names=data[,1])
+        }
+        if(mserr=="known"){
+            data <- data.frame(data[,2], data[,3], row.names=data[,1])
+        }
+
+		data <- data[phy$tip.label,]
 		
 		n=max(phy$edge[,1])
 		ntips=length(phy$tip.label)
@@ -105,8 +111,14 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alph
 		sim.dat[,1]<-phy$tip.label
 		sim.dat[,2]<-data[,1]
 		sim.dat[,3]<-x[TIPS]
-
-		colnames(sim.dat)<-c("Genus_species","Reg","X")		
+        
+        if(mserr == "known"){
+            for(i in TIPS){
+                sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
+            }
+        }
+		colnames(sim.dat)<-c("Genus_species","Reg","X")
+        
 	}
 	if(simmap.tree==TRUE){
 		n=max(phy$edge[,1])
@@ -186,7 +198,11 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alph
 		
 		sim.dat[,1]<-phy$tip.label
 		sim.dat[,2]<-x[TIPS,]
-		
+        if(mserr == "known"){
+            for(i in 1:TIPS){
+                sim.dat[i,2] <- rnorm(1,sim.dat[i,2],data[i,2])
+            }
+        }
 		colnames(sim.dat)<-c("Genus_species","X")
 	}
 	sim.dat
