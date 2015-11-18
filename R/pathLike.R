@@ -358,7 +358,7 @@ PathLik <- function(phy, data, p, hrm=FALSE, rate.cat, ntraits=NULL, charnum=1, 
 			}									
 			if(sum(liks[focal,]) < 1e-100){
 				#Kicks in arbitrary precision calculations: 
-				library(Rmpfr)
+				#library(Rmpfr)
 				liks <- mpfr(liks, 15)
 			}
 		}

@@ -85,7 +85,6 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scale
             n.cov2[edges[i,3],]=nodevar2[i]
         }
     }
-    
     vcv1 <- mat.gen(phy,n.cov1,pp)
     vcv2 <- mat.gen(phy,n.cov2,pp)
     if(any(abs(diff(alpha)) > 0)){

@@ -15,6 +15,7 @@
 
 hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), scaleHeight=FALSE, root.station=TRUE, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
+	ntips <- Ntip(phy)
 	if(warn==TRUE){
 		if(param.count > (ntips/10)){
 			warning("You might not have enough data to fit this model well", call.=FALSE, immediate.=TRUE)
@@ -38,7 +39,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		upper.discrete = rep(upper.bounds[2], np.discrete)
 	}
 	
-	dev.joint<-function(p, phy, data, mserr, discrete.model, ouwie.model, np.discrete, np.continuous, hrm, rate.cat, ntraits, rate.mat, root.p, root.station, optimize){
+	dev.joint <- function(p, phy, data, mserr, discrete.model, ouwie.model, np.discrete, np.continuous, hrm, rate.cat, ntraits, rate.mat, root.p, root.station, optimize){
 		param.count <- np.discrete+np.continuous
 		if(ouwie.model=="BMS"){
 			alpha<-rep(1e-10,dim(rate.mat)[1])
@@ -57,12 +58,12 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 			sigma.sq <- p[np.continuous]
 		}
 		if(ouwie.model=="OUMVA"){
-			alpha <- p[1:(np.continous/2)]
-			sigma.sq <- p[((np.continous/2)+1):np.continuous]
+			alpha <- p[1:(np.continuous/2)]
+			sigma.sq <- p[((np.continuous/2)+1):np.continuous]
 		}
 		trans.rate <- p[(np.continuous+1):param.count]
 		print(trans.rate)
-		regime.lik <- path.lik(phy, data[,c(1:2)], p=trans.rate, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, model=discrete.model, root.p=root.p)
+		regime.lik <- PathLik(phy, data[,c(1:2)], p=trans.rate, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, model=discrete.model, root.p=root.p)
 		print(paste("corHMM", regime.lik$loglik))
 		phy.painted <- regime.lik$mapped.tree
 		print(colnames(phy.painted$mapped.edge))
@@ -88,7 +89,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 	
 	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
 	
-	init.regime <- rayDISC(phy, trait[,c(1,2)], model="ER", node.states="joint", root.p=root.p)
+	init.regime <- rayDISC(phy, data[,c(1,2)], model="ER", node.states="joint", root.p=root.p)
 
 	if(mserr=="none" | mserr=="est"){
 		data.sort<-data.frame(data[,2], data[,3], row.names=data[,1])
