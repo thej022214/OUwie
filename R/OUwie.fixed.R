@@ -287,12 +287,12 @@ print.OUwie.fixed<-function(x, ...){
 		if (x$model == "BM1" | x$model == "BMS"){
 			param.est <- x$solution
 			rownames(param.est)<-c("alpha","sigma.sq")
-#			if(x$root.station==FALSE){
+			if(x$root.station==FALSE){
 			theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-#			}
-#			else{
-#				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
-#			}
+			}
+			else{
+				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
+			}
 			colnames(theta.mat)<-c("estimate", "se")
 			if(x$simmap.tree==FALSE){
 				colnames(param.est) <- colnames(theta.mat) <- levels(x$tot.states)

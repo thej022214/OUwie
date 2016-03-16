@@ -537,12 +537,12 @@ print.OUwie<-function(x, ...){
 	if (is.character(x$model)) {
 		if (x$model == "BM1" | x$model == "BMS" | x$model == "TrendyM" | x$model == "TrendyMS"){
 			param.est <- x$solution
-#			if(x$root.station==FALSE){
+			if(x$root.station==FALSE){
 			theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-#			}
-#			else{
-#				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
-#			}
+			}
+			else{
+				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
+			}
 			rownames(theta.mat)<-c("estimate", "se")
 			if(x$simmap.tree==FALSE){
 				colnames(theta.mat) <- levels(x$tot.states)
