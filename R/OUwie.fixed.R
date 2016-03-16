@@ -152,13 +152,13 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 			index<-matrix(TRUE,2,k)
 			Rate.mat[1,1:k]<-1e-10
 			Rate.mat[2,1:k]<-sigma.sq
-#			if(root.station==TRUE){
-#				param.count<-np+k
-#			}
-#			if(root.station==FALSE){
-			param.count<-np+1
-#			}			
-			bool=FALSE
+			if(root.station==TRUE){
+				param.count<-np+k
+			}
+            if(root.station==FALSE){
+                param.count<-np+1
+            }
+			bool=root.station
 		}
 		if (model == "OU1"){
 			np=2
