@@ -10,7 +10,12 @@
 #and the multiple alphas and sigmas (OUMVA). 
 
 OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
-	#Makes sure the data is in the same order as the tip labels
+	
+    if(is.factor(data[,3])==TRUE){
+        stop("Check the format of the data column. It's reading as a factor.")
+    }
+
+    #Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
 		data<-data.frame(data[,2], data[,3], row.names=data[,1])
 		data<-data[phy$tip.label,]
