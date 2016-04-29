@@ -239,10 +239,9 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 #		if(mserr=="est"){
 #			diag(V)<-diag(V)+p[length(p)]
 #		}
-		
 		if(is.null(theta)){
-			theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
-			se<-sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
+            theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
+            se<-sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
 		}
 		else{
 			theta=theta
@@ -287,12 +286,12 @@ print.OUwie.fixed<-function(x, ...){
 		if (x$model == "BM1" | x$model == "BMS"){
 			param.est <- x$solution
 			rownames(param.est)<-c("alpha","sigma.sq")
-			if(x$root.station==FALSE){
-			theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-			}
-			else{
-				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
-			}
+            if(x$root.station==FALSE){
+                theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
+            }
+            else{
+                theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
+            }
 			colnames(theta.mat)<-c("estimate", "se")
 			if(x$simmap.tree==FALSE){
 				colnames(param.est) <- colnames(theta.mat) <- levels(x$tot.states)

@@ -20,10 +20,15 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			stop("You specified measurement error should be incorporated, but this information is missing")
 		}
 		else{
-			data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
-			data<-data[phy$tip.label,]
+            if(is.factor(data[,4]) == TRUE){
+                stop("Check the format of the measurement error column. It's reading as a factor.")
+            }else{
+                data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
+                data<-data[phy$tip.label,]
+            }
 		}
 	}
+    
 	#Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
@@ -425,12 +430,10 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		if(quiet==FALSE){
 			cat("Finished. Begin thorough search...", "\n")
 		}
-		
 		out = nloptr(x0=log(ip), eval_f=dev, lb=lower, ub=upper, opts=opts, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy)
 	}
 	loglik <- -out$objective
 	out$solution = exp(out$solution)
-
 	#Takes estimated parameters from dev and calculates theta for each regime:
 	dev.theta<-function(p, index.mat, edges=edges, mserr=mserr){
 		tmp<-NULL
@@ -438,8 +441,8 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		N<-length(x[,1])
 		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight)
 		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight, assume.station=bool)
-		if(mserr=="known"){
-			diag(V)<-diag(V)+(data[,3]^2)
+        if(mserr=="known"){
+            diag(V)<-diag(V)+(data[,3]^2)
 		}
 		if(mserr=="est"){
 			diag(V)<-diag(V)+(p[length(p)])
