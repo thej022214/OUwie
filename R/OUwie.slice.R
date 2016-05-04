@@ -4,20 +4,29 @@
 
 OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
+    if(is.factor(data[,2])==TRUE){
+        stop("Check the format of the data column. It's reading as a factor.")
+    }
+
 	#Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
 		data<-data.frame(data[,2], data[,2], row.names=data[,1])
 		data<-data[phy$tip.label,]
 	}
 	if(mserr=="known"){
-		if(!dim(data)[2]==4){
-			stop("You specified measurement error should be incorporated, but this information is missing")
-		}
-		else{
-			data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
-			data<-data[phy$tip.label,]
-		}
+        if(!dim(data)[2]==3){
+            stop("You specified measurement error should be incorporated, but this information is missing")
+        }
+        else{
+            if(is.factor(data[,3]) == TRUE){
+                stop("Check the format of the measurement error column. It's reading as a factor.")
+            }else{
+                data <- data.frame(data[,2], data[,3], row.names=data[,1])
+                data <- data[phy$tip.label,]
+            }
+        }
 	}
+    
 	simmap.tree<-TRUE
 	#How many regimes and timeslices from the input
 	if(any(timeslices>0, na.rm=T) | any(is.na(timeslices))){
@@ -141,10 +150,10 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	#Likelihood function for estimating model parameters
 	dev.slice<-function(p, index.mat, timeslices, mserr){
 		p = exp(p)
-		non.estimated.slices<-timeslices[which(!is.na(timeslices))]
+		non.estimated.slices <- timeslices[which(!is.na(timeslices))]
 		timeslices[] <-c(p, 0)[Slices.vector]
-		timeslices[timeslices==0]<-non.estimated.slices
-		timeslices<-timeslices[order(timeslices, decreasing=FALSE)]
+		timeslices[timeslices==0] <- non.estimated.slices
+		timeslices <- timeslices[order(timeslices, decreasing=FALSE)]
 		if(scaleHeight==TRUE){
 			timeslices = timeslices/max.height
 		}
@@ -155,7 +164,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight, assume.station=bool)
 		if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(10000000)		
 		if(mserr=="known"){
-			diag(V)<-diag(V)+data[,3]
+			diag(V)<-diag(V)+data[,2]
 		}
 		if(mserr=="est"){
 			diag(V)<-diag(V)+p[length(p)]
@@ -263,7 +272,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight, assume.station=bool)
 		
 		if(mserr=="known"){
-			diag(V)<-diag(V)+data[,3]
+			diag(V)<-diag(V)+data[,2]
 		}
 		if(mserr=="est"){
 			diag(V)<-diag(V)+p[length(p)]

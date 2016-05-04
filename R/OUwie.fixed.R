@@ -6,21 +6,30 @@
 
 OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE,scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
-	#Makes sure the data is in the same order as the tip labels
-	if(mserr=="none" | mserr=="est"){
-		data<-data.frame(data[,2], data[,3], row.names=data[,1])
-		data<-data[phy$tip.label,]
-	}
-	if(mserr=="known"){
-		if(!dim(data)[2]==4){
-			cat("You specified measurement error should be incorporated, but this information is missing:\n")
-		}
-		else{
-			data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
-			data<-data[phy$tip.label,]
-		}
-	}
-	#Values to be used throughout
+    if(is.factor(data[,3])==TRUE){
+        stop("Check the format of the data column. It's reading as a factor.")
+    }
+
+    #Makes sure the data is in the same order as the tip labels
+    if(mserr=="none" | mserr=="est"){
+        data<-data.frame(data[,2], data[,3], row.names=data[,1])
+        data<-data[phy$tip.label,]
+    }
+    if(mserr=="known"){
+        if(!dim(data)[2]==4){
+            stop("You specified measurement error should be incorporated, but this information is missing")
+        }
+        else{
+            if(is.factor(data[,4]) == TRUE){
+                stop("Check the format of the measurement error column. It's reading as a factor.")
+            }else{
+                data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
+                data<-data[phy$tip.label,]
+            }
+        }
+    }
+
+    #Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
 	#Will label the clade of interest if the user so chooses:
