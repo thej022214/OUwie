@@ -243,6 +243,9 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}		
 		#Starting values follow from phytools:
 		C.mat<-vcv.phylo(phy)
+        if(mserr=="known"){
+            diag(C.mat)<-diag(C.mat) + data[,2]
+        }
 		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
 		A<-matrix(rep(a,nrow(x)),nrow(x),ncol(x), byrow=TRUE)
 		sig<-as.numeric(t(x-A)%*%solve(C.mat)%*%(x-A)/n)
