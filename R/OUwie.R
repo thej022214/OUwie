@@ -285,6 +285,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			warning("You might not have enough data to fit this model well", call.=FALSE, immediate.=TRUE)
 		}
 	}
+	
 	#Likelihood function for estimating model parameters
 	dev<-function(p, index.mat, edges, mserr, trendy){
 				

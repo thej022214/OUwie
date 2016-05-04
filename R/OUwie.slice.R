@@ -56,7 +56,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	
 	#Resort the edge matrix so that it looks like the original matrix order
 	edges=edges[sort.list(edges[,1]),]
-	x<-as.matrix(data[,2])
+	x<-as.matrix(data[,1])
 	#Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
 		index.mat<-matrix(0,2,k)
