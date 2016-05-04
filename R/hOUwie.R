@@ -10,8 +10,7 @@
 ##To do:
 # 1. Do optimization in log scale 
 # 2. Get rid of this diagnostic stuff.
-# 3. Alternative: run a set of stochastic maps, average the likelihood, and do it that way.
-# 4. 
+# 3. 
 
 hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), scaleHeight=FALSE, root.station=TRUE, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
 	

@@ -206,7 +206,11 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
 	if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		#Need to construct a dataset so that we can run OUwie to get starting values:
-		data.tmp <- data.frame(Genus_species=phy$tip.label,reg=rep(1,length(data[,1])),contT=data[,2])
+        if(mserr == "known"){
+            data.tmp <- data.frame(Genus_species=phy$tip.label,reg=rep(1,length(data[,1])),contT=data[,1], mserr=data[,2])
+        }else{
+            data.tmp <- data.frame(Genus_species=phy$tip.label,reg=rep(1,length(data[,1])),contT=data[,1])
+        }
 		phy.tmp <- phy
 		phy.tmp$node.label <- sample(c(1:k), phy.tmp$Nnode, replace=T)
 		init <- OUwie(phy.tmp, data.tmp, model="OU1", simmap.tree=FALSE, scaleHeight=scaleHeight, root.station=root.station, mserr=mserr, diagn=FALSE, quiet=TRUE)
