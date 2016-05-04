@@ -165,7 +165,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight, assume.station=bool)
 		if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(10000000)		
 		if(mserr=="known"){
-			diag(V)<-diag(V)+data[,2]
+			diag(V)<-diag(V) + (data[,2]^2)
 		}
 		if(mserr=="est"){
 			diag(V)<-diag(V)+p[length(p)]
@@ -244,7 +244,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		#Starting values follow from phytools:
 		C.mat<-vcv.phylo(phy)
         if(mserr=="known"){
-            diag(C.mat)<-diag(C.mat) + data[,2]
+            diag(C.mat)<-diag(C.mat) + (data[,2]^2)
         }
 		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
 		A<-matrix(rep(a,nrow(x)),nrow(x),ncol(x), byrow=TRUE)
@@ -280,7 +280,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight, assume.station=bool)
 		
 		if(mserr=="known"){
-			diag(V)<-diag(V)+data[,2]
+			diag(V)<-diag(V)+(data[,2]^2)
 		}
 		if(mserr=="est"){
 			diag(V)<-diag(V)+p[length(p)]
