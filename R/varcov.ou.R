@@ -104,7 +104,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scale
         diag(species.total.variances) <- exp(-2 *diag(vcv1))
         vcv <- species.total.variances * vcv2
     }else{
-        vcv<-exp(-2*alpha[1]*max(branching.times(phy)))*exp(vcv2)
+        vcv<-exp(-2*alpha[1]*max(branching.times(phy)))*vcv2
     }
     vcv
     
