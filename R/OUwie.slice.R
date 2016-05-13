@@ -38,6 +38,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	max.height <- max(nodeHeights(phy))
 	timeslices <- max.height - timeslices
 	timeslices <- c(0,timeslices)
+
 	#Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
@@ -307,6 +308,11 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	timeslices <- timeslices[order(timeslices, decreasing=FALSE)]
 	phy.sliced<-make.era.map(phy,timeslices)
 	tot.states<-factor(colnames(phy.sliced$mapped.edge))
+	
+	if(any(is.na(timeslices))){
+		param.count <- param.count + sum(is.na(timeslices))
+	}
+		
 	#Calculates the Hessian for use in calculating standard errors and whether the maximum likelihood solution was found
 	if(diagn==TRUE){
 		h <- hessian(x=out$solution, func=dev.slice, index.mat=index.mat, timeslices=timeslices, mserr=mserr)
@@ -355,6 +361,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	class(obj)<-"OUwie.slice"		
 	return(obj)
 }
+
 
 print.OUwie.slice<-function(x, ...){
 	
