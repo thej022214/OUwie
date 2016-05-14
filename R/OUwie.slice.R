@@ -301,6 +301,9 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	if(quiet==FALSE){
 		cat("Finished. Summarizing results.", "\n")	
 	}
+    if(any(is.na(timeslices))){
+        param.count <- param.count + sum(is.na(timeslices))
+    }
 	theta <- dev.theta.slice(out$solution, index.mat, timeslices, mserr)
 	non.estimated.slices<-timeslices[which(!is.na(timeslices))]
 	timeslices[] <- c(out$solution, 0)[Slices.vector]
@@ -309,10 +312,6 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	phy.sliced<-make.era.map(phy,timeslices)
 	tot.states<-factor(colnames(phy.sliced$mapped.edge))
 	
-	if(any(is.na(timeslices))){
-		param.count <- param.count + sum(is.na(timeslices))
-	}
-		
 	#Calculates the Hessian for use in calculating standard errors and whether the maximum likelihood solution was found
 	if(diagn==TRUE){
 		h <- hessian(x=out$solution, func=dev.slice, index.mat=index.mat, timeslices=timeslices, mserr=mserr)
