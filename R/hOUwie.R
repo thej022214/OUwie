@@ -202,7 +202,7 @@ print.hOUwie<-function(x, ...){
 	
 	ntips=Ntip(x$phy)
 	output<-data.frame(x$loglik, x$AIC, x$AICc, x$discrete.model, x$ouwie.model, row.names="")
-	names(output)<-c("-lnL","AIC","AICc","disc.model","ouwie.model")
+	names(output)<-c("lnL","AIC","AICc","disc.model","ouwie.model")
 	cat("\nFit\n")
 	print(output)
 	cat("\n")

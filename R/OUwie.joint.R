@@ -484,7 +484,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		}
 	}
 	ntips = Ntip(phy)
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model,solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits) 
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits) 
 	class(obj)<-"OUwie.joint"		
 	return(obj)
 }
@@ -493,7 +493,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 print.OUwie.joint <- function(x, ...){
 	ntips = Ntip(x$phy)
 	output <- data.frame(x$loglik,x$AIC,x$AICc,x$model, ntips, row.names="")
-	names(output) <- c("-lnL","AIC","AICc","model","ntax")
+	names(output) <- c("lnL","AIC","AICc","model","ntax")
 	cat("\nOverall Fit\n")
 	print(output)
 	cat("\n")

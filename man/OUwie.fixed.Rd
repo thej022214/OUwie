@@ -22,14 +22,15 @@ sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 \item{quiet}{a logical indicating whether or not to print progress to the screen. The default is "FALSE".}
 }
 \details{
-The input is a tree and a data file. The tree must be of class \dQuote{phylo} and must contain the ancestral selective regimes as internal node labels. The data file is a dataframe that must have column entries in the following order: [,1] species names and [,2] their current selective regime. The user specifies the  parameter values (i.e. \eqn{\alpha}{alpha}, \eqn{\sigma^2}{sigma^2}, and \eqn{\theta}{theta}).}
+The input is a tree and a data file. The tree must be of class \dQuote{phylo} and must contain the ancestral selective regimes as internal node labels. The data file is a data.frame that must have column entries in the following order: [,1] species names and [,2] their current selective regime. The user specifies the  parameter values (i.e. \eqn{\alpha}{alpha}, \eqn{\sigma^2}{sigma^2}, and \eqn{\theta}{theta}).}
 
 \value{
 \code{OUwie.fixed} returns an object of class \code{OUwie.fixed}. This is a list with elements:
-\item{$loglik}{the maximum negative log-likelihood.}
+\item{$loglik}{the maximum log-likelihood.}
 \item{$AIC}{Akaike information criterion.}
 \item{$AICc}{Akaike information criterion corrected for sample-size.}
 \item{$model}{The model being fit}
+\item{$param.count}{The number of parameters counted in the model.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
 \item{$theta}{a matrix containing the maximum likelihood estimates of \eqn{\theta}{theta}.}
 \item{$tot.state}{A vector of names for the different regimes}

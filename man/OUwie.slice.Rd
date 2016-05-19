@@ -9,7 +9,7 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
-\item{data}{a data matrix containing species information (see Details).}
+\item{data}{a data.frame containing species information (see Details).}
 \item{model}{models to fit to comparative data (see Details).}
 \item{timeslices}{specifies the value and number fixed timeslices, timeslices to be estimated, or both (see Details).}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
@@ -21,16 +21,19 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
 }
 \details{
-This function fits various likelihood models for continuous characters evolving under discrete selective regimes that defined by a time slice (i.e., before and after K-P event). Timeslices can be fixed, estimated from the data, or some combination of both. Here it is assumed that the present is T=0 and the root is max(branching.times(phy)). Also note that this function is still under development and so far it seems that when specifying an OU model there is a narrow range of conditions in which meaningful parameter estimates are obtained. Thus, use this function at your own risk.
+This function fits various likelihood models for continuous characters evolving under discrete selective regimes that defined by a time slice (i.e., before and after K-P event). Timeslices can be fixed, estimated from the data, or some combination of both. Here it is assumed that the present is T=0 and the root is max(branching.times(phy)). Also note that this function is still under development and so far it seems that when specifying an OU model there is a narrow range of conditions in which meaningful parameter estimates are obtained. Thus, use this function at your own risk. However, I would like to personally thank Graham Slater for vetting the function in great detail.
+
+The trait data.frame must have column entries in the following order: [,1] species names, and [,2] the continuous trait of interest. Alternatively, if the user wants to incorporate measurement error (\code{mserr}="known"), then a third column, [,3], must be included that provides the standard error estimates for each species mean. However, a global measurement error for all taxa can be estimated from the data (\code{mserr}="est"); is not well tested, so use at your own risk. 
 
 Also note, when specifying the BMS model be mindful of the root.station flag. When root.station=FALSE, the non-censored model of O'Meara et al. 2006 is invoked (i.e., a single regime at the root is estimated), and when root.station==TRUE the group mean model of Thomas et al. 2006 (i.e., the number of means equals the number of regimes). The latter case appears to be a strange special case of OU, in that it behaves similarly to the OUMV model, but without selection. I would say that this is more consistent with the censored test of O'Meara et al. (2006), as opposed to having any real connection to OU. In any case, more work is clearly needed to understand the behavior of the group means model, and therefore, I recommend setting root.station=FALSE in the BMS case.
 }
 \value{
 \code{OUwie.slice} returns an object of class \code{OUwie.slice}. This is a list with elements:
-\item{$loglik}{the maximum negative log-likelihood.}
+\item{$loglik}{the maximum log-likelihood.}
 \item{$AIC}{Akaike information criterion.}
 \item{$AICc}{Akaike information criterion corrected for sample-size.}
 \item{$model}{The model being fit}
+\item{$param.count}{The number of parameters counted in the model.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
 \item{$theta}{a matrix containing the maximum likelihood estimates of \eqn{\theta}{theta} and it standard error.}
 \item{$solution.se}{a matrix containing the approximate standard errors of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}. The standard error is calculated as the diagonal of the inverse of the Hessian matrix.}

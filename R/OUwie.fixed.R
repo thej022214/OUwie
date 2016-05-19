@@ -276,7 +276,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	fixed.fit <- dev()
 	loglik<- -fixed.fit[[1]]
 	
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model,solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree,data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]]) 
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree,data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]]) 
 	class(obj)<-"OUwie.fixed"		
 	return(obj)
 }
@@ -286,7 +286,7 @@ print.OUwie.fixed<-function(x, ...){
 	
 	ntips=Ntip(x$phy)
 	output<-data.frame(x$loglik,x$AIC,x$AICc,x$model,ntips,row.names="")
-	names(output)<-c("-lnL","AIC","AICc","model","ntax")
+	names(output)<-c("lnL","AIC","AICc","model","ntax")
 	cat("\nFit\n")
 	print(output)
 	cat("\n")
