@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleHeight=FALSE, assume.station=TRUE){
+weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE){
     
     n=max(phy$edge[,1])
     ntips=length(phy$tip.label)
@@ -35,7 +35,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
                 newtime = edges[i,5]
                 if(simmap.tree==TRUE){
                     if(scaleHeight==TRUE){
-                        currentmap <- phy$maps[[i]]/max(nodeHeights(phy))
+                        currentmap <- phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
                     }
                     else{
                         currentmap <- phy$maps[[i]]
@@ -123,7 +123,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, scaleH
                 newtime=edges[i,5]
                 if(simmap.tree==TRUE){
                     if(scaleHeight==TRUE){
-                        currentmap<-phy$maps[[i]]/max(nodeHeights(phy))
+                        currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
                     }
                     else{
                         currentmap<-phy$maps[[i]]

@@ -3,13 +3,14 @@
 \title{Generalized Hansen model simulator}
 \description{Simulates the Ornstein-Uhlenbeck process of continuous characters evolving under discrete selective regimes.}
 \usage{
-OUwie.sim(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alpha, 
-sigma.sq, theta0, theta, mserr="none")
+OUwie.sim(phy, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,
+alpha, sigma.sq, theta0, theta, mserr="none")
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
 \item{data}{a dataframe containing species information (see Details). Not necessary to include if \code{simmap=TRUE}.}
 \item{simmap.tree}{a logical indicating whether the input tree is in SIMMAP format. The default is \code{FALSE}.} 
+\item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.}
 \item{alpha}{a numeric vector giving the values of \eqn{\alpha}{alpha} for each selective regime (see Details)}
 \item{sigma.sq}{a numeric vector giving the values of \eqn{\sigma^2}{sigma^2} for each selective regime (see Details)} 

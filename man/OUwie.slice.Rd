@@ -4,14 +4,15 @@
 \description{Fits generalized Ornstein-Uhlenbeck-based Hansen models of continuous characters before and after time slices.}
 \usage{
 OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
- timeslices=c(NA), scaleHeight=FALSE, root.station=TRUE, mserr="none",
- slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE)
+ timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE,
+ mserr="none", slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
 \item{data}{a data.frame containing species information (see Details).}
 \item{model}{models to fit to comparative data (see Details).}
 \item{timeslices}{specifies the value and number fixed timeslices, timeslices to be estimated, or both (see Details).}
+\item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
@@ -41,6 +42,7 @@ Also note, when specifying the BMS model be mindful of the root.station flag. Wh
 \item{$tot.state}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
+\item{$root.age}{The user-supplied age at the root of the tree.}
 \item{$opts}{Internal settings of the likelihood search}
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}

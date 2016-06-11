@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, scaleHeight=FALSE, root.station=TRUE, mserr="none", diagn=FALSE, quiet=FALSE){
+OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", diagn=FALSE, quiet=FALSE){
 
 	#Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
@@ -276,7 +276,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		for(i in seq(from = 1, by = k, length.out = ntraits)){
 			j=(i+1):(i+k-1)
 			tmp<-NA
-			try(tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, alpha=c(Rate.mat[1,c(i,j)]), sigma.sq=c(Rate.mat[2,c(i,j)]), quiet=TRUE)$loglik, silent=TRUE)
+			try(tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, alpha=c(Rate.mat[1,c(i,j)]), sigma.sq=c(Rate.mat[2,c(i,j)]), quiet=TRUE)$loglik, silent=TRUE)
 			if(!is.finite(tmp)){
 				return(10000000)
 			}
@@ -468,7 +468,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		}
 		if(model.tmp == "BM1" | model.tmp == "BMS" | model.tmp == "OU1"){
 			j=(i+1):(i+k-1)
-			tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
+			tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
 			tmp <- t(tmp)
 			tmp.mat <- matrix(0,2,k)
 			for(k in 1:k){
@@ -478,13 +478,13 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 			count <- count + 1			
 		}else{
 			j=(i+1):(i+k-1)
-			tmp <- OUwie.fixed(phy,data[,c(1,2,count)],model=model.tmp, simmap.tree=simmap.tree, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
+			tmp <- OUwie.fixed(phy,data[,c(1,2,count)],model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
 			thetas <- cbind(thetas,t(tmp)) 
 			count <- count + 1
 		}
 	}
 	ntips = Ntip(phy)
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits) 
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits)
 	class(obj)<-"OUwie.joint"		
 	return(obj)
 }
@@ -524,7 +524,7 @@ print.OUwie.joint <- function(x, ...){
 
 ######################################################################################################################################
 ######################################################################################################################################
-### Below are the model sets 
+### Below are examples of model sets 
 ######################################################################################################################################
 ######################################################################################################################################
 

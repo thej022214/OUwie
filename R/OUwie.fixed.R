@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values. 
 
-OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE,scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
+OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.")
@@ -63,10 +63,10 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		#Obtains the state at the root
 		root.state=which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
 		##Begins the construction of the edges matrix -- similar to the ouch format##
-		edges=cbind(c(1:(n-1)),phy$edge,nodeHeights(phy))
+		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 
 		if(scaleHeight==TRUE){
-			edges[,4:5]<-edges[,4:5]/max(nodeHeights(phy))
+			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 		}
 		
 		edges=edges[sort.list(edges[,3]),]
@@ -100,10 +100,10 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				#Obtain root state -- for both models assume the root state to be 1 since no other state is used even if provided in the tree
 				root.state<-1
 				#New tree matrix to be used for subsetting regimes
-				edges=cbind(c(1:(n-1)),phy$edge,nodeHeights(phy))
+				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 			
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(nodeHeights(phy))
+					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 				}
 				
 				edges=edges[sort.list(edges[,3]),]
@@ -121,10 +121,10 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				root.state<-phy$node.label[1]
 				int.state<-phy$node.label[-1]
 				#New tree matrix to be used for subsetting regimes
-				edges=cbind(c(1:(n-1)),phy$edge,nodeHeights(phy))
+				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 			
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(nodeHeights(phy))
+					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 				}
 				
 				edges=edges[sort.list(edges[,3]),]
@@ -240,8 +240,8 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	#Likelihood function for estimating model parameters
 	dev<-function(){
 		N<-length(x[,1])
-		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight)
-		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, scaleHeight=scaleHeight,assume.station=bool)
+		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight)
+		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool)
 		if(mserr=="known"){
 			diag(V)<-diag(V)+(data[,3]^2)
 		}
@@ -276,7 +276,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	fixed.fit <- dev()
 	loglik<- -fixed.fit[[1]]
 	
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree,data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]]) 
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]])
 	class(obj)<-"OUwie.fixed"		
 	return(obj)
 }

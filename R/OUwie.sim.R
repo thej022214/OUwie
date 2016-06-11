@@ -17,7 +17,7 @@
 #multiple alphas (OUSMA): alpha=c(0.5,0.1); sigma.sq=c(0.9,0.9); theta0=0; theta=c(1,2)
 #multiple alphas and sigmas (OUSMVA): alpha=c(0.5,0.1); sigma.sq=c(0.45,0.9); theta0=0; theta=c(1,2)
 
-OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alpha, sigma.sq, theta0, theta, mserr="none"){
+OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha, sigma.sq, theta0, theta, mserr="none"){
 
 	if(simmap.tree==FALSE){
 		#This is annoying, but the second column has to be in there twice otherwise, error.
@@ -47,9 +47,9 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alph
 		int.state<-phy$node.label[-1]
 		
 		#New tree matrix to be used for subsetting regimes
-		edges=cbind(c(1:(n-1)),phy$edge,nodeHeights(phy))
+		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 		if(scaleHeight==TRUE){
-			edges[,4:5]<-edges[,4:5]/max(nodeHeights(phy))
+			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 		}
 		edges=edges[sort.list(edges[,3]),]
 
@@ -136,9 +136,9 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alph
 		root.state<-which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
 		
 		#New tree matrix to be used for subsetting regimes
-		edges=cbind(c(1:(n-1)),phy$edge,nodeHeights(phy))
+		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 		if(scaleHeight==TRUE){
-			edges[,4:5]<-edges[,4:5]/max(nodeHeights(phy))
+			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 		}
 		edges=edges[sort.list(edges[,3]),]
 		
@@ -163,7 +163,7 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, scaleHeight=FALSE, alph
 		for(i in 1:length(edges[,1])){
 			
 			if(scaleHeight==TRUE){
-				currentmap<-phy$maps[[i]]/max(nodeHeights(phy))
+				currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
 			}
 			else{
 				currentmap<-phy$maps[[i]]

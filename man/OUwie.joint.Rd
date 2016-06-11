@@ -5,8 +5,8 @@
 \usage{
 OUwie.joint(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV",
 "OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, 
-simmap.tree=FALSE, scaleHeight=FALSE, root.station=TRUE, mserr="none",
-diagn=FALSE, quiet=FALSE)
+simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, 
+root.station=TRUE, mserr="none", diagn=FALSE, quiet=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -15,6 +15,7 @@ diagn=FALSE, quiet=FALSE)
 \item{ntraits}{a numeric indicating the number of traits to analyze.}
 \item{allfree}{a logical indicating whether the parameters vary across the multiple traits (see Details). The default is \code{TRUE}.}
 \item{simmap.tree}{a logical indicating whether the input tree is in SIMMAP format. The default is \code{FALSE}.} 
+\item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{mserr}{designates whether the data matrix contains measurement error for each species value ("known"). The default is "none".}
@@ -38,6 +39,7 @@ Possible models are the same as before: single-rate Brownian motion (\code{model
 \item{$tot.state}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
+\item{$root.age}{The user-supplied age at the root of the tree.}
 \item{$opts}{Internal settings of the likelihood search}
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}

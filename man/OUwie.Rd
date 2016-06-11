@@ -4,14 +4,16 @@
 \description{Fits generalized Ornstein-Uhlenbeck-based Hansen models of continuous characters evolving under discrete selective regimes.}
 \usage{
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
-"TrendyM","TrendyMS"), simmap.tree=FALSE, scaleHeight=FALSE, root.station=TRUE,
-clade=NULL, mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE)
+"TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE, 
+root.station=TRUE, clade=NULL, mserr="none", diagn=FALSE, quiet=FALSE, 
+warn=TRUE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
 \item{data}{a data.frame containing species information (see Details).}
 \item{model}{models to fit to comparative data (see Details).}
 \item{simmap.tree}{a logical indicating whether the input tree is in SIMMAP format. The default is \code{FALSE}.} 
+\item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest (see Details).}
@@ -48,6 +50,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$tot.state}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
+\item{$root.age}{The user-supplied age at the root of the tree.}
 \item{$opts}{Internal settings of the likelihood search}
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}

@@ -12,7 +12,7 @@
 # 2. Get rid of this diagnostic stuff.
 # 3. 
 
-hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), scaleHeight=FALSE, root.station=TRUE, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
+hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), root.age=root.age, scaleHeight=FALSE, root.station=TRUE, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
 	ntips <- Ntip(phy)
 	if(warn==TRUE){
@@ -118,7 +118,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		phy.tmp$node.label <- rep(c(1:num.states), Nnode(phy.tmp))
 		trait.tmp <- data
 		trait.tmp[,2] <- rep(1, Ntip(phy.tmp))
-		init <- OUwie(phy.tmp, trait.tmp, model="OU1", quiet=TRUE, warn=FALSE)
+		init <- OUwie(phy.tmp, trait.tmp, model="OU1", root.age=root.age, quiet=TRUE, warn=FALSE)
 		init.ip <- c(init$solution[1], init$solution[2])
 		if(ouwie.model=="OUM"){
 			ip = init.ip

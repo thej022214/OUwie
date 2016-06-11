@@ -4,7 +4,7 @@
 \description{Allows the user to calculate the likelihood given a specified set of parameter values}
 \usage{
 OUwie.fixed(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), 
-simmap.tree=FALSE, scaleHeight=FALSE, root.station=TRUE, alpha=NULL, 
+simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, alpha=NULL, 
 sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 }       
 \arguments{
@@ -12,6 +12,7 @@ sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 \item{data}{a dataframe containing species information (see Details)}
 \item{model}{models to fit to comparative data (see Details).}
 \item{simmap.tree}{a logical indicating whether the input tree is in SIMMAP format. The default is \code{FALSE}.} 
+\item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated.}
 \item{alpha}{a numeric vector giving the values of \eqn{\alpha}{alpha} for each selective regime}
@@ -36,6 +37,7 @@ The input is a tree and a data file. The tree must be of class \dQuote{phylo} an
 \item{$tot.state}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
+\item{$root.age}{The user-supplied age at the root of the tree.}
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}
 \item{$root.station}{A logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated}
