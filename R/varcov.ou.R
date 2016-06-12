@@ -105,7 +105,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         vcv <- species.total.variances * vcv2
     }else{
         if(is.null(root.age)){
-            root.age = max(branching.time(phy)
+            root.age <- max(branching.time(phy))
         }
         vcv<-exp(-2*alpha[1]*max(root.age))*vcv2
     }
