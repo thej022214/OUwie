@@ -4,6 +4,12 @@
 
 OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", diagn=FALSE, quiet=FALSE){
 
+    if(is.null(root.age)){
+        if(any(branching.times(phy)<0)){
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+
 	#Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
 		data<-data.frame(data[,1], data[,2], data[,3:(2+ntraits)])

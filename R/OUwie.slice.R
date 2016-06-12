@@ -8,6 +8,12 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
         stop("Check the format of the data column. It's reading as a factor.")
     }
 
+    if(is.null(root.age)){
+        if(any(branching.times(phy)<0)){
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+
 	#Makes sure the data is in the same order as the tip labels
 	if(mserr=="none" | mserr=="est"){
 		data<-data.frame(data[,2], data[,2], row.names=data[,1])

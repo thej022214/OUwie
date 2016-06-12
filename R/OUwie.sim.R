@@ -19,6 +19,13 @@
 
 OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha, sigma.sq, theta0, theta, mserr="none"){
 
+    if(is.null(root.age)){
+        if(any(branching.times(phy)<0)){
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+
+    #Makes sure the data is in the same order as the tip labels
 	if(simmap.tree==FALSE){
 		#This is annoying, but the second column has to be in there twice otherwise, error.
         if(mserr=="none"){

@@ -4,6 +4,12 @@
 
 OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", diagn=FALSE, quiet=TRUE, warn=FALSE){
 	
+    if(is.null(root.age)){
+        if(any(branching.times(phy)<0)){
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+
 	#the matrix we are building to store the results:
 	res<-c()
 	#if alpha is NA set to a really small number -- this is only relevant for BM models:
