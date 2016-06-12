@@ -23,7 +23,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
     
     if(!is.null(starting.vals[1])){
         if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
-            if(length(starting.vals<2)){
+            if(length(starting.vals)<2){
                 stop("You only supplied one starting value. For OU models you need to supply two")
             }
         }

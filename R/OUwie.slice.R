@@ -16,7 +16,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 
     if(!is.null(starting.vals[1])){
         if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
-            if(length(starting.vals<2)){
+            if(length(starting.vals)<2){
                 stop("You only supplied one starting value. For OU models you need to supply two")
             }
         }
