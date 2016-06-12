@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
+OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
     if(is.factor(data[,2])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.")
@@ -11,6 +11,14 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
             stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+
+    if(!is.null(starting.vals[1])){
+        if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
+            if(length(starting.vals<2)){
+                stop("You only supplied one starting value. For OU models you need to supply two")
+            }
         }
     }
 
@@ -220,9 +228,12 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
         }
 		phy.tmp <- phy
 		phy.tmp$node.label <- sample(c(1:k), phy.tmp$Nnode, replace=T)
-		init <- OUwie(phy.tmp, data.tmp, model="OU1", simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, mserr=mserr, diagn=FALSE, quiet=TRUE)
-		init.ip <- c(init$solution[1,1],init$solution[2,1])
-
+        if(is.null(starting.vals)){
+            init <- OUwie(phy.tmp, data.tmp, model="OU1", simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, mserr=mserr, diagn=FALSE, quiet=TRUE)
+            init.ip <- c(init$solution[1,1],init$solution[2,1])
+        }else{
+            init.ip <- starting.vals
+        }
 		if(model=="OUMV" | model=="OUMA" | model=="OUM"){
 			ip<-c(rep(init.ip[1],length(unique(index.mat[1,]))),rep(init.ip[2],length(unique(index.mat[2,]))))
 		}
@@ -253,9 +264,13 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
         if(mserr=="known"){
             diag(C.mat)<-diag(C.mat) + (data[,2]^2)
         }
-		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
-		A<-matrix(rep(a,nrow(x)),nrow(x),ncol(x), byrow=TRUE)
-		sig<-as.numeric(t(x-A)%*%solve(C.mat)%*%(x-A)/n)
+        if(is.null(starting.vals)){
+            a <- as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
+            A <- matrix(rep(a,nrow(x)),nrow(x),ncol(x), byrow=TRUE)
+            sig <- as.numeric(t(x-A)%*%solve(C.mat)%*%(x-A)/n)
+        }else{
+            sig <- starting.vals
+        }
 		ip=rep(sig,k)
 		if(mserr=="est"){
 			ip<-c(ip,0)
@@ -343,7 +358,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		else{
 			mserr.est<-NULL
 		}	
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model,solution=solution, theta=theta$theta.est, solution.se=solution.se, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model,solution=solution, theta=theta$theta.est, solution.se=solution.se, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
 	}
 	if(diagn==FALSE){
 		solution <- matrix(out$solution[index.mat], dim(index.mat))
@@ -361,7 +376,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), model=model, param.count=param.count, solution=solution, theta=theta$theta.est, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), model=model, param.count=param.count, solution=solution, theta=theta$theta.est, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
 	}
 	class(obj)<-"OUwie.slice"		
 	return(obj)

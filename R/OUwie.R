@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA), 
 #and the multiple alphas and sigmas (OUMVA). 
 
-OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
+OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.")
@@ -18,6 +18,14 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
             stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+        }
+    }
+    
+    if(!is.null(starting.vals[1])){
+        if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
+            if(length(starting.vals<2)){
+                stop("You only supplied one starting value. For OU models you need to supply two")
+            }
         }
     }
     
@@ -383,8 +391,12 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			edges.tmp=edges
 		}
 		#Initial value for alpha is just the half life based on the entire length of the tree:
-		init <- nloptr(x0=log(c(log(2)/max(branching.times(phy)),sig)), eval_f=dev, lb=init.lower, ub=init.upper, opts=opts, index.mat=init.index.mat, edges=edges.tmp, mserr=mserr, trendy=trendy)
-		init.ip <- c(exp(init$solution[1]), exp(init$solution[2]))
+        if(is.null(starting.vals)){
+            init <- nloptr(x0=log(c(log(2)/max(branching.times(phy)),sig)), eval_f=dev, lb=init.lower, ub=init.upper, opts=opts, index.mat=init.index.mat, edges=edges.tmp, mserr=mserr, trendy=trendy)
+            init.ip <- c(exp(init$solution[1]), exp(init$solution[2]))
+        }else{
+            init.ip <- starting.vals
+        }
 		if(model=="OU1"){
 			ip=init.ip
 		}
@@ -412,7 +424,11 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		#Starting values follow from phytools:
 		C.mat<-vcv.phylo(phy)
 		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
-		sig<-as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
+        if(is.null(starting.vals)){
+            sig<-as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
+        }else{
+            sig <- starting.vals
+        }
 		#####################
 		if(model=="BMS"){
 			ip=rep(sig,k)
@@ -435,7 +451,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			}
 		}
 		if(mserr=="est"){
-			ip<-c(ip,sig)
+			ip <- c(ip,sig)
 			lower = c(lower,0)
 			upper = c(upper,10)
 		}
@@ -511,7 +527,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}		
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
 		
 	}
 	if(diagn==FALSE){
@@ -534,7 +550,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
 	}
 	class(obj)<-"OUwie"		
 	return(obj)

@@ -5,7 +5,8 @@
 \usage{
 OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
  timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE,
- mserr="none", slice.lower.bound=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE)
+ mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, 
+ quiet=FALSE, warn=TRUE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -17,6 +18,7 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{slice.lower.bound}{specifies the value of the lower bound when estimating time slices. The default is \code{NULL}, meaning the value is exp(-21).}
+\item{starting.vals}{a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.} 
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
@@ -47,6 +49,7 @@ Also note, when specifying the BMS model be mindful of the root.station flag. Wh
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}
 \item{$root.station}{A logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated}
+\item{$starting.vals}{A vector of user-supplied initial search parameters.}
 \item{$lb}{The lower bound set}
 \item{$ub}{The upper bound set}
 \item{$iterations}{Number of iterations of the likelihood search that were executed}
