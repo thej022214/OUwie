@@ -5,19 +5,19 @@
 OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
     if(is.factor(data[,2])==TRUE){
-        stop("Check the format of the data column. It's reading as a factor.")
+        stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
 
     if(!is.null(starting.vals[1])){
         if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
             if(length(starting.vals)<2){
-                stop("You only supplied one starting value. For OU models you need to supply two")
+                stop("You only supplied one starting value. For OU models you need to supply two", .call=FALSE)
             }
         }
     }
@@ -29,11 +29,11 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	}
 	if(mserr=="known"){
         if(!dim(data)[2]==3){
-            stop("You specified measurement error should be incorporated, but this information is missing")
+            stop("You specified measurement error should be incorporated, but this information is missing.", .call=FALSE)
         }
         else{
             if(is.factor(data[,3]) == TRUE){
-                stop("Check the format of the measurement error column. It's reading as a factor.")
+                stop("Check the format of the measurement error column. It's reading as a factor.", .call=FALSE)
             }else{
                 data <- data.frame(data[,2], data[,3], row.names=data[,1])
                 data <- data[phy$tip.label,]
@@ -47,7 +47,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		k<-length(timeslices)+1
 	}
 	else{
-		stop("You have not specified a timeslice")
+		stop("You have not specified a timeslice", .call=FALSE)
 	}
 	max.height <- max(MakeAgeTable(phy, root.age=root.age))
 	timeslices <- max.height - timeslices

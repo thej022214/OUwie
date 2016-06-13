@@ -12,19 +12,19 @@
 OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
     if(is.factor(data[,3])==TRUE){
-        stop("Check the format of the data column. It's reading as a factor.")
+        stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
     
     if(!is.null(starting.vals[1])){
         if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
             if(length(starting.vals)<2){
-                stop("You only supplied one starting value. For OU models you need to supply two")
+                stop("You only supplied one starting value. For OU models you need to supply two", .call=FALSE)
             }
         }
     }
@@ -36,11 +36,11 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 	}
 	if(mserr=="known"){
 		if(!dim(data)[2]==4){
-			stop("You specified measurement error should be incorporated, but this information is missing")
+			stop("You specified measurement error should be incorporated, but this information is missing", .call=FALSE)
 		}
 		else{
             if(is.factor(data[,4]) == TRUE){
-                stop("Check the format of the measurement error column. It's reading as a factor.")
+                stop("Check the format of the measurement error column. It's reading as a factor.", .call=FALSE)
             }else{
                 data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
                 data<-data[phy$tip.label,]

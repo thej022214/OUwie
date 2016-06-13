@@ -6,7 +6,7 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 	
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
 
@@ -21,7 +21,7 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 		tmp.phy<-phy
 		if(mserr=="known"){
 			if(!dim(data)[2]==4){
-				stop("You specified measurement error should be incorporated, but this information is missing")
+				stop("You specified measurement error should be incorporated, but this information is missing.", .call=FALSE)
 			}else{
 				#Now lengthen the terminal branches to reflect the intraspecific variation at the tips:
 				terminals <- tmp.phy$edge[,2] <= Ntip(tmp.phy)

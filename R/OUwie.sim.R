@@ -21,7 +21,7 @@ OUwie.sim <- function(phy, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHei
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
 

@@ -7,12 +7,12 @@
 OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
     if(is.factor(data[,3])==TRUE){
-        stop("Check the format of the data column. It's reading as a factor.")
+        stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.")
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
 
@@ -23,11 +23,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
     }
     if(mserr=="known"){
         if(!dim(data)[2]==4){
-            stop("You specified measurement error should be incorporated, but this information is missing")
+            stop("You specified measurement error should be incorporated, but this information is missing", .call=FALSE)
         }
         else{
             if(is.factor(data[,4]) == TRUE){
-                stop("Check the format of the measurement error column. It's reading as a factor.")
+                stop("Check the format of the measurement error column. It's reading as a factor.", .call=FALSE)
             }else{
                 data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
                 data<-data[phy$tip.label,]
