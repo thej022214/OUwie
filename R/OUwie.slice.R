@@ -4,6 +4,10 @@
 
 OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
+    if(model=="BMS" & root.station==TRUE){
+        warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
+    }
+
     if(is.factor(data[,2])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
