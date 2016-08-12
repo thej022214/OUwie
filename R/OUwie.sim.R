@@ -19,6 +19,9 @@
 
 OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", fitted.object=NULL){
   if(!is.null(fitted.object)) {
+    if(grepl("BM", fitted.object$model) | grepl("OU1", fitted.object$model)) {
+      stop(paste("not implemented yet for ", fitted.object$model))
+    }
     if(!is.null(alpha) | !is.null(theta0) | !is.null(theta)) {
       stop("You're passing in parameters to simulate from AND a fitted object to simulate under. You can do one or the other")
     }
