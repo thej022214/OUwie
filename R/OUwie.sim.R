@@ -23,7 +23,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
       stop("You're passing in parameters to simulate from AND a fitted object to simulate under. You can do one or the other")
     }
     phy <- fitted.object$phy
-    data <- fitted.object$data
+    data <- cbind(phy$tip.label, fitted.object$data)
     alpha <- fitted.object$solution['alpha',]
     alpha[which(is.na(alpha))] <- 0
     sigma.sq <- fitted.object$solution['sigma.sq',]
