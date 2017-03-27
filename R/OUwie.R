@@ -99,12 +99,12 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 	if(simmap.tree==FALSE){
 		#Obtain a a list of all the regime states. This is a solution for instances when tip states and
 		#the internal nodes are not of equal length:
-		tot.states<-factor(c(phy$node.label,as.character(data[,1])))
-		k<-length(levels(tot.states))
-		int.states<-factor(phy$node.label)
+		tot.states <- factor(c(phy$node.label,as.character(data[,1])))
+		k <- length(levels(tot.states))
+		int.states <- factor(phy$node.label)
 		phy$node.label=as.numeric(int.states)
-		tip.states<-factor(data[,1])
-		data[,1]<-as.numeric(tip.states)
+		tip.states <- factor(data[,1])
+		data[,1] <- as.numeric(tip.states)
 
 		#A boolean for whether the root theta should be estimated -- default is that it should be.
 		root.station=root.station
@@ -144,7 +144,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 				edges=edges[sort.list(edges[,3]),]
 
 				mm<-c(data[,1],int.state)
-				regime <- matrix(0,nrow=length(mm),ncol=length(unique(mm)))
+				regime <- matrix(0,nrow=length(mm),ncol=k)
 				#Generates an indicator matrix from the regime vector
 				for (i in 1:length(mm)) {
 					regime[i,mm[i]] <- 1
@@ -157,7 +157,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		edges=edges[sort.list(edges[,1]),]
 	}
 
-	#Initializes an integer specifying whether or not the trendy model is to be invoked. Assume 0, unless otherwise stated later:
+    #Initializes an integer specifying whether or not the trendy model is to be invoked. Assume 0, unless otherwise stated later:
 	trendy=0
 	#Data:
 	x<-as.matrix(data[,2])
@@ -305,7 +305,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 	}
 
 	#Likelihood function for estimating model parameters
-	dev<-function(p, index.mat, edges, mserr, trendy){
+	dev <- function(p, index.mat, edges, mserr, trendy){
 
 		p <- exp(p)
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
@@ -382,7 +382,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		init.index.mat<-matrix(0,2,k)
 		init.index.mat[1,1:k]<-1
 		init.index.mat[2,1:k]<-2
-		if(model == "OU1" | model == "OUM"){
+		if(model == "OU1"){
 			edges.tmp=edges
 			if(dim(edges.tmp)[2] < 6){
 				edges.tmp <- cbind(edges.tmp, rep(1, length(edges.tmp[,1])))
@@ -394,6 +394,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		}else{
 			edges.tmp=edges
 		}
+
 		#Initial value for alpha is just the half life based on the entire length of the tree:
         if(is.null(starting.vals)){
             init <- nloptr(x0=log(c(log(2)/max(branching.times(phy)),sig)), eval_f=dev, lb=init.lower, ub=init.upper, opts=opts, index.mat=init.index.mat, edges=edges.tmp, mserr=mserr, trendy=trendy)
@@ -426,10 +427,10 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			phy$edge.length<-(phy$edge.length/d)
 		}
 		#Starting values follow from phytools:
-		C.mat<-vcv.phylo(phy)
-		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
+		C.mat <- vcv.phylo(phy)
+		a <- as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
         if(is.null(starting.vals)){
-            sig<-as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
+            sig <- as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
         }else{
             sig <- starting.vals
         }
@@ -487,8 +488,16 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		tmp$res<-W%*%theta-x
 		#Joins the vector of thetas with the vector of standard errors into a 2 column matrix for easy extraction at the summary stage
 		tmp$theta.est<-cbind(theta,se)
-		#Returns final GLS solution
-		tmp
+        
+        #Calculates R-sq according to Judge et al. 1985 eq. 2.3.16:
+        residuals <- tmp$res
+        fitted.vals <- W%*%theta
+        Y <- residuals + fitted.vals
+        one <- matrix(1, length(Y), 1)
+        a <- as.numeric(pseudoinverse(t(one) %*% pseudoinverse(V) %*% one) %*% (t(one) %*% pseudoinverse(V) %*% Y))
+        Rsq <- 1-(t(residuals) %*% pseudoinverse(V) %*% residuals) / (t(Y-a) %*% pseudoinverse(V) %*% (Y-a))
+		tmp$Rsq <- Rsq
+        return(tmp)
 	}
 
 	#Informs the user that the summarization has begun, output model-dependent and dependent on whether the root theta is to be estimated
@@ -531,7 +540,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, eigval=eigval, eigvect=eigvect)
 
 	}
 	if(diagn==FALSE){
@@ -554,7 +563,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq)
 	}
 	class(obj)<-"OUwie"
 	return(obj)
