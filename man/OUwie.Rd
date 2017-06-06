@@ -43,6 +43,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$loglik}{the maximum log-likelihood.}
 \item{$AIC}{Akaike information criterion.}
 \item{$AICc}{Akaike information criterion corrected for sample-size.}
+\item{$BIC}{Bayesian information criterion.}
 \item{$model}{The model being fit}
 \item{$param.count}{The number of parameters counted in the model.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}

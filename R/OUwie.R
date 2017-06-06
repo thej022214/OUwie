@@ -488,7 +488,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		tmp$res<-W%*%theta-x
 		#Joins the vector of thetas with the vector of standard errors into a 2 column matrix for easy extraction at the summary stage
 		tmp$theta.est<-cbind(theta,se)
-        
+
         #Calculates R-sq according to Judge et al. 1985 eq. 2.3.16:
         residuals <- tmp$res
         fitted.vals <- W%*%theta
@@ -540,7 +540,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, eigval=eigval, eigvect=eigvect)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, eigval=eigval, eigvect=eigvect)
 
 	}
 	if(diagn==FALSE){
@@ -563,7 +563,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq)
 	}
 	class(obj)<-"OUwie"
 	return(obj)
@@ -572,8 +572,8 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 print.OUwie<-function(x, ...){
 
 	ntips=Ntip(x$phy)
-	output<-data.frame(x$loglik,x$AIC,x$AICc,x$model,ntips, row.names="")
-	names(output)<-c("lnL","AIC","AICc","model","ntax")
+	output<-data.frame(x$loglik,x$AIC,x$AICc,x$BIC,x$model,ntips, row.names="")
+	names(output)<-c("lnL","AIC","AICc","BIC","model","ntax")
 	cat("\nFit\n")
 	print(output)
 	cat("\n")
