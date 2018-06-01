@@ -618,6 +618,9 @@ print.OUwie<-function(x, ...){
 				cat("\nOptima\n")
 				print(theta.mat)
 				cat("\n")
+				cat("\nHalf life (another way of reporting alpha)\n")
+				print(log(2)/param.est['alpha',])
+				cat("\n")
 			}
 		}
 		if (x$root.station == TRUE){
@@ -637,6 +640,9 @@ print.OUwie<-function(x, ...){
 				cat("Optima\n")
 				print(theta.mat)
 				cat("\n")
+				cat("\nHalf life (another way of reporting alpha)\n")
+				print(log(2)/param.est['alpha',])
+				cat("\n")
 			}
 		}
 		if (x$root.station == FALSE){
@@ -655,6 +661,9 @@ print.OUwie<-function(x, ...){
 				cat("\n")
 				cat("Optima\n")
 				print(theta.mat)
+				cat("\n")
+				cat("\nHalf life (another way of reporting alpha)\n")
+				print(log(2)/param.est['alpha',])
 				cat("\n")
 			}
 		}
