@@ -6,6 +6,25 @@
 
 ## NOTE THIS IS NOT WORKING YET.
 
+# Idea is to take a tree, add tips at each node, add tips to the data (including figuring out regimes), and optimize the data for these made up tips. Take in OUwie object
+
+attach.stub.taxon <- function(node, phy, tip.name=NULL) {
+  if(is.null(tip.name)) {
+    tip.name <- paste0("node_", node)
+  }
+  return(ape::bind.tree(phy, structure(list(edge = structure(c(2L, 1L), .Dim = 1:2), tip.label = tip.name, Nnode = 1L, edge.length = 0), .Names = c("edge", "tip.label", "Nnode", "edge.length"), class = "phylo"), where=node))
+}
+
+attach.stub.taxa <- function(phy) {
+    root.node <- ape::Ntip(phy)+1
+    start.node <- root.node+1
+    n.node.not.root <- ape::Nnode(phy)-1
+    for (i in sequence(n.node.not.root)) {
+        phy <- attach.stub.taxon(start.node + 2*(i-1), phy, tip.name = paste0("node_", root.node+i)) #all the node numbers go up by one as we add tips
+    }
+    return(phy)
+}
+
 OUwie.anc<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
     if(is.factor(data[,3])==TRUE){
