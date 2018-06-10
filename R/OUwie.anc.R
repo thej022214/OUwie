@@ -25,6 +25,27 @@ attach.stub.taxa <- function(phy) {
     return(phy)
 }
 
+add.stub.taxon.to.data <- function(taxon, phy, data) {
+    data[,1] <- as.character(data[,1])
+    new.row <- data[1,]
+    new.row[1,] <- NA
+    new.row[1,1] <- taxon
+    taxon.id <- which(phy$tip.label==taxon)
+    focal.node.id <- phy$edge[which(phy$edge[,2]==taxon.id),1]
+    new.row[1,2] <- phy$node.label[focal.node.id - ape::Ntip(phy)]
+    return(rbind(data, new.row))
+}
+
+add.stub.taxa.to.data <- function(phy, data) {
+    taxa.to.add <- phy$tip.label[grepl("node_", phy$tip.label)]
+    for (i in sequence(length(taxa.to.add))) {
+        data <- add.stub.taxon.to.data(taxa.to.add[i], phy, data)
+    }
+    return(data)
+}
+
+
+
 OUwie.anc<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
     if(is.factor(data[,3])==TRUE){
