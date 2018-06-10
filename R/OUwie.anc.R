@@ -81,5 +81,15 @@ OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX
 plot.OUwieRecon <- function(x, ...) {
     quantitative.trait <- x$data[,2]
     names(quantitative.trait) <- rownames(x$data)
+    user.recons <- rep(NA, ape::Nnode(x$phy))
+    for(i in sequence(ape::Nnode(x$phy))) {
+        if(i==1) { #we're at the root
+            user.recons[1] <- x$theta[min(nrow(theta), x$phy$node.label[1]),1] #so get the estimate for the regime of there are more than one, otherwise, BM
+        } else {
+            node.index <- i+ape::Ntip(x$phy)
+            # match up here
+            user.recons[i] <- x$data[which(x$phy,2]
+        }
+    }
     phytools::contMap(x$phy,quantitative.trait)
 }
