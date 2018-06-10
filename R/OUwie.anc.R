@@ -48,12 +48,33 @@ add.stub.taxa.to.data <- function(phy, data) {
     return(data)
 }
 
-
-anc.likelihood <- function(x, fitted.OUwie.object) {
-    fitted.OUwie.object$data[grepl("node_", fitted.OUwie.object$data[,1]),3] <- x
-    return(OUwie.fixed(fitted.OUwie.object$phy,fitted.OUwie.object$data, fitted.OUwie.object$model,fitted.OUwie.object$simmap.tree, fitted.OUwie.object$root.age, fitted.OUwie.object$scaleHeight,fitted.OUwie.object$root.station, fitted.OUwie.object$alpha, fitted.OUwie.object$sigma.sq, fitted.OUwie.object$theta, fitted.OUwie.object$clade, fitted.OUwie.object$mserr, quiet=TRUE))
+#So, OUwie data going in has a col for taxon names. Coming out of OUwie (and saved in OUwie object), it has rownames instead. So use these functions. Convert the OUwie object to have a regular OUwie formatted input
+ouwie.col.to.row.names <- function(x) {
+    rownames(x) <- x[,1]
+    return(x[,-1])
 }
 
-OUwie.anc<-function(fitted.OUwie.object){
-    nloptr(x0=rep(median(fitted.OUwie.object$data[,3], na.rm=TRUE), sum(grepl("node_", data[,1]))), eval_f=likelihood, _____)
+ouwie.row.names.to.col <- function(x) {
+    return(cbind(Genus_species=rownames(x), x))
+}
+
+
+
+anc.likelihood <- function(x, fitted.OUwie.object) {
+    traits <- fitted.OUwie.object$data
+    traits[grepl("node_", traits[,1]),3] <- x
+    #model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
+    return(-1*OUwie.fixed(phy=fitted.OUwie.object$phy,data=traits, model=fitted.OUwie.object$model, simmap.tree=fitted.OUwie.object$simmap.tree, root.age=fitted.OUwie.object$root.age, scaleHeight=FALSE, root.station=fitted.OUwie.object$root.station, alpha=fitted.OUwie.object$solution['alpha',], sigma.sq=fitted.OUwie.object$solution['sigma.sq',], theta=fitted.OUwie.object$theta[,1], clade=NULL, mserr=ifelse(is.null(fitted.OUwie.object$mserr.est), "none", fitted.OUwie.object$mserr.est), quiet=TRUE)$loglik)
+}
+
+OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)){
+    fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
+    fitted.OUwie.object$data <- add.stub.taxa.to.data(fitted.OUwie.object$phy, ouwie.row.names.to.col(fitted.OUwie.object$data))
+    traits <- fitted.OUwie.object$data
+    result <- nloptr(x0=rep(median(traits[,3], na.rm=TRUE), sum(grepl("node_", traits[,1]))), eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=fitted.OUwie.object)
+    traits <- rownames(traits[,1])
+    traits[grepl("node_", traits[,1]),3] <- result$solution
+    traits <- traits[,-1]
+    fitted.OUwie.object$data <- traits
+    return(result)
 }
