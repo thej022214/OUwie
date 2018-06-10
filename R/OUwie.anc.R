@@ -67,14 +67,19 @@ anc.likelihood <- function(x, fitted.OUwie.object) {
     return(-1*OUwie.fixed(phy=fitted.OUwie.object$phy,data=traits, model=fitted.OUwie.object$model, simmap.tree=fitted.OUwie.object$simmap.tree, root.age=fitted.OUwie.object$root.age, scaleHeight=FALSE, root.station=fitted.OUwie.object$root.station, alpha=fitted.OUwie.object$solution['alpha',], sigma.sq=fitted.OUwie.object$solution['sigma.sq',], theta=fitted.OUwie.object$theta[,1], clade=NULL, mserr=ifelse(is.null(fitted.OUwie.object$mserr.est), "none", fitted.OUwie.object$mserr.est), quiet=TRUE)$loglik)
 }
 
-OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="100000", "ftol_rel"=.Machine$double.eps^0.5)){
     fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
     fitted.OUwie.object$data <- add.stub.taxa.to.data(fitted.OUwie.object$phy, ouwie.row.names.to.col(fitted.OUwie.object$data))
     traits <- fitted.OUwie.object$data
     result <- nloptr(x0=rep(median(traits[,3], na.rm=TRUE), sum(grepl("node_", traits[,1]))), eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=fitted.OUwie.object)
-    traits <- rownames(traits[,1])
     traits[grepl("node_", traits[,1]),3] <- result$solution
-    traits <- traits[,-1]
-    fitted.OUwie.object$data <- traits
-    return(result)
+    fitted.OUwie.object$data <- ouwie.col.to.row.names(traits)
+    class(fitted.OUwie.object) <- c("OUwieRecon", "OUwie")
+    return(fitted.OUwie.object)
+}
+
+plot.OUwieRecon <- function(x, ...) {
+    quantitative.trait <- x$data[,2]
+    names(quantitative.trait) <- rownames(x$data)
+    phytools::contMap(x$phy,quantitative.trait)
 }
