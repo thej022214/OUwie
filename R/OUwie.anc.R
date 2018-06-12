@@ -88,7 +88,7 @@ plot.OUwieRecon <- function(x, ...) {
         } else {
             node.index <- i+ape::Ntip(x$phy)
             # match up here
-            user.recons[i] <- x$data[which(x$phy,2]
+            user.recons[i] <- x$data[which(x$phy$edges[,2]==node.index)]
         }
     }
     x$phy <- ape::drop.tip(x$phy, x$phy$tip.label[grepl("node_",x$phy$tip.label)])
