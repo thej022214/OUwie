@@ -91,5 +91,7 @@ plot.OUwieRecon <- function(x, ...) {
             user.recons[i] <- x$data[which(x$phy,2]
         }
     }
-    phytools::contMap(x$phy,quantitative.trait)
+    x$phy <- ape::drop.tip(x$phy, x$phy$tip.label[grepl("node_",x$phy$tip.label)])
+    pruned <- geiger::treedata(x$phy, quantitative.trait, warnings=FALSE, sort=TRUE)
+    phytools::contMap(pruned$phy, pruned$data, method="user", anc.states=user.recons)
 }
