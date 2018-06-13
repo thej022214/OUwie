@@ -67,7 +67,7 @@ anc.likelihood <- function(x, fitted.OUwie.object) {
     return(-1*OUwie.fixed(phy=fitted.OUwie.object$phy,data=traits, model=fitted.OUwie.object$model, simmap.tree=fitted.OUwie.object$simmap.tree, root.age=fitted.OUwie.object$root.age, scaleHeight=FALSE, root.station=fitted.OUwie.object$root.station, alpha=fitted.OUwie.object$solution['alpha',], sigma.sq=fitted.OUwie.object$solution['sigma.sq',], theta=fitted.OUwie.object$theta[,1], clade=NULL, mserr=ifelse(is.null(fitted.OUwie.object$mserr.est), "none", fitted.OUwie.object$mserr.est), quiet=TRUE)$loglik)
 }
 
-OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="100000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
     fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
     fitted.OUwie.object$data <- add.stub.taxa.to.data(fitted.OUwie.object$phy, ouwie.row.names.to.col(fitted.OUwie.object$data))
     traits <- fitted.OUwie.object$data
@@ -84,11 +84,11 @@ plot.OUwieRecon <- function(x, ...) {
     user.recons <- rep(NA, ape::Nnode(x$phy))
     for(i in sequence(ape::Nnode(x$phy))) {
         if(i==1) { #we're at the root
-            user.recons[1] <- x$theta[min(nrow(theta), x$phy$node.label[1]),1] #so get the estimate for the regime of there are more than one, otherwise, BM
+            user.recons[1] <- x$theta[min(nrow(x$theta), x$phy$node.label[1]),1] #so get the estimate for the regime of there are more than one, otherwise, BM
         } else {
-            node.index <- i+ape::Ntip(x$phy)
+            node.index <- i+ape::Ntip(x$phy)-sum(grepl("node_", x$phy$tip.label))
             # match up here
-            user.recons[i] <- x$data[which(x$phy$edges[,2]==node.index)]
+            user.recons[i] <- x$data[paste0("node_", node.index),2]
         }
     }
     x$phy <- ape::drop.tip(x$phy, x$phy$tip.label[grepl("node_",x$phy$tip.label)])
