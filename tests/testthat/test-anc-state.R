@@ -3,9 +3,6 @@ context("test-anc-state.R")
 test_that("ancestral state estimation works", {
   data("tworegime")
   fitted <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE)
-  recon <- OUwie.anc(fitted)
-  plot(recon)
-  phy.stubbed <- attach.stub.taxa(fitted$phy)
-  data.stubbed <- add.stub.taxa.to.data(phy.stubbed, fitted$data)
-
+  recon <- OUwie.anc(fitted, knowledge=TRUE)
+  expect_s3_class(recon, "OUwie.anc")
 })
