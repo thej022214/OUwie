@@ -331,9 +331,9 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			#However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
 			if(!is.finite(DET)){
 				DET <- determinant(V, logarithm=TRUE)
-				logl <- -.5*(t(W%*%theta-x)%*%pseudoinverse(V)%*%(W%*%theta-x))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
+				logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
 			}else{
-				logl <- -.5*(t(W%*%theta-x)%*%pseudoinverse(V)%*%(W%*%theta-x))-.5*as.numeric(DET)-.5*(N*log(2*pi))
+				logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET)-.5*(N*log(2*pi))
 			}
 		}else{
 			E_a <- Inf
@@ -345,9 +345,9 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 			#However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
 			if(!is.finite(DET)){
 				DET <- determinant(V, logarithm=TRUE)
-				logl <- -.5*(t(E_a-x)%*%pseudoinverse(V)%*%(E_a-x))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
+				logl <- -.5*(t(x-E_a)%*%pseudoinverse(V)%*%(x-E_a))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
 			}else{
-				logl <- -.5*(t(E_a-x)%*%pseudoinverse(V)%*%(E_a-x))-.5*as.numeric(DET)-.5*(N*log(2*pi))
+				logl <- -.5*(t(x-E_a)%*%pseudoinverse(V)%*%(x-E_a))-.5*as.numeric(DET)-.5*(N*log(2*pi))
 			}
 		}
 		#When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
