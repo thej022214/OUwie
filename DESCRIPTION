@@ -1,10 +1,10 @@
 Package: OUwie
 Version: 1.53
-Data: 2019-06-10
+Date: 2019-06-10
 Title: Analysis of Evolutionary Rates in an OU Framework
 Author: Jeremy M. Beaulieu <jbeaulieu@nimbios.org>, Brian O'Meara <bomeara@utk.edu>
 Maintainer: Jeremy Beaulieu <jbeaulieu@nimbios.org>
-Depends: R (>= 3.2.0), ape, nloptr, lattice, grDevices
+Depends: R (>= 3.2.0), ape, nloptr, lattice, grDevices, geiger
 Imports: numDeriv, corpcor, phytools, paleotree, phangorn, stats, expm, corHMM, Rmpfr
 Description: Calculates and compares rate differences of continuous character evolution under Brownian motion and a new set of Ornstein-Uhlenbeck based Hansen models that allow the strength of selection and stochastic motion to vary across selective regimes.
 License: GPL (>= 2)

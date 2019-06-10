@@ -59,6 +59,7 @@ Also note, when specifying the BMS model be mindful of the root.station flag. Wh
 \item{$eigvect}{The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details)}
 }
 \examples{
+\donttest{
 data(tworegime)
 
 ##Here we want a fixed slice at T=2, assuming the present is T=0:
@@ -82,7 +83,7 @@ data(tworegime)
 
 ##Fit an BMS model with an unknown and a fixed timeslice:
 #ppBM<-OUwie.slice(tree,trait[,c(1,3)],model=c("BMS"), root.station=TRUE, timeslices=c(NA,2))
-
+}
 }
 \references{
 Beaulieu J.M., and O'Meara B.C. In prep.

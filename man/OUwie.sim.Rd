@@ -43,6 +43,7 @@ With a fitted OUwie model, it just uses the parameters from that, ignoring any a
 A dataframe containing, as column entries, [,1] species names, [,2] current regime, [,3] simulated continuous trait, x.
 }
 \examples{
+\donttest{
 data(sim.ex)
 
 #Simulate an Ornstein-Uhlenbeck model with different state means
@@ -59,5 +60,6 @@ alpha=alpha,sigma.sq=sigma.sq,theta0=theta0,theta=theta)
 result <- OUwie(tree, sim.data, model="OUMVA", simmap.tree=FALSE,scaleHeight=FALSE)
 sim.data.2 <- OUwie.sim(fitted.object=result)
 
+}
 }
 \author{Jeremy M. Beaulieu and Brian C. O'Meara}

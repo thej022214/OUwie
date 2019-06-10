@@ -67,6 +67,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$eigvect}{The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details)}
 }
 \examples{
+\donttest{
 data(tworegime)
 
 #Plot the tree and the internal nodes to highlight the selective regimes:
@@ -86,7 +87,7 @@ nodelabels(pch=21, bg=select.reg)
 
 #Fit an OU model based on a clade of interest:
 #OUwie(tree,trait,model=c("OUMV"), root.station=TRUE, clade=c("t50", "t64"))
-
+}
 }
 \references{
 Beaulieu J.M., Jhwueng D.C., Boettiger C., and O'Meara B.C. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution 66:2369-2383.

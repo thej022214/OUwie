@@ -40,6 +40,8 @@ Note that if \code{root.station} is \code{TRUE} (the default), \eqn{\theta_0}{th
 
 }
 \examples{
+\donttest{
+
 data(tworegime)
 
 ##First step is estimate parameters under a particular model:
@@ -52,6 +54,7 @@ data(tworegime)
 ##Finally summarize to obtain the desired confidence -- here is the 95% CI:
 #apply(boot.reps, 2, quantile, probs=c(0.025,0.975))
 
+}
 }
 \references{
 Beaulieu J.M., Jhwueng D.C., Boettiger C., and O'Meara B.C. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution 66:2369-2383.

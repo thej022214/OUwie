@@ -45,6 +45,7 @@ The input is a tree and a data file. The tree must be of class \dQuote{phylo} an
 }
 
 \examples{
+\donttest{
 data(tworegime)
 
 #Calculate the likelihood based on known values of
@@ -55,5 +56,6 @@ theta=c(1.678196,0.4185894)
 
 OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE,
 clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta)
+}
 }
 \author{Jeremy M. Beaulieu}

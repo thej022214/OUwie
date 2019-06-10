@@ -50,6 +50,7 @@ Possible models are the same as before: single-rate Brownian motion (\code{model
 \item{$ntraits}{Number of traits optimized}
 }
 \examples{
+\donttest{
 #data(tworegime)
 
 #trait1 <- OUwie.sim(tree,trait, alpha=pp$solution[1,], 
@@ -63,6 +64,7 @@ Possible models are the same as before: single-rate Brownian motion (\code{model
 
 ##Now fit a OUMV model applied to each separately, but optimized jointly:
 #oumv.joint <- OUwie.joint(tree,trait.multi, model="OUMV", ntraits=2, allfree=TRUE)
+}
 }
 \references{
 
