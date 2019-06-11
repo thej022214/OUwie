@@ -1,5 +1,5 @@
-[![](http://www.r-pkg.org/badges/version/OUwie)](http://www.r-pkg.org/pkg/OUwie)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/OUwie)](http://www.r-pkg.org/pkg/OUwie)
+[![](https://www.r-pkg.org/badges/version/OUwie)](https://www.r-pkg.org/pkg/OUwie)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/OUwie)](https://www.r-pkg.org/pkg/OUwie)
 
 
 ### Installation
@@ -13,7 +13,7 @@ install.packages("OUwie")
 
 #### Development version from GitHub
 
-Windows users install [Rtools](http://cran.r-project.org/bin/windows/Rtools/) first.
+Windows users install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.
 
 
 ```r
