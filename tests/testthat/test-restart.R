@@ -1,0 +1,8 @@
+context("test-restart.R")
+
+test_that("restarting works", {
+  data("tworegime")
+  fitted1 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="5", "ftol_rel"=.1))
+  fitted2 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, starting.vals=fitted1$new.start)
+  testthat::expect_lt(fitted2$AIC, fitted1$AIC)
+})

@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA),
 #and the multiple alphas and sigmas (OUMVA).
 
-OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
+OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
 
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
@@ -366,7 +366,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 	lower = rep(-20, np)
 	upper = rep(20, np)
 
-	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
+	#opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
 
 	if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		if(scaleHeight==TRUE){
@@ -467,6 +467,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 	}
 	loglik <- -out$objective
 	out$solution = exp(out$solution)
+	out$new.starting <- out$solution # note: back in regular param space, not log space used in the search
 	#Takes estimated parameters from dev and calculates theta for each regime:
 	dev.theta<-function(p, index.mat, edges=edges, mserr=mserr){
 		tmp<-NULL
@@ -540,7 +541,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, eigval=eigval, eigvect=eigvect)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, eigval=eigval, eigvect=eigvect, new.start=out$new.start)
 
 	}
 	if(diagn==FALSE){
@@ -563,7 +564,7 @@ OUwie<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 		else{
 			mserr.est<-NULL
 		}
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, new.start=out$new.start)
 	}
 	class(obj)<-"OUwie"
 	return(obj)

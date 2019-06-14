@@ -6,7 +6,7 @@
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
 root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE,
-quiet=FALSE, warn=TRUE)
+quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -22,6 +22,7 @@ quiet=FALSE, warn=TRUE)
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
+\item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }
 \details{
 This function fits various likelihood models for continuous characters evolving under discrete selective regimes. The function returns parameter estimates and their approximate standard errors. The R package \code{nloptr} provides a common interface to NLopt, an open-source library for nonlinear optimization. The likelihood function is maximized using the bounded subplex optimization routine (\code{NLOPT_LN_SBPLX}). As input all \code{OUwie} requires is a tree and a trait data.frame. The tree must be of class \dQuote{phylo} and must contain the ancestral selective regimes as internal node labels. Internal node labels can be applied manually or from some sort of ancestral state reconstruction procedure (BayesTraits, \code{ape}, \code{diversitree}, SIMMAP, etc.), which would then be brought into OUwie. This is essentially what is required by \code{ouch} and Brownie (though Brownie provides built-in ancestral state reconstruction capabilities). The trait data.frame must have column entries in the following order: [,1] species names, [,2] current selective regime, and [,3] the continuous trait of interest. Alternatively, if the user wants to incorporate measurement error (\code{mserr}="known"), then a fourth column, [,4] must be included that provides the standard error estimates for each species mean. However, a global measurement error for all taxa can be estimated from the data (\code{mserr}="est"); is not well tested, so use at your own risk. Also, a user can specify a particular clade as being in a different selective regime, by inputting a pair of species whose mrca is the root of the clade of interest [e.g., \code{clade}=c("taxaA","taxaB")]. OUwie will automatically assign internal node labels and update the data matrix according to this clade designation.
@@ -65,6 +66,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$res}{A vector of residuals from the model fit.  The residuals are ordered in the same way as the tips in the tree.}
 \item{$eigval}{The eigenvalues from the decomposition of the Hessian of the likelihood function. If any \code{eigval<0} then one or more parameters were not optimized during the likelihood search (see Details)}
 \item{$eigvect}{The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details)}
+\item{$new.start}{The vector of values to use if you want to restart the run from this point (starting.vals for a new run)}
 }
 \examples{
 \donttest{
@@ -77,16 +79,37 @@ select.reg[tree$node.label == 2] <- "red"
 plot(tree)
 nodelabels(pch=21, bg=select.reg)
 
-#Not run
+}
+
+\dontrun{
 #To see the first 5 lines of the data matrix to see what how to
 #structure the data:
-#trait[1:5,]
+trait[1:5,]
 
 #Now fit an OU model that allows different sigma^2:
-#OUwie(tree,trait,model=c("OUMV"),root.station=TRUE)
+OUwie(tree,trait,model=c("OUMV"),root.station=TRUE)
 
 #Fit an OU model based on a clade of interest:
-#OUwie(tree,trait,model=c("OUMV"), root.station=TRUE, clade=c("t50", "t64"))
+OUwie(tree,trait,model=c("OUMV"), root.station=TRUE, clade=c("t50", "t64"))
+
+#For large trees, it may be useful to have ways to restart the search (due to
+#finite time per run on a computing cluster, for example). You can do this
+#by changing settings of OUwie runs. For example:
+
+run1 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
+list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_rel"=.Machine$double.eps^0.5))
+
+save(run1, file="run1.rda")
+
+#Then, later or in a different session:
+
+load("run1.rda")
+
+run2 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
+list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_rel"=.Machine$double.eps^0.5),
+starting.vals=run1$new.start)
+
+#run2 will start off where run1 stopped.
 }
 }
 \references{
