@@ -1,4 +1,4 @@
-export(OUwie,OUwie.sim,OUwie.fixed,OUwie.slice,OUwie.boot,OUwie.joint, OUwie.anc)
+export(OUwie,OUwie.sim,OUwie.fixed,OUwie.slice,OUwie.boot,OUwie.joint, OUwie.anc, fix.kappa)
 import(ape, nloptr, corpcor, lattice, grDevices, geiger)
 importFrom(phytools, make.era.map)
 importFrom(numDeriv, hessian)
