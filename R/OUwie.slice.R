@@ -3,7 +3,7 @@
 #written by Jeremy M. Beaulieu
 
 OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, quiet=FALSE, warn=TRUE){
-	
+
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
     }
@@ -44,7 +44,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
             }
         }
 	}
-    
+
 	simmap.tree<-TRUE
 	#How many regimes and timeslices from the input
 	if(any(timeslices>0, na.rm=T) | any(is.na(timeslices))){
@@ -60,23 +60,23 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	#Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
-	
+
 	#A boolean for whether the root theta should be estimated -- default is that it should be.
 	root.station=root.station
 	#Obtains the state at the root
 	root.state=1
 	##Begins the construction of the edges matrix -- similar to the ouch format##
 	edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
-	
+
 	if(scaleHeight==TRUE){
 		edges[,4:5]<-edges[,4:5]/max.height
 	}
 	edges=edges[sort.list(edges[,3]),]
-	
+
 	#Resort the edge matrix so that it looks like the original matrix order
 	edges=edges[sort.list(edges[,1]),]
 	x <- as.matrix(data[,1])
-	
+
 	#Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
 		index.mat<-matrix(0,2,k)
@@ -95,7 +95,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 			}
 			if(root.station==FALSE){
 				param.count<-np+1
-			}			
+			}
 			bool=root.station
 		}
 		if (model == "OUM"){
@@ -182,7 +182,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		N<-length(x[,1])
 		V<-varcov.ou(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight)
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool)
-		if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(10000000)		
+		if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(10000000)
 		if(mserr=="known"){
 			diag(V)<-diag(V) + (data[,2]^2)
 		}
@@ -191,6 +191,9 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		theta<-Inf
 		try(theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x, silent=TRUE)
+		if(length(theta)==0) {
+			return(10000000)
+		}
 		if(any(theta==Inf)){
 			return(10000000)
 		}
@@ -205,16 +208,16 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		if(!is.finite(logl)){
 			return(10000000)
-		}		
+		}
 		return(-logl)
 	}
-	
+
 	if(quiet==FALSE){
 		cat("Initializing...", "\n")
 	}
     if(is.null(slice.lower.bound)){
         slice.lower.bound = 0.00001
-    }    
+    }
 	lb = -20
 	ub = 20
 	lower = rep(lb, np)
@@ -262,7 +265,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		if(scaleHeight==TRUE){
 			d <- max(diag(vcv.phylo(phy)))
 			phy$edge.length<-(phy$edge.length/d)
-		}		
+		}
 		#Starting values follow from phytools:
 		C.mat<-vcv.phylo(phy)
         if(mserr=="known"){
@@ -289,7 +292,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		out = nloptr(x0=log(ip), eval_f=dev.slice, lb=lower, ub=upper, opts=opts, index.mat=index.mat, timeslices=timeslices, mserr=mserr)
 	}
-	
+
 	loglik <- -out$objective
 	out$solution = exp(out$solution)
 	#Takes estimated parameters from dev and calculates theta for each regime:
@@ -304,7 +307,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		N<-length(x[,1])
 		V<-varcov.ou(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight)
 		W<-weight.mat(phy.sliced, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool)
-		
+
 		if(mserr=="known"){
 			diag(V)<-diag(V)+(data[,2]^2)
 		}
@@ -324,7 +327,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	}
 	#Informs the user that the summarization has begun, output model-dependent and dependent on whether the root theta is to be estimated
 	if(quiet==FALSE){
-		cat("Finished. Summarizing results.", "\n")	
+		cat("Finished. Summarizing results.", "\n")
 	}
     if(any(is.na(timeslices))){
         param.count <- param.count + sum(is.na(timeslices))
@@ -336,7 +339,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	timeslices <- timeslices[order(timeslices, decreasing=FALSE)]
 	phy.sliced<-make.era.map(phy,timeslices)
 	tot.states<-factor(colnames(phy.sliced$mapped.edge))
-	
+
 	#Calculates the Hessian for use in calculating standard errors and whether the maximum likelihood solution was found
 	if(diagn==TRUE){
 		h <- hessian(x=out$solution, func=dev.slice, index.mat=index.mat, timeslices=timeslices, mserr=mserr)
@@ -349,10 +352,10 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		if(simmap.tree==TRUE){
 			colnames(solution) <- colnames(solution.se) <- c(colnames(phy.sliced$mapped.edge))
-		}				
+		}
 		#Eigendecomposition of the Hessian to assess reliability of likelihood estimates
 		hess.eig <- eigen(h,symmetric=TRUE)
-		#If eigenvect is TRUE then the eigenvector and index matrix will appear in the list of objects 
+		#If eigenvect is TRUE then the eigenvector and index matrix will appear in the list of objects
 		eigval <- signif(hess.eig$values,2)
 		eigvect <- round(hess.eig$vectors, 2)
 		if(mserr=="est"){
@@ -361,7 +364,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		else{
 			mserr.est<-NULL
-		}	
+		}
 		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model,solution=solution, theta=theta$theta.est, solution.se=solution.se, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, eigval=eigval, eigvect=eigvect)
 	}
 	if(diagn==FALSE){
@@ -382,20 +385,20 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 		}
 		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), model=model, param.count=param.count, solution=solution, theta=theta$theta.est, timeslices=timeslices, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy.sliced, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res)
 	}
-	class(obj)<-"OUwie.slice"		
+	class(obj)<-"OUwie.slice"
 	return(obj)
 }
 
 
 print.OUwie.slice<-function(x, ...){
-	
+
 	ntips=Ntip(x$phy)
 	output<-data.frame(x$loglik,x$AIC,x$AICc,x$model,ntips, row.names="")
 	names(output)<-c("lnL","AIC","AICc","model","ntax")
 	cat("\nFit\n")
 	print(output)
 	cat("\n")
-	
+
 	if (is.character(x$model)) {
 		if (x$model == "BMS"){
 			param.est <- x$solution
@@ -449,7 +452,7 @@ print.OUwie.slice<-function(x, ...){
 			}
 		}
 		if (x$root.station == FALSE){
-			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){ 
+			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
 				param.est<- x$solution
 				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
 				rownames(theta.mat)<-c("estimate", "se")
@@ -471,7 +474,7 @@ print.OUwie.slice<-function(x, ...){
 				print(theta.mat)
 				cat("\n")
 			}
-		}		
+		}
 	}
 	if(any(x$eigval<0)){
 		index.matrix <- x$index.mat
@@ -480,7 +483,7 @@ print.OUwie.slice<-function(x, ...){
 		}
 		if(x$simmap.tree==TRUE){
 			colnames(index.matrix) <- colnames(x$phy$mapped.edge)
-		}				
+		}
 		#If any eigenvalue is less than 0 then the solution is not the maximum likelihood solution
 		if (any(x$eigval<0)) {
 			cat("The objective function may be at a saddle point -- check eigenvectors or try a simpler model", "\n")
@@ -488,6 +491,5 @@ print.OUwie.slice<-function(x, ...){
 	}
 	else{
 		cat("Arrived at a reliable solution","\n")
-	}	
+	}
 }
-
