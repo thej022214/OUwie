@@ -86,7 +86,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		cat("Initializing...", "\n")
 	}
 	
-	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
+	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_abs"=0.001)
 	
 	init.regime <- rayDISC(phy, data[,c(1,2)], model="ER", node.states="joint", root.p=root.p)
 

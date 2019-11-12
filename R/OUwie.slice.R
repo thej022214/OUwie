@@ -225,7 +225,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 	#Update the bounds with estimated timeslices:
 	lower = c(lower, rep(-21,length(which(is.na(timeslices)))))
 	upper = c(upper, log(rep(max(MakeAgeTable(phy, root.age=root.age))-slice.lower.bound,length(which(is.na(timeslices))))))
-	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
+	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_abs"=0.001)
 	if(model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		#Need to construct a dataset so that we can run OUwie to get starting values:
         if(mserr == "known"){

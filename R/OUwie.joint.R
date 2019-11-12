@@ -304,7 +304,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 	ub = 20
 	lower = rep(lb, np)
 	upper = rep(ub, np)
-	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
+	opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_abs"=0.001)
 	
 	if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMVr" | model == "OUMA" | model == "OUMAr" | model == "OUMVA"){
 		n=max(phy$edge[,1])

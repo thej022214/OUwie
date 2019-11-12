@@ -68,7 +68,7 @@ anc.likelihood <- function(x, fitted.OUwie.object) {
 }
 
 
-OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5), knowledge=FALSE){
+OUwie.anc<-function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_abs"=0.001), knowledge=FALSE){
     if(!knowledge) {
       stop("You are trying to run the function without having read all the documentation. Please do ?OUwie.anc before using this function and read ALL the documentation.")
     }

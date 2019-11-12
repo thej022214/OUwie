@@ -6,7 +6,7 @@
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
 root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE,
-quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5))
+quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_abs"=0.001))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -97,7 +97,7 @@ OUwie(tree,trait,model=c("OUMV"), root.station=TRUE, clade=c("t50", "t64"))
 #by changing settings of OUwie runs. For example:
 
 run1 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
-list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_rel"=.Machine$double.eps^0.5))
+list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001))
 
 save(run1, file="run1.rda")
 
@@ -106,7 +106,7 @@ save(run1, file="run1.rda")
 load("run1.rda")
 
 run2 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
-list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_rel"=.Machine$double.eps^0.5),
+list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001),
 starting.vals=run1$new.start)
 
 #run2 will start off where run1 stopped.

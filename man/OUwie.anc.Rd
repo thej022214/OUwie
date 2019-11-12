@@ -3,8 +3,8 @@
 \title{Estimate ancestral states given a fitted OUwie model}
 \description{Fits ancestral states (a joint estimate) given a fitted OUwie model. Currently, only works for trees with regimes painted on as node labels (rather than a simmap tree). The intended use case is just to visualize what the model is saying about evolution to help intuition (is the model something you can believe in?) rather than a firm estimate you should use to say, Yes, 56.4 MY, the ancestral body size was 17.34 mm. It could likely be anywhere from 1 to 100 mm with about equal chance. Please read details before using this function.}
 \usage{
-OUwie.anc(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", 
-"maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5), knowledge=FALSE)
+OUwie.anc(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX",
+"maxeval"="1000", "ftol_abs"=0.001), knowledge=FALSE)
 }
 \arguments{
 \item{fitted.OUwie.object}{an object returned from the OUwie function}
