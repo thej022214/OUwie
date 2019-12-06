@@ -6,7 +6,8 @@
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
 root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE,
-quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_abs"=0.001))
+quiet=FALSE, warn=TRUE, opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000", 
+ftol_rel = .Machine$double.eps^0.5))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}

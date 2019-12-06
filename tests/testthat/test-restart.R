@@ -1,6 +1,7 @@
 context("test-restart.R")
 
 test_that("restarting works", {
+    skip_on_cran()
   data("tworegime")
   fitted1 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="5", "ftol_abs"=.1))
   fitted2 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, starting.vals=fitted1$new.start)
