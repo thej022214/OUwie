@@ -3,7 +3,7 @@
 #written by Jeremy M. Beaulieu
 
 weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE){
-    
+
     n=max(phy$edge[,1])
     ntips=length(phy$tip.label)
     if(is.null(root.state)) {
@@ -109,7 +109,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             W[1:(ntips),j] <- diag(w.piece)
         }
     }
-    
+
     if(assume.station==FALSE){
         W <- matrix(0,ntips,k+1)
         W.piece.root <- matrix(0, ntips, ntips)
@@ -198,10 +198,12 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             diag(W.piece.root) <- diag(W.piece.root) + diag(w.piece1)
             W[1:(ntips),j+1] <- diag(w.piece)
         }
-        W[,1] = diag(W.piece.root)
+        #W[,1] = diag(W.piece.root)
     }
+    W[,1] <- W[,1]+exp(-alpha[1])
+
     #Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter
-    W <- W/rowSums(W)
+    #W <- W/rowSums(W)
     W
 }
 
@@ -215,7 +217,7 @@ mat.gen<-function(phy,piece.wise,pp){
     ep <- piece.wise[,1]
     comp <- numeric(n + phy$Nnode)
     mat <- matrix(0, n, n)
-    
+
     for (i in length(anc):1) {
         focal <- comp[anc[i]]
         comp[des[i]] <- focal + ep[des[i]]
@@ -229,8 +231,6 @@ mat.gen<-function(phy,piece.wise,pp){
     }
     diag.elts <- 1 + 0:(n - 1)*(n + 1)
     mat[diag.elts] <- comp[1:n]
-    
+
     mat
 }
-
-
