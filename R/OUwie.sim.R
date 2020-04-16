@@ -17,7 +17,7 @@
 #multiple alphas (OUSMA): alpha=c(0.5,0.1); sigma.sq=c(0.9,0.9); theta0=0; theta=c(1,2)
 #multiple alphas and sigmas (OUSMVA): alpha=c(0.5,0.1); sigma.sq=c(0.45,0.9); theta0=0; theta=c(1,2)
 
-OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", fitted.object=NULL){
+OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, fitted.object=NULL){
   if(!is.null(fitted.object)) {
     if(grepl("BM", fitted.object$model) | grepl("OU1", fitted.object$model)) {
       stop(paste("not implemented yet for ", fitted.object$model))
@@ -137,9 +137,9 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 				x[edges[i,3],]=x[edges[i,2],]*exp(-alpha[oldregime]*(newtime-oldtime))+(theta[oldregime])*(1-exp(-alpha[oldregime]*(newtime-oldtime)))+sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(newtime-oldtime)))/(2*alpha[oldregime]))
 			}
 			else{
-				halftime=newtime+((oldtime-newtime)/2)
-				epoch1=x[edges[i,2],]*exp(-alpha[oldregime]*(halftime-oldtime))+(theta[oldregime])*(1-exp(-alpha[oldregime]*(halftime-oldtime)))+sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(halftime-oldtime)))/(2*alpha[oldregime]))
-				oldtime=halftime
+				shifttime=newtime+((oldtime-newtime) * shift.point)
+				epoch1=x[edges[i,2],]*exp(-alpha[oldregime]*(shifttime-oldtime))+(theta[oldregime])*(1-exp(-alpha[oldregime]*(shifttime-oldtime)))+sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(shifttime-oldtime)))/(2*alpha[oldregime]))
+				oldtime=shifttime
 				newtime=newtime
 				x[edges[i,3],]=epoch1*exp(-alpha[newregime]*(newtime-oldtime))+(theta[newregime])*(1-exp(-alpha[newregime]*(newtime-oldtime)))+sigma[newregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[newregime]*(newtime-oldtime)))/(2*alpha[newregime]))
 			}

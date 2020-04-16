@@ -4,7 +4,7 @@
 \description{Fits generalized Ornstein-Uhlenbeck-based Hansen models of continuous characters before and after time slices.}
 \usage{
 OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
- timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE,
+ timeslices=c(NA), root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5,
  mserr="none", slice.lower.bound=NULL, starting.vals=NULL, diagn=FALSE, 
  quiet=FALSE, warn=TRUE)
 }       
@@ -16,6 +16,7 @@ OUwie.slice(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"),
 \item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
+\item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, of halfway along a branch.}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{slice.lower.bound}{specifies the value of the lower bound when estimating time slices. The default is \code{NULL}, meaning the value is exp(-21).}
 \item{starting.vals}{a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.} 

@@ -5,9 +5,9 @@
 \usage{
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
-root.station=TRUE, clade=NULL, mserr="none", starting.vals=NULL, diagn=FALSE,
-quiet=FALSE, warn=TRUE, opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000", 
-ftol_rel = .Machine$double.eps^0.5))
+root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, 
+diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list(algorithm = "NLOPT_LN_SBPLX",
+maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -17,6 +17,7 @@ ftol_rel = .Machine$double.eps^0.5))
 \item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.}
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).}
+\item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest (see Details).}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{starting.vals}{a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.}
@@ -55,6 +56,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
 \item{$root.age}{The user-supplied age at the root of the tree.}
+\item{$split.point}{The user-supplied point at which regime changes are assumed to have occurred.}
 \item{$opts}{Internal settings of the likelihood search}
 \item{$data}{User-supplied dataset}
 \item{$phy}{User-supplied tree}

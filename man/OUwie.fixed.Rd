@@ -4,8 +4,8 @@
 \description{Allows the user to calculate the likelihood given a specified set of parameter values}
 \usage{
 OUwie.fixed(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), 
-simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, alpha=NULL, 
-sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
+simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, 
+alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
@@ -15,6 +15,7 @@ sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 \item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated.}
+\item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{alpha}{a numeric vector giving the values of \eqn{\alpha}{alpha} for each selective regime}
 \item{sigma.sq}{a numeric vector giving the values of \eqn{\sigma^2}{sigma^2} for each selective regime} 
 \item{theta}{a numeric vector giving the values of \eqn{\theta}{theta} for each selective regime}

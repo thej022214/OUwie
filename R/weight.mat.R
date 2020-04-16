@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE){
+weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=.5){
 
     n=max(phy$edge[,1])
     ntips=length(phy$tip.label)
@@ -80,10 +80,10 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                         }
                     }
                     else{
-                        halftime=newtime-((newtime-oldtime)/2)
-                        epoch1a=exp(-alpha[oldregime]*(halftime-oldtime))
-                        epoch1b=exp(alpha[oldregime]*halftime)-exp(alpha[oldregime]*oldtime)
-                        oldtime=halftime
+                        shifttime=newtime-((newtime-oldtime)*shift.point)
+                        epoch1a=exp(-alpha[oldregime]*(shifttime-oldtime))
+                        epoch1b=exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime)
+                        oldtime=shifttime
                         epoch2a=exp(-alpha[newregime]*(newtime-oldtime))
                         epoch2b=exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime)
                         if(oldregime==j){
@@ -170,10 +170,10 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                         }
                     }
                     else{
-                        halftime=newtime-((newtime-oldtime)/2)
-                        epoch1a=exp(-alpha[oldregime]*(halftime-oldtime))
-                        epoch1b=exp(alpha[oldregime]*halftime)-exp(alpha[oldregime]*oldtime)
-                        oldtime=halftime
+                        shifttime=newtime-((newtime-oldtime)*shift.point)
+                        epoch1a=exp(-alpha[oldregime]*(shifttime-oldtime))
+                        epoch1b=exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime)
+                        oldtime=shifttime
                         newtime=newtime
                         epoch2a=exp(-alpha[newregime]*(newtime-oldtime))
                         epoch2b=exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime)

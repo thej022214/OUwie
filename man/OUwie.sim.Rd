@@ -4,7 +4,8 @@
 \description{Simulates the Ornstein-Uhlenbeck process of continuous characters evolving under discrete selective regimes.}
 \usage{
 OUwie.sim(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,
-alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", fitted.object=NULL)
+alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, 
+fitted.object=NULL)
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
@@ -17,6 +18,7 @@ alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", fitted.object=
 \item{theta0}{a numeric indicating the starting state, \eqn{\theta_0}{theta_0}}
 \item{theta}{a numeric vector giving the values of \eqn{\theta}{theta} for each selective regime (see Details)}
 \item{mserr}{designates whether a third column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{fitted.object}{a model fit from OUwie to use for simulation.}
 }
 \details{

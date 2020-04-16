@@ -12,7 +12,7 @@
 # 2. Get rid of this diagnostic stuff.
 # 3. 
 
-hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), root.age=root.age, scaleHeight=FALSE, root.station=TRUE, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
+hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), discrete.model=c("ER", "SYM", "ARD", "HRM"), root.age=root.age, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, root.p=NULL, rate.cat=NULL, ntraits=1, nstates=2, rate.mat=NULL, lower.bounds=c(1e-6,0), upper.bounds=c(1000,1000), mserr="none", diagn=FALSE, quiet=FALSE, warn=TRUE){
 	
 	ntips <- Ntip(phy)
 	if(warn==TRUE){
@@ -38,7 +38,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		upper.discrete = rep(upper.bounds[2], np.discrete)
 	}
 	
-	dev.joint <- function(p, phy, data, mserr, discrete.model, ouwie.model, np.discrete, np.continuous, hrm, rate.cat, ntraits, rate.mat, root.p, root.station, optimize){
+	dev.joint <- function(p, phy, data, mserr, discrete.model, ouwie.model, np.discrete, np.continuous, hrm, rate.cat, ntraits, rate.mat, root.p, root.station, shift.point, optimize){
 		param.count <- np.discrete+np.continuous
 		if(ouwie.model=="BMS"){
 			alpha<-rep(1e-10,dim(rate.mat)[1])
@@ -67,7 +67,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		phy.painted <- regime.lik$mapped.tree
 		print(colnames(phy.painted$mapped.edge))
 		print(sigma.sq[as.numeric(colnames(phy.painted$mapped.edge))])
-		ouwie.lik <- OUwie.fixed(phy.painted, data, model=ouwie.model, simmap.tree=TRUE, alpha=alpha[as.numeric(colnames(phy.painted$mapped.edge))], sigma.sq=sigma.sq[as.numeric(colnames(phy.painted$mapped.edge))], root.station=root.station, mserr=mserr, quiet=TRUE)
+		ouwie.lik <- OUwie.fixed(phy.painted, data, model=ouwie.model, simmap.tree=TRUE, alpha=alpha[as.numeric(colnames(phy.painted$mapped.edge))], sigma.sq=sigma.sq[as.numeric(colnames(phy.painted$mapped.edge))], root.station=root.station, shift.point=shift.point, mserr=mserr, quiet=TRUE)
 		print(paste("ouwie", ouwie.lik$loglik))
 		if(optimize==TRUE){
 			loglik <- sum(regime.lik$loglik, ouwie.lik$loglik)
@@ -154,7 +154,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 		ip.final <- c(ip, rep(init.regime$solution[2], np.discrete))
 		
 		#NOTE: This might be too much stuff to pass (I cannot remember if there is an upper limit or not) -- if failure, then create object and put this stuff in it like deep42:
-		out = nloptr(x0=ip.final, eval_f=dev.joint, lb=lower.final, ub=upper.final, opts=opts, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, optimize=TRUE)
+		out = nloptr(x0=ip.final, eval_f=dev.joint, lb=lower.final, ub=upper.final, opts=opts, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, shift.point=shift.point, optimize=TRUE)
 	}else{
 		if(scaleHeight==TRUE){
 			d <- max(diag(vcv.phylo(phy)))
@@ -177,11 +177,11 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 			cat("Finished. Begin thorough search...", "\n")
 		}
 		ip.final <- c(ip, rep(init.regime$solution[2], np.discrete))
-		out = nloptr(x0=ip.final, eval_f=dev.joint, lb=lower.final, ub=upper.final, opts=opts, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, optimize=TRUE)
+		out = nloptr(x0=ip.final, eval_f=dev.joint, lb=lower.final, ub=upper.final, opts=opts, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, shift.point=shift.point, optimize=TRUE)
 	}
 	
 	#Optimize states and estimate proper thetas using MLEs:
-	maps.and.optima <- dev.joint(p=out$solution, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, optimize=FALSE)
+	maps.and.optima <- dev.joint(p=out$solution, phy=phy, data=data, mserr=mserr, discrete.model=discrete.model, ouwie.model=ouwie.model, np.discrete=np.discrete, np.continuous=np.continuous, hrm=hrm, rate.cat=rate.cat, ntraits=ntraits, rate.mat=rate.mat, root.p=root.p, root.station=root.station, shift.point=shift.point, optimize=FALSE)
 	param.count <- np.continuous+np.discrete
 
 	#Formats the discrete rate matrix properly -- the OUwie rate matrix should be returned from OUwie already formatted correctly (go me!):
@@ -192,7 +192,7 @@ hOUwie <- function(phy, data, ouwie.model=c("BMS","OUM","OUMV","OUMA","OUMVA"), 
 	loglik = -out$objective
 	print(maps.and.optima$ouwie.mat)
 	#Generates the hOUwie object -- be sure that you include as much as needs to be there:
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(Ntip(phy)/(Ntip(phy)-param.count-1))), ouwie.model=ouwie.model, discrete.model=discrete.model, solution=out$solution, mserr=mserr, theta=maps.and.optima$theta, tot.states=dim(rate.mat)[1], discrete.mat=discrete.solution, ouwie.mat=maps.and.optima$ouwie.mat, opts=opts, data=data, phy=maps.and.optima$regime.paint, root.station=root.station, lb=lower.final, ub=upper.final, iterations=out$iterations) 
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(Ntip(phy)/(Ntip(phy)-param.count-1))), ouwie.model=ouwie.model, discrete.model=discrete.model, solution=out$solution, mserr=mserr, theta=maps.and.optima$theta, tot.states=dim(rate.mat)[1], discrete.mat=discrete.solution, ouwie.mat=maps.and.optima$ouwie.mat, shift.point=shift.point, opts=opts, data=data, phy=maps.and.optima$regime.paint, root.station=root.station, lb=lower.final, ub=upper.final, iterations=out$iterations)
 	class(obj)<- "hOUwie"
 	return(obj)
 }

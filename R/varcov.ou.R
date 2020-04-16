@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE){
+varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=.5){
     if(is.null(root.state)) {
         root.state<-which(edges[dim(edges)[1],]==1)-5
         edges<-edges[-1*dim(edges)[1],]
@@ -70,10 +70,10 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                 nodevar2[i]=sigma[oldregime]*((exp(2*alpha[oldregime]*newtime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
             }
             else{
-                halftime=newtime-((newtime-oldtime)/2)
-                epoch1a=alpha[oldregime]*(halftime-oldtime)
-                epoch1b=sigma[oldregime]*((exp(2*alpha[oldregime]*halftime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
-                oldtime=halftime
+                shifttime=newtime-((newtime-oldtime)*shift.point)
+                epoch1a=alpha[oldregime]*(shifttime-oldtime)
+                epoch1b=sigma[oldregime]*((exp(2*alpha[oldregime]*shifttime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
+                oldtime=shifttime
                 newtime=newtime
                 epoch2a=alpha[newregime]*(newtime-oldtime)
                 epoch2b=sigma[newregime]*((exp(2*alpha[newregime]*newtime)-exp(2*alpha[newregime]*oldtime))/(2*alpha[newregime]))
