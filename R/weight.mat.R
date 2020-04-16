@@ -19,13 +19,13 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
     }
     pp <- prop.part(phy)
     edges = edges
-    oldregime=root.state
     nodevar1=rep(0,max(edges[,3]))
     nodevar2=rep(0,max(edges[,3]))
     alpha=Rate.mat[1,]
     if(assume.station==TRUE){
         W <- matrix(0,ntips,k)
         for(j in 1:k){
+            oldregime=root.state
             n.cov1=matrix(0, n, 1)
             n.cov2=matrix(0, n, 1)
             #Weights for each species per regime
@@ -115,6 +115,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
         W <- matrix(0,ntips,k+1)
         W.piece.root <- matrix(0, ntips, ntips)
         for(j in 1:k){
+            oldregime=root.state
             n.cov1=matrix(0, n, 1)
             n.cov2=matrix(0, n, 1)
             #Weights for each species per regime
