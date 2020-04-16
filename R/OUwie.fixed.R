@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-#Allows the user to calculate the likelihood given a specified set of parameter values. 
+#Allows the user to calculate the likelihood given a specified set of parameter values.
 
 OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,root.station=TRUE, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
@@ -63,7 +63,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		tot.states<-factor(colnames(phy$mapped.edge))
 		tip.states<-factor(data[,1])
 		data[,1]<-as.numeric(tip.states)
-		
+
 		#A boolean for whether the root theta should be estimated -- default is that it should be.
 		root.station=root.station
 		#Obtains the state at the root
@@ -74,27 +74,27 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		if(scaleHeight==TRUE){
 			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 		}
-		
+
 		edges=edges[sort.list(edges[,3]),]
-		
+
 		#Resort the edge matrix so that it looks like the original matrix order
 		edges=edges[sort.list(edges[,1]),]
 	}
 	if(simmap.tree==FALSE){
-		#Obtain a a list of all the regime states. This is a solution for instances when tip states and 
+		#Obtain a a list of all the regime states. This is a solution for instances when tip states and
 		#the internal nodes are not of equal length:
 		tot.states<-factor(c(phy$node.label,as.character(data[,1])))
-		
+
 		k<-length(levels(tot.states))
 
 		int.states<-factor(phy$node.label)
-		phy$node.label=as.numeric(int.states)		
+		phy$node.label=as.numeric(int.states)
 		tip.states<-factor(data[,1])
 		data[,1]<-as.numeric(tip.states)
-		
+
 		#A boolean for whether the root theta should be estimated -- default is that it should be.
 		root.station=root.station
-		if (is.character(model)) {			
+		if (is.character(model)) {
 			if (model == "BM1"| model == "OU1"){
 				##Begins the construction of the edges matrix -- similar to the ouch format##
 				#Makes a vector of absolute times in proportion of the total length of the tree
@@ -102,16 +102,16 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				phy$node.label<-sample(c(1:k),phy$Nnode, replace=T)
 				int.states=length(levels(tip.states))
 				#Since we only really have one global regime, make up the internal nodes -- this could be improved
-				phy$node.label<-as.numeric(int.states)				
+				phy$node.label<-as.numeric(int.states)
 				#Obtain root state -- for both models assume the root state to be 1 since no other state is used even if provided in the tree
 				root.state<-1
 				#New tree matrix to be used for subsetting regimes
 				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
-			
+
 				if(scaleHeight==TRUE){
 					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 				}
-				
+
 				edges=edges[sort.list(edges[,3]),]
 
 				regime <- matrix(0,nrow=length(edges[,1]),ncol=k)
@@ -119,27 +119,27 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				if (k>1) {
 					regime[,2:k]<-0
 				}
-				
+
 				edges=cbind(edges,regime)
 			}
-			else{				
+			else{
 				#Obtain root state and internal node labels
 				root.state<-phy$node.label[1]
 				int.state<-phy$node.label[-1]
 				#New tree matrix to be used for subsetting regimes
 				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
-			
+
 				if(scaleHeight==TRUE){
 					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 				}
-				
+
 				edges=edges[sort.list(edges[,3]),]
-				
+
 				mm<-c(data[,1],int.state)
 				regime <- matrix(0,nrow=length(mm),ncol=length(unique(mm)))
 				#Generates an indicator matrix from the regime vector
 				for (i in 1:length(mm)) {
-					regime[i,mm[i]] <- 1 
+					regime[i,mm[i]] <- 1
 				}
 				#Finishes the edges matrix
 				edges=cbind(edges,regime)
@@ -149,11 +149,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		edges=edges[sort.list(edges[,1]),]
 	}
 	x<-as.matrix(data[,2])
-	
+
 	#Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
 		Rate.mat <- matrix(1, 2, k)
-		
+
 		if (model == "BM1"){
 			np=1
 			index<-matrix(TRUE,2,k)
@@ -198,7 +198,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 			}
 			if(root.station==FALSE){
 				param.count<-np+k+1
-			}			
+			}
 			bool=root.station
 		}
 		if (model == "OUMV") {
@@ -242,11 +242,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		}
 	}
 	obj<-NULL
-	
+
 	#Likelihood function for estimating model parameters
 	dev<-function(){
 		N<-length(x[,1])
-		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight)
+		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool)
 		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool)
 		if(mserr=="known"){
 			diag(V)<-diag(V)+(data[,3]^2)
@@ -281,22 +281,22 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	}
 	fixed.fit <- dev()
 	loglik<- -fixed.fit[[1]]
-	
+
 	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]])
-	class(obj)<-"OUwie.fixed"		
+	class(obj)<-"OUwie.fixed"
 	return(obj)
 }
 
 
 print.OUwie.fixed<-function(x, ...){
-	
+
 	ntips=Ntip(x$phy)
 	output<-data.frame(x$loglik,x$AIC,x$AICc,x$model,ntips,row.names="")
 	names(output)<-c("lnL","AIC","AICc","model","ntax")
 	cat("\nFit\n")
 	print(output)
 	cat("\n")
-	
+
 	if (is.character(x$model)) {
 		if (x$model == "BM1" | x$model == "BMS"){
 			param.est <- x$solution
@@ -362,7 +362,7 @@ print.OUwie.fixed<-function(x, ...){
 			}
 		}
 		if (x$root.station == FALSE){
-			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){ 
+			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
 				print(x$theta)
 				param.est<- x$solution
 				rownames(param.est)<-c("alpha","sigma.sq")
@@ -383,8 +383,6 @@ print.OUwie.fixed<-function(x, ...){
 				print(theta.mat)
 				cat("\n")
 			}
-		}		
-	}	
+		}
+	}
 }
-
-
