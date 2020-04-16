@@ -41,12 +41,8 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                 regimeduration<-currentmap[regimeindex]
                 newtime<-oldtime+regimeduration
                 regimenumber<-which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
-                if(!assume.station) {
-                    nodevar1[i]=nodevar1[i]+alpha[regimenumber]*(newtime-oldtime)
-                    nodevar2[i]=nodevar2[i]+sigma[regimenumber]*((exp(2*alpha[regimenumber]*newtime)-exp(2*alpha[regimenumber]*oldtime))/(2*alpha[regimenumber]))
-                } else {
-                    # Assuming stationarity
-                }
+                nodevar1[i]=nodevar1[i]+alpha[regimenumber]*(newtime-oldtime)
+                nodevar2[i]=nodevar2[i]+sigma[regimenumber]*((exp(2*alpha[regimenumber]*newtime)-exp(2*alpha[regimenumber]*oldtime))/(2*alpha[regimenumber]))
                 oldtime <- newtime
                 newregime <- regimenumber
             }
@@ -69,24 +65,20 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                 oldregime=root.state
             }
             newregime=which(edges[i,6:(k+5)]==1)
-            if(!assume.station) {
-                if(oldregime==newregime){
-                    nodevar1[i]=alpha[oldregime]*(newtime-oldtime)
-                    nodevar2[i]=sigma[oldregime]*((exp(2*alpha[oldregime]*newtime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
-                }
-                else{
-                    halftime=newtime-((newtime-oldtime)/2)
-                    epoch1a=alpha[oldregime]*(halftime-oldtime)
-                    epoch1b=sigma[oldregime]*((exp(2*alpha[oldregime]*halftime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
-                    oldtime=halftime
-                    newtime=newtime
-                    epoch2a=alpha[newregime]*(newtime-oldtime)
-                    epoch2b=sigma[newregime]*((exp(2*alpha[newregime]*newtime)-exp(2*alpha[newregime]*oldtime))/(2*alpha[newregime]))
-                    nodevar1[i]<-epoch1a+epoch2a
-                    nodevar2[i]<-epoch1b+epoch2b
-                }
-            } else {
-                # Assuming stationarity
+            if(oldregime==newregime){
+                nodevar1[i]=alpha[oldregime]*(newtime-oldtime)
+                nodevar2[i]=sigma[oldregime]*((exp(2*alpha[oldregime]*newtime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
+            }
+            else{
+                halftime=newtime-((newtime-oldtime)/2)
+                epoch1a=alpha[oldregime]*(halftime-oldtime)
+                epoch1b=sigma[oldregime]*((exp(2*alpha[oldregime]*halftime)-exp(2*alpha[oldregime]*oldtime))/(2*alpha[oldregime]))
+                oldtime=halftime
+                newtime=newtime
+                epoch2a=alpha[newregime]*(newtime-oldtime)
+                epoch2b=sigma[newregime]*((exp(2*alpha[newregime]*newtime)-exp(2*alpha[newregime]*oldtime))/(2*alpha[newregime]))
+                nodevar1[i]<-epoch1a+epoch2a
+                nodevar2[i]<-epoch1b+epoch2b
             }
             oldregime=newregime
             n.cov1[edges[i,3],]=nodevar1[i]
@@ -116,6 +108,9 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             root.age <- max(branching.times(phy))
         }
         vcv<-exp(-2*alpha[1]*max(root.age))*vcv2
+    }
+    if(assume.station) {
+        vcv <- vcv + sigma[1]*exp(-2*alpha[1])/(2*alpha[1])
     }
     vcv
 
