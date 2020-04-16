@@ -4,8 +4,6 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values while estimating the states at internal nodes. Assumes you have estimated the paramters already using OUwie
 
-## NOTE THIS IS NOT WORKING YET.
-
 # Idea is to take a tree, add tips at each node, add tips to the data (including figuring out regimes), and optimize the data for these made up tips. Take in OUwie object
 
 attach.stub.taxon <- function(node, phy, tip.name=NULL) {
