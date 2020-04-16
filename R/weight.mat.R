@@ -108,6 +108,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             w.piece <- w.piece1 * w.piece2
             W[1:(ntips),j] <- diag(w.piece)
         }
+        W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
     }
 
     if(assume.station==FALSE){
@@ -199,8 +200,8 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             W[1:(ntips),j+1] <- diag(w.piece)
         }
         #W[,1] = diag(W.piece.root)
+        W[,1] <- W[,1]+exp(-alpha[root.state])
     }
-    W[,1] <- W[,1]+exp(-alpha[1])
 
     #Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter
     #W <- W/rowSums(W)
