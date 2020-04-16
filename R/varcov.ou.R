@@ -109,9 +109,9 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         }
         vcv<-exp(-2*alpha[1]*max(root.age))*vcv2
     }
-    if(assume.station) {
-        vcv <- vcv + sigma[1]*exp(-2*alpha[1])/(2*alpha[1])
-    }
+    #if(assume.station) {
+    #    vcv <- vcv + sigma[1]*exp(-2*alpha[1])/(2*alpha[1])
+    #}
     vcv
 
 }
