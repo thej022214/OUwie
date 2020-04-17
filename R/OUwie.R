@@ -52,7 +52,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 		}
 	}
 
-	#Values to be used throughout
+    #Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
 	#Will label the clade of interest if the user so chooses:
@@ -472,9 +472,12 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 	dev.theta<-function(p, index.mat, edges=edges, mserr=mserr){
 		tmp<-NULL
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
+        print(Rate.mat)
 		N<-length(x[,1])
 		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        print(diag(V))
+        W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        print(W)
         if(mserr=="known"){
             diag(V)<-diag(V)+(data[,3]^2)
 		}
@@ -482,11 +485,11 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			diag(V)<-diag(V)+(p[length(p)])
 		}
 		theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
-		#Calculates the hat matrix:
+        #Calculates the hat matrix:
 		#H.mat<-W%*%pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)
 		#Standard error of theta -- uses pseudoinverse to overcome singularity issues
 		se<-sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
-		tmp$res<-W%*%theta-x
+        tmp$res<-W%*%theta-x
 		#Joins the vector of thetas with the vector of standard errors into a 2 column matrix for easy extraction at the summary stage
 		tmp$theta.est<-cbind(theta,se)
 

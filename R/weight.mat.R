@@ -18,16 +18,13 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
         k<-length(6:mm[2])
     }
     pp <- prop.part(phy)
-    edges = edges
-    nodevar1=rep(0,max(edges[,3]))
-    nodevar2=rep(0,max(edges[,3]))
+    nodevar=rep(0,max(edges[,3]))
     alpha=Rate.mat[1,]
     if(assume.station==TRUE){
         W <- matrix(0,ntips,k)
         for(j in 1:k){
             oldregime=root.state
-            n.cov1=matrix(0, n, 1)
-            n.cov2=matrix(0, n, 1)
+            n.cov=matrix(0, n, 1)
             #Weights for each species per regime
             for(i in 1:length(edges[,1])){
                 anc = edges[i, 2]
@@ -42,19 +39,16 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                     }
                 }
                 if(simmap.tree==TRUE){
-                    nodevar1[i] <- 0
-                    nodevar2[i] <- 0
+                    nodevar[i] <- 0
                     for (regimeindex in 1:length(currentmap)){
                         regimeduration <- currentmap[regimeindex]
                         newtime <- oldtime + regimeduration
                         regimenumber <- which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
                         if(regimenumber == j){
-                            nodevar1[i] <- exp(-alpha[regimenumber]*(newtime-oldtime))
-                            nodevar2[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
+                            nodevar[i] <- exp(-alpha[root.state])*(exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime))
                         }
                         else{
-                            nodevar1[i] <- nodevar1[i]
-                            nodevar2[i] <- nodevar2[i]
+                            nodevar[i] <- nodevar[i]
                         }
                         oldtime <- newtime
                     }
@@ -70,45 +64,37 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                     }
                     newregime=which(edges[i,6:(k+5)]==1)
                     if(oldregime==newregime){
-                        if(oldregime == j){
-                            nodevar1[i] <- exp(-alpha[oldregime]*(newtime-oldtime))
-                            nodevar2[i] <- exp(alpha[oldregime]*newtime)-exp(alpha[oldregime]*oldtime)
+                        if(newregime == j){
+                            nodevar[i] <- exp(-alpha[root.state])*(exp(alpha[oldregime]*newtime)-exp(alpha[oldregime]*oldtime))
                         }
                         else{
-                            nodevar1[i] <- 0
-                            nodevar2[i] <- 0
+                            nodevar[i] <- 0
                         }
                     }
                     else{
                         shifttime=newtime-((newtime-oldtime)*shift.point)
-                        epoch1a=exp(-alpha[oldregime]*(shifttime-oldtime))
-                        epoch1b=exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime)
-                        oldtime=shifttime
-                        epoch2a=exp(-alpha[newregime]*(newtime-oldtime))
-                        epoch2b=exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime)
+                        epoch1 = exp(-alpha[root.state])*(exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime))
+                        oldtime = shifttime
+                        newtime = newtime
+                        epoch2 = exp(-alpha[root.state])*(exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime))
                         if(oldregime==j){
-                            nodevar1[i]=epoch1a
-                            nodevar2[i]=epoch1b
+                            nodevar[i]=epoch1
                         }
                         if(newregime==j){
-                            nodevar1[i]=epoch2a
-                            nodevar2[i]=epoch2b
+                            nodevar[i]=epoch2
                         }
                         if(!newregime==j && !oldregime==j){
-                            nodevar1[i] = 0
-                            nodevar2[i] = 0
+                            nodevar[i] = 0
                         }
                     }
                 }
-                n.cov1[edges[i,3],] = nodevar1[i]
-                n.cov2[edges[i,3],] = nodevar2[i]
+                n.cov[edges[i,3],] = nodevar[i]
             }
-            w.piece1 <- mat.gen(phy, n.cov1, pp)
-            w.piece2 <- mat.gen(phy, n.cov2, pp)
-            w.piece <- w.piece1 * w.piece2
+            w.piece <- mat.gen(phy, n.cov, pp)
             W[1:(ntips),j] <- diag(w.piece)
         }
         W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
+        #W <- W/rowSums(W)
     }
 
     if(assume.station==FALSE){
@@ -116,8 +102,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
         W.piece.root <- matrix(0, ntips, ntips)
         for(j in 1:k){
             oldregime=root.state
-            n.cov1=matrix(0, n, 1)
-            n.cov2=matrix(0, n, 1)
+            n.cov=matrix(0, n, 1)
             #Weights for each species per regime
             for(i in 1:length(edges[,1])){
                 anc = edges[i, 2]
@@ -139,12 +124,10 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                         newtime <- oldtime + regimeduration
                         regimenumber <- which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
                         if (regimenumber == j){
-                            nodevar1[i] <- exp(-alpha[regimenumber]*(newtime-oldtime))
-                            nodevar2[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
+                            nodevar[i] <- exp(-alpha[root.state])*(exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime))
                         }
                         else{
-                            nodevar1[i] <- nodevar1[i]
-                            nodevar2[i] <- nodevar2[i]
+                            nodevar[i] <- nodevar1[i]
                         }
                         oldtime <- newtime
                     }
@@ -161,51 +144,37 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                     newregime=which(edges[i,6:(k+5)]==1)
                     if(oldregime==newregime){
                         if(newregime==j){
-                            nodevar1[i]=exp(-alpha[oldregime]*(newtime-oldtime))
-                            nodevar2[i]=exp(alpha[oldregime]*newtime)-exp(alpha[oldregime]*oldtime)
+                            nodevar[i]=exp(-alpha[root.state])*(exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime))
                         }
                         else{
-                            nodevar1[i] <- 0
-                            nodevar2[i] <- 0
+                            nodevar[i] <- 0
                         }
                     }
                     else{
                         shifttime=newtime-((newtime-oldtime)*shift.point)
-                        epoch1a=exp(-alpha[oldregime]*(shifttime-oldtime))
-                        epoch1b=exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime)
-                        oldtime=shifttime
-                        newtime=newtime
-                        epoch2a=exp(-alpha[newregime]*(newtime-oldtime))
-                        epoch2b=exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime)
+                        epoch1 = exp(-alpha[root.state])*(exp(alpha[oldregime]*shifttime)-exp(alpha[oldregime]*oldtime))
+                        oldtime = shifttime
+                        newtime = newtime
+                        epoch2 = exp(-alpha[root.state])*(exp(alpha[newregime]*newtime)-exp(alpha[newregime]*oldtime))
                         if(oldregime==j){
-                            nodevar1[i]=epoch1a
-                            nodevar2[i]=epoch1b
+                            nodevar[i]=epoch1
                         }
                         if(newregime==j){
-                            nodevar1[i]=epoch2a
-                            nodevar2[i]=epoch2b
+                            nodevar[i]=epoch2
                         }
                         if(!newregime==j & !oldregime==j){
-                            nodevar1[i]=0
-                            nodevar2[i]=0
+                            nodevar[i]=0
                         }
                     }
                 }
-                n.cov1[edges[i,3]]=nodevar1[i]
-                n.cov2[edges[i,3]]=nodevar2[i]
+                n.cov[edges[i,3]]=nodevar[i]
             }
-            w.piece1 <- mat.gen(phy,n.cov1,pp)
-            w.piece2 <- mat.gen(phy,n.cov2,pp)
-            w.piece <- w.piece1 * w.piece2
-            diag(W.piece.root) <- diag(W.piece.root) + diag(w.piece1)
+            w.piece <- mat.gen(phy,n.cov,pp)
             W[1:(ntips),j+1] <- diag(w.piece)
         }
-        #W[,1] = diag(W.piece.root)
-        W[,1] <- W[,1]+exp(-alpha[root.state])
+        W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
+        #W <- W/rowSums(W)
     }
-
-    #Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter
-    #W <- W/rowSums(W)
     W
 }
 

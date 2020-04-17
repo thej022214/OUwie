@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
+OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE){
 
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
@@ -34,7 +34,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
             }
         }
     }
-
+    
     #Values to be used throughout
 	n=max(phy$edge[,1])
 	ntips=length(phy$tip.label)
@@ -106,10 +106,10 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				#Obtain root state -- for both models assume the root state to be 1 since no other state is used even if provided in the tree
 				root.state<-1
 				#New tree matrix to be used for subsetting regimes
-				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
+                edges=cbind(c(1:(n-1)),phy$edge,OUwie:::MakeAgeTable(phy, root.age=root.age))
 
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+					edges[,4:5]<-edges[,4:5]/max(OUwie:::MakeAgeTable(phy, root.age=root.age))
 				}
 
 				edges=edges[sort.list(edges[,3]),]
@@ -127,10 +127,10 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				root.state<-phy$node.label[1]
 				int.state<-phy$node.label[-1]
 				#New tree matrix to be used for subsetting regimes
-				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
+				edges=cbind(c(1:(n-1)),phy$edge,OUwie:::MakeAgeTable(phy, root.age=root.age))
 
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+					edges[,4:5]<-edges[,4:5]/max(OUwie:::MakeAgeTable(phy, root.age=root.age))
 				}
 
 				edges=edges[sort.list(edges[,3]),]
@@ -243,11 +243,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	}
 	obj<-NULL
 
-	#Likelihood function for estimating model parameters
+    #Likelihood function for estimating model parameters
 	dev<-function(){
 		N<-length(x[,1])
-		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-		W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        V <- OUwie:::varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        W <- OUwie:::weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
 		if(mserr=="known"){
 			diag(V)<-diag(V)+(data[,3]^2)
 		}
@@ -266,14 +266,14 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		theta.est<-cbind(theta,se)
 		res<-W%*%theta-x
 		#When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
-		DET <- sum(log(abs(Re(diag(qr(V)$qr)))))
-		#However, sometimes there are underflow issues so I toggle between the two approaches:
-		if(!is.finite(DET)){
-			DET<-determinant(V, logarithm=TRUE)
-			logl<--.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
-		}else{
-			logl<--.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET)-.5*(N*log(2*pi))
-		}
+        DET <- sum(log(abs(Re(diag(qr(V)$qr)))))
+        #However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
+        if(!is.finite(DET)){
+            DET <- determinant(V, logarithm=TRUE)
+            logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
+        }else{
+            logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET)-.5*(N*log(2*pi))
+        }
 		list(-logl,theta.est,res)
 	}
 	if(quiet==FALSE){
