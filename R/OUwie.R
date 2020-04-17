@@ -90,6 +90,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 
 		if(scaleHeight==TRUE){
 			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+            root.age = 1
 		}
 		edges=edges[sort.list(edges[,3]),]
 
@@ -122,6 +123,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 				if(scaleHeight==TRUE){
 					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                    root.age = 1
 				}
 				edges=edges[sort.list(edges[,3]),]
 
@@ -140,6 +142,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
                 edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 				if(scaleHeight==TRUE){
 					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                    root.age = 1
 				}
 				edges=edges[sort.list(edges[,3]),]
 
@@ -472,12 +475,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 	dev.theta<-function(p, index.mat, edges=edges, mserr=mserr){
 		tmp<-NULL
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
-        print(Rate.mat)
 		N<-length(x[,1])
 		V<-varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        print(diag(V))
         W<-weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        print(W)
         if(mserr=="known"){
             diag(V)<-diag(V)+(data[,3]^2)
 		}

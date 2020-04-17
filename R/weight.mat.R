@@ -3,7 +3,7 @@
 #written by Jeremy M. Beaulieu
 
 weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=.5){
-
+    
     n=max(phy$edge[,1])
     ntips=length(phy$tip.label)
     if(is.null(root.state)) {
@@ -96,7 +96,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
         W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
         #W <- W/rowSums(W)
     }
-
+    
     if(assume.station==FALSE){
         W <- matrix(0,ntips,k+1)
         W.piece.root <- matrix(0, ntips, ntips)
@@ -188,7 +188,7 @@ mat.gen<-function(phy,piece.wise,pp){
     ep <- piece.wise[,1]
     comp <- numeric(n + phy$Nnode)
     mat <- matrix(0, n, n)
-
+    
     for (i in length(anc):1) {
         focal <- comp[anc[i]]
         comp[des[i]] <- focal + ep[des[i]]
@@ -202,6 +202,6 @@ mat.gen<-function(phy,piece.wise,pp){
     }
     diag.elts <- 1 + 0:(n - 1)*(n + 1)
     mat[diag.elts] <- comp[1:n]
-
+    
     mat
 }

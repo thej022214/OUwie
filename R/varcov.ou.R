@@ -2,6 +2,10 @@
 
 #written by Jeremy M. Beaulieu
 
+#OU variance-covariance matrix generator
+
+#written by Jeremy M. Beaulieu
+
 varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=.5){
     if(is.null(root.state)) {
         root.state<-which(edges[dim(edges)[1],]==1)-5
@@ -29,7 +33,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         for(i in 1:length(edges[,1])){
             anc = edges[i, 2]
             desc = edges[i, 3]
-
+            
             if(scaleHeight==TRUE){
                 currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
             }
@@ -101,19 +105,19 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                 }
             }
         }
-        diag(species.total.variances) <- exp(-2 *diag(vcv1))
+        diag(species.total.variances) <- exp(-2 * diag(vcv1))
         vcv <- species.total.variances * vcv2
     }else{
         if(is.null(root.age)){
             root.age <- max(branching.times(phy))
         }
-        vcv<-exp(-2*alpha[1]*max(root.age))*vcv2
+        vcv <- exp(-2*alpha[1]*max(root.age))*vcv2
     }
     if(assume.station) {
         vcv <- vcv + sigma[root.state]*exp(-2*alpha[root.state])/(2*alpha[root.state])
     }
     vcv
-
+    
 }
 
 
@@ -126,7 +130,7 @@ mat.gen<-function(phy,piece.wise,pp){
     ep <- piece.wise[,1]
     comp <- numeric(n + phy$Nnode)
     mat <- matrix(0, n, n)
-
+    
     for (i in length(anc):1) {
         focal <- comp[anc[i]]
         comp[des[i]] <- focal + ep[des[i]]
@@ -140,6 +144,6 @@ mat.gen<-function(phy,piece.wise,pp){
     }
     diag.elts <- 1 + 0:(n - 1)*(n + 1)
     mat[diag.elts] <- comp[1:n]
-
+    
     mat
 }

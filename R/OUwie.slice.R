@@ -70,6 +70,7 @@ OUwie.slice<-function(phy, data, model=c("BMS","OUM","OUMV","OUMA","OUMVA"), tim
 
 	if(scaleHeight==TRUE){
 		edges[,4:5]<-edges[,4:5]/max.height
+        root.age = 1
 	}
 	edges=edges[sort.list(edges[,3]),]
 

@@ -73,6 +73,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 
 		if(scaleHeight==TRUE){
 			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+            root.age = 1
 		}
 
 		edges=edges[sort.list(edges[,3]),]
@@ -84,9 +85,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 		#Obtain a a list of all the regime states. This is a solution for instances when tip states and
 		#the internal nodes are not of equal length:
 		tot.states<-factor(c(phy$node.label,as.character(data[,1])))
-
 		k<-length(levels(tot.states))
-
 		int.states<-factor(phy$node.label)
 		phy$node.label=as.numeric(int.states)
 		tip.states<-factor(data[,1])
@@ -106,10 +105,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				#Obtain root state -- for both models assume the root state to be 1 since no other state is used even if provided in the tree
 				root.state<-1
 				#New tree matrix to be used for subsetting regimes
-                edges=cbind(c(1:(n-1)),phy$edge,OUwie:::MakeAgeTable(phy, root.age=root.age))
+                edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(OUwie:::MakeAgeTable(phy, root.age=root.age))
+ 					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                    root.age = 1
 				}
 
 				edges=edges[sort.list(edges[,3]),]
@@ -127,12 +127,11 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 				root.state<-phy$node.label[1]
 				int.state<-phy$node.label[-1]
 				#New tree matrix to be used for subsetting regimes
-				edges=cbind(c(1:(n-1)),phy$edge,OUwie:::MakeAgeTable(phy, root.age=root.age))
-
+				edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(OUwie:::MakeAgeTable(phy, root.age=root.age))
+					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                    root.age = 1
 				}
-
 				edges=edges[sort.list(edges[,3]),]
 
 				mm<-c(data[,1],int.state)
@@ -241,14 +240,15 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 			bool=root.station
 		}
 	}
-	obj<-NULL
+	
+    obj<-NULL
 
     #Likelihood function for estimating model parameters
-	dev<-function(){
-		N<-length(x[,1])
-        V <- OUwie:::varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        W <- OUwie:::weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-		if(mserr=="known"){
+	dev.fixed <- function(){
+		N <- length(x[,1])
+        V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        if(mserr=="known"){
 			diag(V)<-diag(V)+(data[,3]^2)
 		}
 #		if(mserr=="est"){
@@ -279,7 +279,7 @@ OUwie.fixed<-function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","O
 	if(quiet==FALSE){
 		cat("Calculating likelihood using fixed parameter values:",c(alpha,sigma.sq,theta), "\n")
 	}
-	fixed.fit <- dev()
+	fixed.fit <- dev.fixed()
 	loglik<- -fixed.fit[[1]]
 
 	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]])

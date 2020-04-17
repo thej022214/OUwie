@@ -282,7 +282,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		for(i in seq(from = 1, by = k, length.out = ntraits)){
 			j=(i+1):(i+k-1)
 			tmp<-NA
-			try(tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, alpha=c(Rate.mat[1,c(i,j)]), sigma.sq=c(Rate.mat[2,c(i,j)]), quiet=TRUE)$loglik, silent=TRUE)
+			try(tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, shift.point=shift.point, alpha=c(Rate.mat[1,c(i,j)]), sigma.sq=c(Rate.mat[2,c(i,j)]), quiet=TRUE)$loglik, silent=TRUE)
 			if(!is.finite(tmp)){
 				return(10000000)
 			}
@@ -474,7 +474,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		}
 		if(model.tmp == "BM1" | model.tmp == "BMS" | model.tmp == "OU1"){
 			j=(i+1):(i+k-1)
-			tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
+			tmp <- OUwie.fixed(phy,data[,c(1,2,count)], model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, shift.point=shift.point, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
 			tmp <- t(tmp)
 			tmp.mat <- matrix(0,2,k)
 			for(k in 1:k){
@@ -484,7 +484,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 			count <- count + 1			
 		}else{
 			j=(i+1):(i+k-1)
-			tmp <- OUwie.fixed(phy,data[,c(1,2,count)],model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
+			tmp <- OUwie.fixed(phy,data[,c(1,2,count)],model=model.tmp, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, shift.point=shift.point, alpha=c(solution[1,c(i,j)]), sigma.sq=c(solution[2,c(i,j)]), quiet=TRUE)$theta
 			thetas <- cbind(thetas,t(tmp)) 
 			count <- count + 1
 		}
