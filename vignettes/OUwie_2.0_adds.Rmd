@@ -1,0 +1,27 @@
+
+---
+title: "OUwie 2.0"
+author: "Jeremy M. Beaulieu and Brian C. O'Meara"
+output:
+  pdf_document:
+    fig_caption: yes
+vignette: >
+   %\VignetteEngine{knitr::rmarkdown}
+   %\VignetteIndexEntry{Running hisse}
+   \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## New Features
+
+Will expand on these topics tomorrow.
+
+1. Added in Ho and Ane added variance bit when assuming a stationary 
+2. Bug in the way the weight matrix was constructed.
+3. BIC -- Ho and Ane new sample size corrections
+4. Idenfiability tests
+5. Ancestral state reconstruction under OUwie models
+6. Unit tests
