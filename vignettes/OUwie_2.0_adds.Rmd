@@ -79,6 +79,6 @@ recons <- OUwie.anc(ouwiefit, knowledge=TRUE)
 From there, you can then easily plot these reconstructions using an internal function that recognizes the `OUwie` and `OUwie.anc` class:
 
 ```{r, fig.align="center", fig.width=6, fig.height=6}
-plot(recons, fsize = 0.5)
+plot(recons,)
 ```
 
