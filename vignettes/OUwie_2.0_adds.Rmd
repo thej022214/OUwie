@@ -15,21 +15,29 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+require(OUwie)
+```
+
 It's been quite a while since we've done any active development of `OUwie`. However, it was recently brought to our attention that the likelihoods between `OUwie` and `ouch` when the model assumes different OU means (what we refer to as "OUM"). We would like to thank and credit Clay Cressler for working through our code to identify these issues. So, we have taken this opportunity to release a new version of `OUwie` that corrects these issues as well as provide a number of new capabilities. Some of these new functions were implemented at the request of users, for our own research, and as part of tutorials for various workshops. 
 
-### Bug fixes
+## Bug fixes
 
 There was a bug in the most recent version of the weight matrix generation code. For some reason, while looping over the different regimes, the function was not resetting the regime to the regime at the root, and the calculation for the weights for the root regime was missing a $W_{0,i}+e^{(-\alpha_{0,i})}$ term. These are now fixed, and fortunately does not cause any detectable effect on the likelihood, though it does impact the estimates of the regime optima. 
 
-We have also added modification to the way the variance-covariance matrix is constructed when assuming stationarity at the root. In the original Beaulieu et al. (2012) we expanded upon equation A5 in Butler and King (2004), which assumed that the root optima was estimated. However, by default we drop the root optima and assume that the system started at stationarity. Ho and Ane (2013) showed that the covariance calculated assuming under the stationarity there is an additional variance term that has to be added to this calculation. For example, consider two tips that diverge at the root. Under the original formulation of Butler and King (2004) the covariance between the two tips was zero because $s_{ij}=0$, so $1-e^{-2\alpha s_{ij}}=0$). With the Ho and Ane (2013) method, $V_{ij} = \frac{\sigma^2}{2\alpha} e^{-2\alpha}$ is added to account for the fact that, up until $T=0$, the lineage is assumed to have been evolving in the ancestral regime.
+We have also added modification to the way the variance-covariance matrix is constructed when assuming stationarity at the root. In the original Beaulieu et al. (2012) we expanded upon equation A5 in Butler and King (2004), which assumed that the root optima was estimated. However, by default we drop the root optima and assume that the system started at stationarity. Ho and Ane (2013) showed that the covariance calculated assuming under the stationarity there is an additional variance term that has to be added to this calculation. For example, consider two tips that diverge at the root. Under the original formulation of Butler and King (2004) the covariance between the two tips was zero because $s_{ij}=0$, so $1-e^{-2\alpha s_{ij}}=0$). With the Ho and Ane (2013) method, $V_{ij} = \frac{\sigma^2}{2\alpha}e^{-2\alpha}$ is added to account for the fact that, up until $T=0$, the lineage is assumed to have been evolving in the ancestral regime.
 
-### New Features
+## New Features
 
-3. BIC -- Ho and Ane new sample size corrections -- BRIAN
-4. Idenfiability tests -- BRIAN
-5. 
+### BIC -- Ho and Ane new sample size corrections -- BRIAN
 
-**Ancestral state reconstruction under OUwie models** The request to implement ancestral state estimation resulted in many important comments in the public R-SIG-PHYLO discussion forum. It was not an issue as to whether or not you **could** estimate ancestral states, the discussion was more of **should** you. Here is a sampling of comments from experts in the field:
+### Idenfiability tests -- BRIAN
+
+### Matrix conditioning -- BRIAN 
+
+### Ancestral state reconstruction under OUwie models
+
+The request to implement ancestral state estimation resulted in many important comments in the public R-SIG-PHYLO discussion forum. It was not an issue as to whether or not you **could** estimate ancestral states, the discussion was more of **should** you. Here is a sampling of comments from experts in the field:
 
 > *So in short, yes, you can do it, with any number of methods. But why? If you can answer your biological question with methods that do not involve estimation of a parameter that is inherently fraught with error, it might be better to go another way. Bottom line - use caution and be thoughtful!* 
 -- Marguerite Butler
@@ -51,8 +59,26 @@ We have also added modification to the way the variance-covariance matrix is con
 
 These are some of the people who best know the power and limitations of the OU model in phylogenetics -- heed them!
 
-To ensure that you've read this before use, please pass knowledge=TRUE as an argument to the function.
+It's fairly straightforward to run. All you need is an object of class `OUwie` and it plugs directly into `OUwie.anc()` function:
+```{r, eval=TRUE, echo=FALSE}
+data(tworegime)
+set.seed(42)
+ouwiefit <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=TRUE, shift.point=0.5, quiet=TRUE)
+```
 
+```{r, eval=FALSE, echo=FALSE}
+recons <- OUwie.anc(ouwiefit)
+```
 
+Ah! If you run the code above a somewhat snarky response is printed to the screen. Since you are here reading this, we think this is sufficient, and you are at least aware that we are not huge fans of this approach. So, there is no need to read the manual (it's basically the same as what you see here). The proper way to call the `OUwie.anc() function call is simply add in `knowledge=TRUE`: 
 
+```{r}
+recons <- OUwie.anc(ouwiefit, knowledge=TRUE)
+```
+
+From there, you can then easily plot these reconstructions using an internal function that recognizes the `OUwie` and `OUwie.anc` class:
+
+```{r, fig.align="center", fig.width=6, fig.height=6}
+plot(recons, fsize = 0.5)
+```
 
