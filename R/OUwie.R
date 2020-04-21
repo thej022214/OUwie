@@ -694,7 +694,7 @@ print.OUwie<-function(x, ...){
 
 MakeAgeTable <- function(phy, root.age=NULL){
     if(is.null(root.age)){
-        node.ages <- dateNodes(phy, rootAge=max(branching.times(phy)))
+        node.ages <- dateNodes(phy, rootAge=max(node.depth.edgelength(phy)))
     }else{
         node.ages <- dateNodes(phy, rootAge=root.age)
     }

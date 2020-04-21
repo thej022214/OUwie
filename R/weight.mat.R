@@ -94,7 +94,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             W[1:(ntips),j] <- diag(w.piece)
         }
         W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
-        #W <- W/rowSums(W)
+        W <- W/rowSums(W)
     }
     
     if(assume.station==FALSE){
@@ -173,7 +173,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             W[1:(ntips),j+1] <- diag(w.piece)
         }
         W[,root.state] <- W[,root.state]+exp(-alpha[root.state])
-        #W <- W/rowSums(W)
+        W <- W/rowSums(W)
     }
     W
 }
