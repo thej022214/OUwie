@@ -82,3 +82,14 @@ From there, you can then easily plot these reconstructions using an internal fun
 plot(recon, fsize=0.5)
 ```
 
+
+# References
+
+Beaulieu J.M., Jhwueng D.C., Boettiger C., and O'Meara B.C. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution 66:2369-2383.
+
+Butler M.A., King A.A. 2004. Phylogenetic comparative analysis: A modeling approach for adaptive evolution. American Naturalist 164:683-695.
+
+Ho, L.S.T., and C. Ane. 2013. Asymptotic theory with hierarchical autocorrelation: Orstein-Uhlenbeck tree models. The Annals of Statistics, 41: 957-981.
+
+Ho, L.S.T., and C. Ane. 2014. Intrinsic inference difficulties for trait evolution with Ornstein-Uhlenbeck models. Methods in Ecology and Evolution, 5: 1133-1146.
+
