@@ -2,11 +2,18 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, mserr="none", diagn=FALSE, quiet=FALSE){
+OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, mserr="none", diagn=FALSE, check.identify=TRUE, quiet=FALSE){
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
             stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
+        }
+    }
+
+    if(check.identify == TRUE){
+        check.identify <- CheckIdentify(phy=phy, data=data, simmap.tree=simmap.tree, verbose=FALSE)
+        if(check.identify == 0){
+            stop("The supplied regime painting is unidentifiable.", .call=FALSE)
         }
     }
 
