@@ -29,9 +29,7 @@ We have also added modification to the way the variance-covariance matrix is con
 
 ## New Features
 
-### BIC -- Ho and Ane new sample size corrections -- BRIAN
-
-### Idenfiability tests -- BRIAN
+### Idenfiability tests and modified BIC
 
 ### Matrix conditioning -- BRIAN 
 

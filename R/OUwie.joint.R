@@ -2,23 +2,23 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, mserr="none", diagn=FALSE, check.identify=TRUE, quiet=FALSE){
+OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, mserr="none", check.identify=TRUE, diagn=FALSE, quiet=FALSE){
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
             stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
         }
     }
-
+    
     if(check.identify == TRUE){
-        check.identify <- CheckIdentify(phy=phy, data=data, simmap.tree=simmap.tree, verbose=FALSE)
-        if(check.identify == 0){
+        check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
+        if(check.identify[1] == 0){
             stop("The supplied regime painting is unidentifiable.", .call=FALSE)
         }
     }
-
-	#Makes sure the data is in the same order as the tip labels
-	if(mserr=="none" | mserr=="est"){
+    
+    #Makes sure the data is in the same order as the tip labels
+    if(mserr=="none" | mserr=="est"){
 		data<-data.frame(data[,1], data[,2], data[,3:(2+ntraits)])
 	}
 	if(mserr=="known"){
@@ -497,7 +497,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		}
 	}
 	ntips = Ntip(phy)
-	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))),model=model, param.count=param.count, solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, shift.point=shift.point, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits)
+	obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=solution, thetas=thetas, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, opts=opts, data=data, phy=phy, root.station=root.station, shift.point=shift.point, lb=lower, ub=upper, iterations=out$iterations, ntraits=ntraits)
 	class(obj)<-"OUwie.joint"		
 	return(obj)
 }
@@ -505,8 +505,8 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 
 print.OUwie.joint <- function(x, ...){
 	ntips = Ntip(x$phy)
-	output <- data.frame(x$loglik,x$AIC,x$AICc,x$model, ntips, row.names="")
-	names(output) <- c("lnL","AIC","AICc","model","ntax")
+    output <- data.frame(x$loglik,x$AIC,x$AICc,x$mBIC,x$model,ntips, row.names="")
+    names(output)<-c("lnL","AIC","AICc","mBIC","model","ntax")
 	cat("\nOverall Fit\n")
 	print(output)
 	cat("\n")

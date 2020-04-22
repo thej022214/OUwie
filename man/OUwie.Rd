@@ -6,8 +6,9 @@
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
 root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, 
-diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list(algorithm = "NLOPT_LN_SBPLX",
-maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
+check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, 
+opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000", 
+ftol_rel = .Machine$double.eps^0.5))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -21,6 +22,7 @@ maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest (see Details).}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{starting.vals}{a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.}
+\item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
@@ -47,6 +49,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$AIC}{Akaike information criterion.}
 \item{$AICc}{Akaike information criterion corrected for sample-size.}
 \item{$BIC}{Bayesian information criterion.}
+\item{$mBIC}{modified Bayesian information criterion of Ho and Ane (2014).}
 \item{$model}{The model being fit}
 \item{$param.count}{The number of parameters counted in the model.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
@@ -121,6 +124,8 @@ Beaulieu J.M., Jhwueng D.C., Boettiger C., and O'Meara B.C. 2012. Modeling stabi
 O'Meara B.C., Ane C., Sanderson P.C., Wainwright P.C. 2006. Testing for different rates of continuous trait evolution using likelihood. Evolution 60:922-933.
 
 Butler M.A., King A.A. 2004. Phylogenetic comparative analysis: A modeling approach for adaptive evolution. American Naturalist 164:683-695.
+
+Ho, L.S.T., and C. Ane. 2014. Intrinsic inference difficulties for trait evolution with Ornstein-Uhlenbeck models. Methods in Ecology and Evolution, 5: 1133-1146.
 
 Thomas G.H., Freckleton R.P., and Szekely T. 2006. Comparative analysis of the influence of developmental mode on phenotypic diversification rates in shorebirds. Proceedings of the Royal Society, B. 273:1619-1624.
 }

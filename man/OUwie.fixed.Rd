@@ -5,7 +5,8 @@
 \usage{
 OUwie.fixed(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), 
 simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, 
-alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
+alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, 
+quiet=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
@@ -21,6 +22,7 @@ alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", quiet=FALSE)
 \item{theta}{a numeric vector giving the values of \eqn{\theta}{theta} for each selective regime}
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest.}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
 \item{quiet}{a logical indicating whether or not to print progress to the screen. The default is "FALSE".}
 }
 \details{

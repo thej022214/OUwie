@@ -1,9 +1,9 @@
 
-### Ho and Ane test of identifiability of selection optima
+### Ho and Ane test of identifiability of regime optima
 
 #written by Jeremy M. Beaulieu
 
-CheckIdentify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, verbose=TRUE){
+check.identify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, quiet=FALSE){
     phy = reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
     N <- dim(phy$edge)[1]
@@ -25,7 +25,12 @@ CheckIdentify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, verbos
         }
         v[anc[i],] = v[anc[i],]+v[des[i],]
         if(simmap.tree==TRUE){
-            print("oops. Forgot!")
+            regimeindex <- colnames(phy$mapped.edge)
+            currentmap <- phy$maps[[i]]
+            if(length(currentmap > 1)){
+                shift.number <- shift.number + 1
+                regime_shifts[[shift.number]] <- i
+            }
         }else{
             if(regime_labs[anc[i]] != regime_labs[des[i]]){
                 shift.number <- shift.number + 1
@@ -33,21 +38,21 @@ CheckIdentify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, verbos
             }
         }
     }
-    identifiable <- check(regime_shifts)
+    identifiable <- check(regime_shifts, ROOT=ROOT, n=n, N=N, v=v, des=des)
     if(identifiable[1] == 0){
-        if(verbose=TRUE){
-            cat("The regimes are unidentifiable.", "\n")
+        if(quiet==FALSE){
+            cat("The regime optima are unidentifiable.", "\n")
         }
-        return(identifiable[1])
+        return(identifiable)
     }else{
         if(get.penalty == TRUE){
-            if(verbose=TRUE){
-                cat("The regimes are identifiable.", "\n")
+            if(quiet == FALSE){
+                cat("The regime optima are identifiable.", "\n")
             }
-            return(identifiable[2])
+            return(identifiable)
         }else{
-            if(verbose=TRUE){
-                cat("The regimes are identifiable.", "\n")
+            if(quiet==FALSE){
+                cat("The regime optima are identifiable.", "\n")
             }
             return(identifiable[1])
         }
@@ -57,7 +62,7 @@ CheckIdentify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, verbos
 
 ##Check function taken from phylolm, which is an embedded function
 ##for checking identifiability of the OUshifts model:
-check <- function(model) {
+check <- function(model, ROOT, n, N, v, des) {
     ### return identifiability check and modified BIC penalty
     if (length(model)==0) return(c(1,log(n)))
     checkpar = rep(ROOT,n)

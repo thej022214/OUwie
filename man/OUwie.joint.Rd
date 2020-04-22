@@ -6,7 +6,8 @@
 OUwie.joint(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV",
 "OUMVr","OUMA","OUMAr","OUMVA","OUMVAr"), ntraits, allfree=TRUE, 
 simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, 
-root.station=TRUE, shift.point=0.5, mserr="none", diagn=FALSE, quiet=FALSE)
+root.station=TRUE, shift.point=0.5, mserr="none", check.identify=TRUE, diagn=FALSE, 
+quiet=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -20,6 +21,7 @@ root.station=TRUE, shift.point=0.5, mserr="none", diagn=FALSE, quiet=FALSE)
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{mserr}{designates whether the data matrix contains measurement error for each species value ("known"). The default is "none".}
+\item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 }
