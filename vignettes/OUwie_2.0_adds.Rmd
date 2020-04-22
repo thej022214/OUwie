@@ -35,14 +35,14 @@ We have also added modification to the way the variance-covariance matrix is con
 
 ### Matrix conditioning -- BRIAN 
 
-### Ancestral state reconstruction under OUwie models
+### Ancestral trait reconstruction
 
-The request to implement ancestral state estimation resulted in many important comments in the public R-SIG-PHYLO discussion forum. It was not an issue as to whether or not you **could** estimate ancestral states, the discussion was more of **should** you. Here is a sampling of comments from experts in the field:
+Since `OUwie` was first released we've received a deluge of requests to allow for ancestral trait reconstruction. One such request made its way onto the public R-SIG-PHYLO discussion forum, which stimulated an important conversation about not whether or not you **could** estimate ancestral states, but, rather, **should** you. The answer is "it's complicated" and we don't recommend it. In our view, the intended use case is just to visualize what the model is saying about evolution to help intuition. For example, is the model something you can believe in? But, if you don't want to listen to us regarding the merits of ancestral trait reconstructions, here is a sample of comments from other experts in the field:
 
 > *So in short, yes, you can do it, with any number of methods. But why? If you can answer your biological question with methods that do not involve estimation of a parameter that is inherently fraught with error, it might be better to go another way. Bottom line - use caution and be thoughtful!* 
 -- Marguerite Butler
 
-> *I would add an extra caveat to Marguerite's excellent post: Most researchers work with extant taxa only, ignoring extinction. This causes a massive ascertainment bias, and the character states of the extinct taxa can often be very different to the ancestral state reconstructions, particularly if the evolutionary model is wrong. Eg. there has been an evolutionary trend for example. Ancestral state reconstructions based only on extant taxa should be treated as hypotheses to be tested with fossil data. I wouldn't rely on them for much more.*
+> *I would add an extra caveat to Marguerite's excellent post: Most researchers work with extant taxa only, ignoring extinction. This causes a massive ascertainment bias, and the character states of the extinct taxa can often be very different to the ancestral state reconstructions, particularly if the evolutionary model is wrong. E.g. there has been an evolutionary trend for example. Ancestral state reconstructions based only on extant taxa should be treated as hypotheses to be tested with fossil data. I wouldn't rely on them for much more.*
 -- Simone Blomberg
 
 > *While I am at it, let me echo Simone and Marguerite's warnings. The predicted ancestral states will reflect the process you assumed to predict them. Hence, if you  use them to make inferences about evolution, you will recover your own assumptions. I.e. if you predict from a model with no trend, you will find no trend, etc. Many comparative studies are flawed for this reason.* 
@@ -57,9 +57,9 @@ The request to implement ancestral state estimation resulted in many important c
 > *I'll also add that I think there's a great deal to be skeptical of ancestral trait reconstruction even when large amounts of fossil data is available. You can try the exercise yourself: simulate pure BM on a non-ultrametric tree with lots of 'extinct' tips, and you'll still find pretty large confidence intervals on the estimates of the trait values. What does it mean to do ancestral trait reconstruction, if our calculations of uncertainty are that broad?*
 -- Dave Bapst
 
-These are some of the people who best know the power and limitations of the OU model in phylogenetics -- heed them!
+These people probably know better than anyone about the power and limitations of the OU model in phylogenetics. So, don't listen to us, listen to them!
 
-It's fairly straightforward to run. All you need is an object of class `OUwie` and it plugs directly into `OUwie.anc()` function:
+Still determined? Ok, fair enough. It is straightforward to run the ancestral trait reconstruction in `OUwie`. All you need is an object of class `OUwie`, which is plugged directly into the new `OUwie.anc()` function:
 ```{r, eval=TRUE, echo=FALSE}
 data(tworegime)
 set.seed(42)
@@ -67,18 +67,18 @@ ouwiefit <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=TRUE,
 ```
 
 ```{r, eval=FALSE, echo=FALSE}
-recons <- OUwie.anc(ouwiefit)
+recon <- OUwie.anc(ouwiefit)
 ```
 
-Ah! If you run the code above a somewhat snarky response is printed to the screen. Since you are here reading this, we think this is sufficient, and you are at least aware that we are not huge fans of this approach. So, there is no need to read the manual (it's basically the same as what you see here). The proper way to call the `OUwie.anc() function call is simply add in `knowledge=TRUE`: 
+Ah! If you run the code above a somewhat snarky response is printed to the screen. Since you are here reading this, we think this is sufficient, and you are at least aware that we are not huge fans of this approach. So, there is no need to read the manual (it's basically the same as what you see here), and the proper way to call the `OUwie.anc()` function call is simply add in `knowledge=TRUE`: 
 
 ```{r}
-recons <- OUwie.anc(ouwiefit, knowledge=TRUE)
+recon <- OUwie.anc(ouwiefit, knowledge=TRUE)
 ```
 
 From there, you can then easily plot these reconstructions using an internal function that recognizes the `OUwie` and `OUwie.anc` class:
 
 ```{r, fig.align="center", fig.width=6, fig.height=6}
-plot(recons,)
+plot(recon, fsize=0.5)
 ```
 

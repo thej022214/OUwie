@@ -108,5 +108,5 @@ plot.OUwie.anc <- function(x, ...) {
     # }
     x$phy <- ape::drop.tip(x$phy, x$phy$tip.label[grepl("node_",x$phy$tip.label)])
     pruned <- geiger::treedata(x$phy, quantitative.trait, warnings=FALSE, sort=TRUE)
-    phytools::contMap(pruned$phy, pruned$data[,1], method="user", anc.states=x$NodeRecon)
+    phytools::contMap(pruned$phy, pruned$data[,1], method="user", anc.states=x$NodeRecon, ...)
 }
