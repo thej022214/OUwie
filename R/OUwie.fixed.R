@@ -23,7 +23,12 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
-    
+    if(model == "OUMV" |  model == "OUMA" |  model == "OUMVA"){
+        if(root.station == TRUE){
+            stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
+        }
+    }
+
     #Makes sure the data is in the same order as the tip labels
     if(mserr=="none" | mserr=="est"){
         data<-data.frame(data[,2], data[,3], row.names=data[,1])
@@ -31,11 +36,11 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     if(mserr=="known"){
         if(!dim(data)[2]==4){
-            stop("You specified measurement error should be incorporated, but this information is missing", .call=FALSE)
+            stop("You specified measurement error should be incorporated, but this information is missing.", call. = FALSE)
         }
         else{
             if(is.factor(data[,4]) == TRUE){
-                stop("Check the format of the measurement error column. It's reading as a factor.", .call=FALSE)
+                stop("Check the format of the measurement error column. It's reading as a factor.",  call. = FALSE)
             }else{
                 data<-data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
                 data<-data[phy$tip.label,]
@@ -111,12 +116,12 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 #Since we only really have one global regime, make up the internal nodes -- this could be improved
                 phy$node.label<-as.numeric(int.states)
                 #Obtain root state -- for both models assume the root state to be 1 since no other state is used even if provided in the tree
-                root.state<-1
+                root.state <- 1
                 #New tree matrix to be used for subsetting regimes
                 edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
                 
-                if(scaleHeight==TRUE){
-                    edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                if(scaleHeight == TRUE){
+                    edges[,4:5] <-  edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
                     root.age = 1
                 }
                 
@@ -259,9 +264,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         if(mserr=="known"){
             diag(V)<-diag(V)+(data[,3]^2)
         }
-        #        if(mserr=="est"){
-        #            diag(V)<-diag(V)+p[length(p)]
-        #        }
         if(is.null(theta)){
             theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
             se<-sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
@@ -271,8 +273,8 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             se=rep(NA,length(theta))
         }
         
-        theta.est<-cbind(theta,se)
-        res<-W%*%theta-x
+        theta.est <- cbind(theta,se)
+        res <- W%*%theta-x
         #When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
         DET <- sum(log(abs(Re(diag(qr(V)$qr)))))
         #However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
@@ -287,10 +289,31 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     if(quiet==FALSE){
         cat("Calculating likelihood using fixed parameter values:",c(alpha,sigma.sq,theta), "\n")
     }
+    
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
-    V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, V=V, root.station=root.station, res=fixed.fit[[3]])
+    
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+    if(root.station == FALSE){
+        rates <- cbind(NA, Rate.mat, NA)
+        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+        rates <- rbind(rates, thetas)
+        weights <- cbind(W, data[,1])
+        regime.weights <- rbind(rates, weights)
+        rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+        colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
+    }
+    if(root.station == TRUE){
+        rates <- cbind(Rate.mat, NA)
+        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+        rates <- rbind(rates, thetas)
+        weights <- cbind(W, data[,1])
+        regime.weights <- rbind(rates, weights)
+        rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+        colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
+    }
+    
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], regime.weights=regime.weights)
     class(obj)<-"OUwie.fixed"
     return(obj)
 }
@@ -371,7 +394,6 @@ print.OUwie.fixed<-function(x, ...){
         }
         if (x$root.station == FALSE){
             if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-                print(x$theta)
                 param.est<- x$solution
                 rownames(param.est)<-c("alpha","sigma.sq")
                 theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
