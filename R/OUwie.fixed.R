@@ -18,7 +18,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     
     if(check.identify == TRUE){
         check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
-        if(check.identify == 0){
+        if(check.identify[1] == 0){
             stop("The supplied regime painting is unidentifiable.", .call=FALSE)
         }
     }
@@ -289,8 +289,8 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
-    
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]])
+    V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, V=V, root.station=root.station, res=fixed.fit[[3]])
     class(obj)<-"OUwie.fixed"
     return(obj)
 }

@@ -144,7 +144,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                     newregime=which(edges[i,6:(k+5)]==1)
                     if(oldregime==newregime){
                         if(newregime==j){
-                            nodevar[i]=exp(-alpha[root.state])*(exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime))
+                            nodevar[i] <- exp(-alpha[root.state])*(exp(alpha[oldregime]*newtime)-exp(alpha[oldregime]*oldtime))
                         }
                         else{
                             nodevar[i] <- 0

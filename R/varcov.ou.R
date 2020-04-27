@@ -2,10 +2,6 @@
 
 #written by Jeremy M. Beaulieu
 
-#OU variance-covariance matrix generator
-
-#written by Jeremy M. Beaulieu
-
 varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=.5){
     if(is.null(root.state)) {
         root.state<-which(edges[dim(edges)[1],]==1)-5
@@ -112,9 +108,9 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             root.age <- max(branching.times(phy))
         }
         vcv <- exp(-2*alpha[1]*max(root.age))*vcv2
-    }
-    if(assume.station) {
-        vcv <- vcv + sigma[root.state]*exp(-2*alpha[root.state])/(2*alpha[root.state])
+        #if(assume.station) {
+        #    vcv <- vcv + sigma[root.state]*exp(-2*alpha[root.state])/(2*alpha[root.state])
+        #}
     }
     vcv
     

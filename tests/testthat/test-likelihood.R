@@ -31,3 +31,10 @@ test_that("testing OUMV likelihood", {
     comparison <- identical(round(ouwiefit$loglik,5), -14.92345)
     expect_true(comparison)
 })
+
+
+
+
+
+
+
