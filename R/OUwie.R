@@ -35,11 +35,13 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
     
     if(check.identify == TRUE){
         check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
-        if(check.identify[1] == 0){
-            stop("The supplied regime painting is unidentifiable.", call. = FALSE)
+        if(clade == NULL){
+            if(check.identify[1] == 0){
+                stop("The supplied regime painting is unidentifiable.", call. = FALSE)
+            }
         }
     }
-    
+
     if(model == "OUMV" |  model == "OUMA" |  model == "OUMVA"){
         if(root.station == TRUE){
             stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
@@ -47,7 +49,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
     }
     
     #Makes sure the data is in the same order as the tip labels
-    if(mserr=="none" | mserr=="est"){
+    if(mserr == "none" | mserr == "est"){
 		data<-data.frame(data[,2], data[,3], row.names=data[,1])
 		data<-data[phy$tip.label,]
 	}
