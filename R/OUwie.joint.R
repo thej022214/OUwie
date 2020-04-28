@@ -6,14 +6,14 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", .call=FALSE)
+            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", call. = FALSE)
         }
     }
     
     if(check.identify == TRUE){
         check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
         if(check.identify[1] == 0){
-            stop("The supplied regime painting is unidentifiable.", .call=FALSE)
+            stop("The supplied regime painting is unidentifiable.", call. = FALSE)
         }
     }
     
@@ -22,7 +22,7 @@ OUwie.joint <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMVr
 		data<-data.frame(data[,1], data[,2], data[,3:(2+ntraits)])
 	}
 	if(mserr=="known"){
-		stop("You specified measurement error and it is not supported yet.", .call=FALSE)
+		stop("You specified measurement error and it is not supported yet.", call. = FALSE)
 	}
 	tot.states<-factor(c(phy$node.label,as.character(data[,2])))
 	k <- length(levels(tot.states))

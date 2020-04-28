@@ -149,7 +149,7 @@ quickVCV <- function(phy, alpha, sigma.sq, scaleHeight){
 
 
 ##Matrix generating function taken from vcv.phylo in ape:
-mat.gen<-function(phy,piece.wise,pp){
+mat.gen <- function(phy,piece.wise,pp){
     phy <- reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
     anc <- phy$edge[,1]

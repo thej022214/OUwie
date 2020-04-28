@@ -2,45 +2,46 @@
 
 #written by Jeremy M. Beaulieu
 
-expected.trendy<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.value){
+expected.trendy <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.value, shift.point){
 	
-	n=max(phy$edge[,1])
-	ntips=length(phy$tip.label)
+	n <- max(phy$edge[,1])
+	ntips <- length(phy$tip.label)
 	if(is.null(root.state)) {
-		root.state<-which(edges[dim(edges)[1],]==1)-5
-		edges<-edges[-1*dim(edges)[1],]
+		root.state <- which(edges[dim(edges)[1],]==1)-5
+		edges <- edges[-1*dim(edges)[1],]
 	}
 	if(simmap.tree==TRUE){
-		k=length(colnames(phy$mapped.edge))
+		k <- length(colnames(phy$mapped.edge))
 	}
 	if(simmap.tree==FALSE){
-		mm<-dim(edges)
-		k<-length(6:mm[2])
+		mm <- dim(edges)
+		k <- length(6:mm[2])
 	}
 	pp <- prop.part(phy)
-	edges = edges
-	oldregime=root.state
-	nodevar=rep(0,max(edges[,3]))
+	edges <- edges
+	oldregime <- root.state
+	nodevar <- rep(0,max(edges[,3]))
 	
 	#Parameters:
-	alpha=Rate.mat[1,]
-	sigma=Rate.mat[2,]
-	trend=Rate.mat[3,]
+	alpha <- Rate.mat[1,]
+	sigma <- Rate.mat[2,]
+	trend <- Rate.mat[3,]
 	
 	E <- matrix(0,ntips,k)
 	for(j in 1:k){
-		n.cov=matrix(0, n, 1)			
+        oldregime <- root.state
+		n.cov <- matrix(0, n, 1)
 		#Weights for each species per regime
 		for(i in 1:length(edges[,1])){
-			anc = edges[i, 2]
-			oldtime=edges[i,4]
-			newtime=edges[i,5]
+			anc <- edges[i, 2]
+			oldtime <- edges[i,4]
+			newtime <- edges[i,5]
 			if(simmap.tree==TRUE){
 				if(scaleHeight==TRUE){
-					currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
+					currentmap <- phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
 				}
 				else{
-					currentmap<-phy$maps[[i]]
+					currentmap <- phy$maps[[i]]
 				}					
 			}
 			if(simmap.tree==TRUE){
@@ -53,55 +54,56 @@ expected.trendy<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, r
 						nodevar[i] <- trend[regimenumber]*(newtime - oldtime)
 					}
 					else{
-						nodevar[i]=nodevar[i]
+						nodevar[i] <- nodevar[i]
 					}
 					oldtime <- newtime
 				}
 			}
 			if(simmap.tree==FALSE){
 				if(anc%in%edges[,3]){
-					start=which(edges[,3]==anc)
-					oldregime=which(edges[start,6:(k+5)]==1)
+					start <- which(edges[,3]==anc)
+					oldregime <- which(edges[start,6:(k+5)]==1)
 				}
 				else{
 					#For the root:
-					oldregime=root.state
+					oldregime <- root.state
 				}	
-				newregime=which(edges[i,6:(k+5)]==1)
+				newregime <- which(edges[i,6:(k+5)]==1)
 				if(oldregime==newregime){
 					if(newregime==j){
-						nodevar[i] = trend[oldregime]*(newtime - oldtime)
+						nodevar[i] <- trend[oldregime]*(newtime - oldtime)
 					}
 					else{
-						nodevar[i]=0
+						nodevar[i] <- 0
 					}
 				}
 				else{
-					halftime=newtime-((newtime-oldtime)/2)
-					epoch1 = trend[oldregime]*(newtime - oldtime)
-					oldtime=halftime
-					newtime=newtime
-					epoch2=trend[newregime]*(newtime - oldtime)
+					shifttime <- newtime-((newtime-oldtime) * shift.point)
+					epoch1 <- trend[oldregime]*(newtime - oldtime)
+					oldtime <- shifttime
+					newtime <- newtime
+					epoch2 <- trend[newregime]*(newtime - oldtime)
 					if(oldregime==j){
-						nodevar[i]=epoch1
+						nodevar[i] <- epoch1
 					}
 					if(newregime==j){
-						nodevar[i]=epoch2
+						nodevar[i] <- epoch2
 					}
 					if(!newregime==j && !oldregime==j){
-						nodevar[i] = 0
+						nodevar[i] <- 0
 					}
 				}
 			}
-			n.cov[edges[i,3],]=nodevar[i]
+			n.cov[edges[i,3],] <- nodevar[i]
 		}
-		e.piece<-mat.gen(phy,n.cov,pp)
-		E[1:(ntips),j]<-diag(e.piece)
+		e.piece <- mat.gen(phy,n.cov,pp)
+		E[1:(ntips),j] <- diag(e.piece)
 	}
 	#The expected values are E[a] = root _ time_1 *trend_1 + time_2 * trend_2 + ...
 	E <- rowSums(E) + root.value
 	E
 }
+
 
 ##Matrix generating function taken from vcv.phylo in ape:
 mat.gen<-function(phy,piece.wise,pp){

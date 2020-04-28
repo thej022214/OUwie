@@ -118,7 +118,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 		data[,1] <- as.numeric(tip.states)
 
 		#A boolean for whether the root theta should be estimated -- default is that it should be.
-		root.station=root.station
 		if (is.character(model)) {
 			if (model == "BM1"| model == "OU1"){
 				##Begins the construction of the edges matrix -- similar to the ouch format##
@@ -659,30 +658,8 @@ print.OUwie<-function(x, ...){
 			print(theta.mat)
 			cat("\n")
 		}
-		if (x$root.station == TRUE | x$root.station==FALSE){
-			if (x$model == "OU1"){
-				param.est<- x$solution
-				theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-				rownames(theta.mat)<-c("estimate", "se")
-				if(x$simmap.tree==FALSE){
-					colnames(theta.mat) <- levels(x$tot.states)
-				}
-				if(x$simmap.tree==TRUE){
-					colnames(theta.mat) <- c(colnames(x$phy$mapped.edge))
-				}
-				cat("Rates\n")
-				print(param.est)
-				cat("\n")
-				cat("\nOptima\n")
-				print(theta.mat)
-				cat("\n")
-				cat("\nHalf life (another way of reporting alpha)\n")
-				print(log(2)/param.est['alpha',])
-				cat("\n")
-			}
-		}
-		if (x$root.station == TRUE){
-			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+        if (x$root.station == TRUE){
+			if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
 				param.est<- x$solution
 				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
 				rownames(theta.mat)<-c("estimate", "se")
@@ -704,7 +681,7 @@ print.OUwie<-function(x, ...){
 			}
 		}
 		if (x$root.station == FALSE){
-			if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+			if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
 				param.est<- x$solution
 				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
 				rownames(theta.mat)<-c("estimate", "se")
