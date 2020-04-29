@@ -4,7 +4,8 @@
 #written by Jeremy M. Beaulieu
 
 check.identify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, quiet=FALSE){
-    phy = reorder(phy, "pruningwise")
+    
+    phy <- reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
     N <- dim(phy$edge)[1]
     ROOT <- n + 1L

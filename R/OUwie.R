@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA),
 #and the multiple alphas and sigmas (OUMVA).
 
-OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
 
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
@@ -34,8 +34,8 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
     }
     
     if(check.identify == TRUE){
-        check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
-        if(clade == NULL){
+        if(is.null(clade)){
+            check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
             if(check.identify[1] == 0){
                 stop("The supplied regime painting is unidentifiable.", call. = FALSE)
             }
@@ -387,9 +387,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			d <- max(diag(vcv.phylo(phy)))
 			phy$edge.length<-(phy$edge.length/d)
 		}
-		C.mat<-vcv.phylo(phy)
-		a<-as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
-		sig<-as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
+		C.mat <- vcv.phylo(phy)
+		a <- as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
+		sig <- as.numeric(t(x-a)%*%solve(C.mat)%*%(x-a)/n)
 		init.np=2
 		init.lower = rep(lb, init.np)
 		init.upper = rep(ub, init.np)
