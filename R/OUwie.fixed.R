@@ -352,28 +352,8 @@ print.OUwie.fixed<-function(x, ...){
             print(theta.mat)
             cat("\n")
         }
-        if (x$root.station == TRUE | x$root.station==FALSE){
-            if (x$model == "OU1"){
-                param.est<- x$solution
-                rownames(param.est)<-c("alpha","sigma.sq")
-                theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-                rownames(theta.mat)<-c("estimate", "se")
-                if(x$simmap.tree==FALSE){
-                    colnames(param.est) <- colnames(theta.mat) <- levels(x$tot.states)
-                }
-                if(x$simmap.tree==TRUE){
-                    colnames(param.est) <- colnames(theta.mat) <- c(colnames(x$phy$mapped.edge))
-                }
-                cat("Rates\n")
-                print(param.est)
-                cat("\n")
-                cat("\nOptima\n")
-                print(theta.mat)
-                cat("\n")
-            }
-        }
         if (x$root.station == TRUE){
-            if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
                 param.est<- x$solution
                 rownames(param.est)<-c("alpha","sigma.sq")
                 theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
@@ -393,7 +373,7 @@ print.OUwie.fixed<-function(x, ...){
             }
         }
         if (x$root.station == FALSE){
-            if (x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
                 param.est<- x$solution
                 rownames(param.est)<-c("alpha","sigma.sq")
                 theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
