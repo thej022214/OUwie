@@ -1,7 +1,7 @@
-library(phytools)
-library(OUwie)
+#library(phytools)
+#library(OUwie)
 #need add getDescendants to the NAMESPACE
-library(RColorBrewer)
+#library(RColorBrewer)
 
 
 OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), shift.max=3, sigma.sq.max.k=3, alpha.max.k=3, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, mserr="none", opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)) {
@@ -33,8 +33,8 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
 
     #Step 3: Now summarize everything:
     solution <- mapped.thetas$solution
-    print(solution)
-    #rownames(solution) <- rownames(find.shifts$model.fit$index.mat) <- c("alpha", "sigma.sq")
+
+    rownames(solution) <- rownames(find.shifts$model.fit$index.mat) <- c("alpha", "sigma.sq")
     tot.states <- factor(c(mapped.phy$node.label, as.character(mapped.data[,2])))
     colnames(solution) <- levels(tot.states)
 
@@ -293,10 +293,6 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
     mapping.tree.data <- GetShiftMap(curmodel, phy, data)
     shifts <- k <- length(curmodel)
 
-    if(curmodel[[1]] == 125){
-        print("at the right shift")
-    }
-    
     ####GET MODEL COMBINATIONS###
     dredge.combos <- DredgeCombinations(shifts=shifts, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k)
     ###########################################
@@ -344,10 +340,6 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
             #optimize likelihood
             out <- nloptr(x0=log(ip), eval_f=GetLikelihood, phy=mapping.tree.data$phy, data=mapping.tree.data$data, simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, index.mat=index.mat, mserr=mserr, lb=lower, ub=upper, opts=opts)
             loglik <- out$objective
-            if(curmodel[[1]] == 125){
-                print("loglik")
-                print(loglik)
-            }
             if(criterion == "AIC"){
                 score <- (2*loglik) + (2*param.count)
             }
@@ -359,7 +351,6 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
             }
             if(criterion == "mBIC"){
                 score <- (2*loglik) + check.identify[2]
-                print(score)
             }
             if(score < current.best.score){
                 current.best.score <- score
