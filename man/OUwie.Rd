@@ -5,7 +5,7 @@
 \usage{
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
-root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, 
+root.station=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, 
 check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, 
 opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000", 
 ftol_rel = .Machine$double.eps^0.5))
@@ -34,8 +34,6 @@ This function fits various likelihood models for continuous characters evolving 
 The initial implementation followed \code{ouch} in that the tree is automatically rescaled so that the branch lengths were in proportion to the total height of the tree. However, this makes the results inconsistent with other implementations such as Brownie or \code{geiger}. Therefore, we allow the user to choose whether the tree should be rescaled or not. Note that the when \code{scaleHeight=FALSE} the bounds will have to be adjusted to the appropriate scale.
 
 Possible models are as follows: single-rate Brownian motion (\code{model=BM1}), Brownian motion with different rate parameters for each state on a tree (\code{model=BMS}), Ornstein-Uhlenbeck model with a single optimum for all species (\code{model=OU1}), Ornstein-Uhlenbeck model with different state means and a single \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} acting all selective regimes (\code{model=OUM}), and new Ornstein-Uhlenbeck models that assume different state means as well as either multiple \eqn{\sigma^2}{sigma^2} (\code{model=OUMV}), multiple \eqn{\alpha}{alpha} (\code{model=OUMA}), or multiple \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} per selective regime (\code{model=OUMVA}).
-
-If \code{root.station} is \code{TRUE} (the default), \eqn{\theta_0}{theta_0} is dropped from the model. Under these conditions it is assumed that the starting value is distributed according to the stationary distribution of the OU process. This would not fit a biological scenario involving moving away from an ancestral state, but it does fit a scenario of evolution at a steady state. Dropping \eqn{\theta_0}{theta_0} from the model can sometimes stabilize estimates of the primary optima, especially in situations where the estimates of \eqn{\theta}{theta} in the full model are non-sensical. In regards to the accuracy of estimating \eqn{\theta_0}{theta_0}, it is important to note that in simulation, as \eqn{\alpha}{alpha} increases estimates of \eqn{\theta_0}{theta_0} converge to zero. Thus, when \eqn{\alpha}{alpha} is large (i.e. \eqn{\alpha}{alpha}>2) it is likely that any inference of an evolutionary trend will be an artifact and positively misleading.
 
 Also note, when specifying the BMS model be mindful of the root.station flag. When root.station=FALSE, the non-censored model of O'Meara et al. 2006 is invoked (i.e., a single regime at the root is estimated), and when root.station==TRUE the group mean model of Thomas et al. 2006 (i.e., the number of means equals the number of regimes). The latter case appears to be a strange special case of OU, in that it behaves similarly to the OUMV model, but without selection. I would say that this is more consistent with the censored test of O'Meara et al. (2006), as opposed to having any real connection to OU. In any case, more work is clearly needed to understand the behavior of the group means model, and therefore, I recommend setting root.station=FALSE in the BMS case.
 
