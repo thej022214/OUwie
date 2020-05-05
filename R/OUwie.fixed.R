@@ -17,7 +17,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     
     if(check.identify == TRUE){
-        check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=TRUE, quiet=TRUE)
+        check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=FALSE, quiet=TRUE)
         if(check.identify[1] == 0){
             stop("The supplied regime painting is unidentifiable.", .call=FALSE)
         }
@@ -103,7 +103,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         phy$node.label=as.numeric(int.states)
         tip.states<-factor(data[,1])
         data[,1]<-as.numeric(tip.states)
-        
+ 
         #A boolean for whether the root theta should be estimated -- default is that it should be.
         root.station=root.station
         if (is.character(model)) {
@@ -167,90 +167,65 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         Rate.mat <- matrix(1, 2, k)
         
         if (model == "BM1"){
-            np=1
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-1e-10
-            Rate.mat[2,1:k]<-sigma.sq
-            param.count<-np+1
-            bool=TRUE
+            np <- 1
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- 1e-10
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+1
+            bool <- TRUE
         }
         if (model == "BMS"){
-            np=k
+            np <- k
             index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-1e-10
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+k
+            Rate.mat[1,1:k] <- 1e-10
+            Rate.mat[2,1:k] <- sigma.sq
+            if(root.station == TRUE){
+                param.count <- np+k
             }
-            if(root.station==FALSE){
-                param.count<-np+1
+            if(root.station == FALSE){
+                param.count <- np+1
             }
-            bool=root.station
+            bool <- root.station
         }
         if (model == "OU1"){
-            np=2
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-alpha
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+1
-            }
-            if(root.station==FALSE){
-                param.count<-np+2
-            }
-            bool=root.station
+            np <- 2
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- alpha
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+1
+            bool <- root.station
         }
         if (model == "OUM"){
-            np=2
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-alpha
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+k
-            }
-            if(root.station==FALSE){
-                param.count<-np+k+1
-            }
-            bool=root.station
+            np <- 2
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- alpha
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+k
+            bool <- root.station
         }
         if (model == "OUMV") {
-            np=k+1
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-alpha
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+k
-            }
-            if(root.station==FALSE){
-                param.count<-np+k+1
-            }
-            bool=root.station
+            np <- k+1
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- alpha
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+k
+            bool <- root.station
         }
         if (model == "OUMA") {
-            np=k+1
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-alpha
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+k
-            }
-            if(root.station==FALSE){
-                param.count<-np+k+1
-            }
-            bool=root.station
+            np <- k+1
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- alpha
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+k
+            bool <- root.station
         }
         if (model == "OUMVA") {
-            np=k*2
-            index<-matrix(TRUE,2,k)
-            Rate.mat[1,1:k]<-alpha
-            Rate.mat[2,1:k]<-sigma.sq
-            if(root.station==TRUE){
-                param.count<-np+k
-            }
-            if(root.station==FALSE){
-                param.count<-np+k+1
-            }
-            bool=root.station
+            np <- k*2
+            index <- matrix(TRUE,2,k)
+            Rate.mat[1,1:k] <- alpha
+            Rate.mat[2,1:k] <- sigma.sq
+            param.count <- np+k
+            bool <- root.station
         }
     }
     
@@ -260,7 +235,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     dev.fixed <- function(){
         N <- length(x[,1])
         V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
         if(mserr=="known"){
             diag(V)<-diag(V)+(data[,3]^2)
         }
@@ -293,17 +268,17 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
     
-    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-    if(root.station == FALSE){
-        rates <- cbind(NA, Rate.mat, NA)
-        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
-        rates <- rbind(rates, thetas)
-        weights <- cbind(W, data[,1])
-        regime.weights <- rbind(rates, weights)
-        rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-        colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
-    }
-    if(root.station == TRUE){
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    #if(root.station == FALSE){
+    #    rates <- cbind(NA, Rate.mat, NA)
+    #    thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+    #    rates <- rbind(rates, thetas)
+    #    weights <- cbind(W, data[,1])
+    #    regime.weights <- rbind(rates, weights)
+    #    rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+    #    colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
+    #}
+    #if(root.station == TRUE){
         rates <- cbind(Rate.mat, NA)
         thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
         rates <- rbind(rates, thetas)
@@ -311,9 +286,9 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         regime.weights <- rbind(rates, weights)
         rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
         colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
-    }
+    #}
     
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, mBIC = -2*loglik + check.identify[2], model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], regime.weights=regime.weights)
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], regime.weights=regime.weights)
     class(obj)<-"OUwie.fixed"
     return(obj)
 }
@@ -322,8 +297,8 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
 print.OUwie.fixed<-function(x, ...){
     
     ntips=Ntip(x$phy)
-    output<-data.frame(x$loglik,x$AIC,x$AICc,x$mBIC,x$model,ntips, row.names="")
-    names(output)<-c("lnL","AIC","AICc","mBIC","model","ntax")
+    output<-data.frame(x$loglik,x$AIC,x$AICc,x$BIC,x$model,ntips, row.names="")
+    names(output)<-c("lnL","AIC","AICc","BIC","model","ntax")
     cat("\nFit\n")
     print(output)
     cat("\n")
@@ -352,7 +327,7 @@ print.OUwie.fixed<-function(x, ...){
             print(theta.mat)
             cat("\n")
         }
-        if (x$root.station == TRUE){
+        #if (x$root.station == TRUE){
             if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
                 param.est<- x$solution
                 rownames(param.est)<-c("alpha","sigma.sq")
@@ -371,29 +346,29 @@ print.OUwie.fixed<-function(x, ...){
                 print(theta.mat)
                 cat("\n")
             }
-        }
-        if (x$root.station == FALSE){
-            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-                param.est<- x$solution
-                rownames(param.est)<-c("alpha","sigma.sq")
-                theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
-                rownames(theta.mat)<-c("estimate", "se")
-                if(x$simmap.tree==FALSE){
-                    colnames(param.est) <- levels(x$tot.states)
-                    colnames(theta.mat)<-c("Root", levels(x$tot.states))
-                }
-                if(x$simmap.tree==TRUE){
-                    colnames(param.est) <- c(colnames(x$phy$mapped.edge))
-                    colnames(theta.mat)<-c("Root", colnames(x$phy$mapped.edge))
-                }
-                cat("\nRates\n")
-                print(param.est)
-                cat("\n")
-                cat("Optima\n")
-                print(theta.mat)
-                cat("\n")
-            }
-        }
+        #}
+            #if (x$root.station == FALSE){
+            #if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+            #    param.est<- x$solution
+            #    rownames(param.est)<-c("alpha","sigma.sq")
+            #    theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
+            #    rownames(theta.mat)<-c("estimate", "se")
+            #    if(x$simmap.tree==FALSE){
+            #        colnames(param.est) <- levels(x$tot.states)
+            #        colnames(theta.mat)<-c("Root", levels(x$tot.states))
+            #    }
+            #    if(x$simmap.tree==TRUE){
+            #        colnames(param.est) <- c(colnames(x$phy$mapped.edge))
+            #        colnames(theta.mat)<-c("Root", colnames(x$phy$mapped.edge))
+            #    }
+            #    cat("\nRates\n")
+            #    print(param.est)
+            #    cat("\n")
+            #    cat("Optima\n")
+            #    print(theta.mat)
+            #    cat("\n")
+            #}
+        #}
     }
 }
 

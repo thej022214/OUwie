@@ -3,7 +3,7 @@
 
 #written by Jeremy M. Beaulieu
 
-check.identify <- function(phy, data, simmap.tree=FALSE, get.penalty=TRUE, quiet=FALSE){
+check.identify <- function(phy, data, simmap.tree=FALSE, param.count=3, get.penalty=TRUE, quiet=FALSE){
     
     phy <- reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
@@ -71,7 +71,7 @@ check <- function(model, ROOT, n, N, v, des) {
     if (i %in% model) checkpar[which(v[des[i],]==1)] = i
     if (length(levels(as.factor(checkpar))) == length(model)+1) {
         numchange = length(model)
-        pen = 3*log(n) + (2*numchange - 1)*log(n)
+        pen = (2*numchange - 1)*log(n)
         for (j in 1:numchange)
         pen = pen + log(length(which(as.factor(checkpar)==levels(as.factor(checkpar))[j])))
         return(c(1,pen))

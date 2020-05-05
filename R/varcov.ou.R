@@ -30,7 +30,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         sigma=Rate.mat[2,]
         n.cov1=matrix(rep(0,n), n, 1)
         n.cov2=matrix(rep(0,n), n, 1)
-
+        
         if(simmap.tree==TRUE){
             regimeindex<-colnames(phy$mapped.edge)
             for(i in 1:length(edges[,1])){
@@ -114,7 +114,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             if(is.null(root.age)){
                 root.age <- max(branching.times(phy))
             }
-            vcv <- exp(-2*alpha[1]*max(root.age))*vcv2
+            vcv <- exp(-2*alpha[1]*max(root.age)) * vcv2
         }
     }
     vcv

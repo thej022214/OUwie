@@ -13,27 +13,29 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
     #Coerce the data so that it will run in OUwie -- using values of OU1 as the starting points:
     cat("Initializing...","\n")
     
-    data2 <- data.frame(taxon=as.character(data[,1]), regime=sample(c(1:2), length(data[,1]), replace=TRUE), trait=data[,2], stringsAsFactors=FALSE)
-    phy$node.label <- sample(c(1:2),phy$Nnode, replace=TRUE)
-    start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, clade=c(phy$tip.label[1], phy$tip.label[2]), root.station=root.station)
-
+    data2 <- data.frame(taxon=as.character(data[,1]), regime=rep(1, length(data[,1])), trait=data[,2], stringsAsFactors=FALSE)
+    #phy$node.label <- sample(c(1:2),phy$Nnode, replace=TRUE)
+    start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, root.station=FALSE, scaleHeight=scaleHeight, mserr=mserr, check.identify=FALSE)
     cat("Begin optimization routine -- Starting values:", c(start.vals$solution[1,1], start.vals$solution[2,1]), "\n")
     phy$node.label <- NULL
     find.shifts <- GetShiftModel(phy=phy, data=data, nmax=shift.max, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, opts=opts)
-   
+
     cat("Finished. Summarizing", "\n")
-    
+
     #Step 1: Paint the tree up and make the proper data.
     mapped.phy <- find.shifts$model.fit$model.phy
-    mapped.data <- find.shifts$model.fit$model.data
+    if(dim(find.shifts$model.fit$model.data)[2] == 2){
+        mapped.data <- cbind(phy$tip.label, find.shifts$model.fit$model.data)
+    }else{
+        mapped.data <- find.shifts$model.fit$model.data
+    }
     
     #Step 2: Get thetas:
-    mapped.thetas <- GetThetas(p=find.shifts$model.fit$fit.object$solution, phy=mapped.phy, data=mapped.data, simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, index.mat=find.shifts$model.fit$index.mat, mserr=mserr)
+    mapped.thetas <- GetThetas(p=log(find.shifts$model.fit$fit.object$solution), phy=mapped.phy, data=mapped.data, simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, index.mat=find.shifts$model.fit$index.mat, mserr=mserr)
     regime.weights <- mapped.thetas$regime.weights
 
     #Step 3: Now summarize everything:
     solution <- mapped.thetas$solution
-
     rownames(solution) <- rownames(find.shifts$model.fit$index.mat) <- c("alpha", "sigma.sq")
     tot.states <- factor(c(mapped.phy$node.label, as.character(mapped.data[,2])))
     colnames(solution) <- levels(tot.states)
@@ -46,7 +48,7 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
         mserr.est <- NULL
     }
     
-    obj <- list(loglik = mapped.thetas$loglik, criterion=criterion, criterion.score=find.shifts$model.fit$criterion, shift.model=find.shifts$shiftmodel, solution=solution, mserr.est=mserr.est, theta=mapped.thetas$theta, tot.states=tot.states, index.mat=find.shifts$model.fit$index.mat, simmap.tree=FALSE, root.age=root.age, shift.point=shift.point, opts=opts, data=mapped.data, phy=mapped.phy, root.station=root.station, starting.vals=start.vals$solution, regime.weights=regime.weights)
+    obj <- list(loglik = mapped.thetas$loglik, criterion=criterion, criterion.score=find.shifts$model.fit$criterion, shift.model=find.shifts$shiftmodel, solution=solution, mserr.est=mserr.est, theta=mapped.thetas$theta, tot.states=tot.states, index.mat=find.shifts$model.fit$fit.object$index.mat, simmap.tree=FALSE, root.age=root.age, shift.point=shift.point, opts=opts, data=mapped.data, phy=mapped.phy, root.station=root.station, starting.vals=start.vals$solution, regime.weights=regime.weights)
     class(obj) <- "OUwie.dredge"
     return(obj)
 }
@@ -147,6 +149,7 @@ GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mB
 }
 
 ## TEST ##
+#library(phylolm)
 #data(flowerSize)
 #data(flowerTree)
 #dat <- data.frame(taxon = flowerTree$tip.label, trait=flowerSize$log_transformed_size)
@@ -292,7 +295,6 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
     ####GENERATE TREE PAINTING AND DATA SET####
     mapping.tree.data <- GetShiftMap(curmodel, phy, data)
     shifts <- k <- length(curmodel)
-
     ####GET MODEL COMBINATIONS###
     dredge.combos <- DredgeCombinations(shifts=shifts, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k)
     ###########################################
@@ -318,9 +320,9 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
             index.mat[2,] <- as.numeric(dredge.combos$sigma.sq.par.map[sigma.index,]) + max.par
             np <- max(index.mat)
             pars <- c(index.mat[1,], index.mat[2,])
-            param.count <- np + (k+1)
+            param.count <- np
             if(root.station == FALSE){
-                param.count <- param.count + 1
+                param.count <- param.count
             }
             
             np.sequence <- 1:np
@@ -339,18 +341,22 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
             }
             #optimize likelihood
             out <- nloptr(x0=log(ip), eval_f=GetLikelihood, phy=mapping.tree.data$phy, data=mapping.tree.data$data, simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, index.mat=index.mat, mserr=mserr, lb=lower, ub=upper, opts=opts)
+            out$solution <- exp(out$solution)
             loglik <- out$objective
             if(criterion == "AIC"){
-                score <- (2*loglik) + (2*param.count)
+                score <- (2*loglik) + (2*(shifts+param.count))
             }
-            if(criterion == "AICc"){
-                score <- (2*loglik) + (2*param.count*(ntips/(ntips-param.count-1)))
+            if(criterion == "sAICc"){
+                #What surface does
+                score <- (2*loglik) + (2*(2 * shifts + param.count))
             }
             if(criterion == "BIC"){
-                score <- (2*loglik) + (log(ntips) * param.count)
+                score <- (2*loglik) + (log(ntips)*(shifts + param.count))
             }
             if(criterion == "mBIC"){
-                score <- (2*loglik) + check.identify[2]
+                #need to finish penalty calculation --
+                penalty <- (param.count * log(ntips)) + check.identify[2]
+                score <- (2*loglik) + penalty
             }
             if(score < current.best.score){
                 current.best.score <- score
@@ -367,6 +373,7 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
 }
 
 ### TEST ###
+#library(phylolm)
 #dat <- data.frame(taxon = flowerTree$tip.label, trait=flowerSize$log_transformed_size)
 #curmodel <- list()
 #curmodel[[1]] <- 45
@@ -391,18 +398,11 @@ GetParameterPainting <- function(phy, data, rates, k.pars){
 
 plot.OUwie.dredge <- function(x, col.pal=c("Set1"), ...) {
     
-    if(x$root.station == TRUE){
-        truncated.regime.weight.mat <- x$regime.weights[,-c(dim(x$regime.weights)[2])]
-        alpha.regimes <- truncated.regime.weight.mat[1,]
-        sigma.regimes <- truncated.regime.weight.mat[2,]
-        theta.regimes <- truncated.regime.weight.mat[3,]
-    }else{
-        truncated.regime.weight.mat <- x$regime.weights[,-c(1, dim(x$regime.weights)[2])]
-        alpha.regimes <- truncated.regime.weight.mat[1,]
-        sigma.regimes <- truncated.regime.weight.mat[2,]
-        theta.regimes <- truncated.regime.weight.mat[3,]
-    }
-    
+    truncated.regime.weight.mat <- x$regime.weights[,-c(dim(x$regime.weights)[2])]
+    alpha.regimes <- truncated.regime.weight.mat[1,]
+    sigma.regimes <- truncated.regime.weight.mat[2,]
+    theta.regimes <- truncated.regime.weight.mat[3,]
+     
     par(mfcol=c(1,3))
     
     regime.lvls <- dim(truncated.regime.weight.mat)[2]

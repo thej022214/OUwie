@@ -5,13 +5,13 @@ test_that("testing OU1 likelihood stationary", {
     
     data(tworegime)
     set.seed(42)
-    ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
+    ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=TRUE, shift.point=0.5, quiet=TRUE)
     comparison <- identical(round(ouwiefit$loglik,5), -22.54063)
     expect_true(comparison)
 })
 
 
-test_that("testing OUM likelihood stationary ", {
+test_that("testing OUM likelihood stationary", {
     skip_on_cran()
 
     data(tworegime)

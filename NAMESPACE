@@ -1,4 +1,4 @@
-export(OUwie,OUwie.sim,OUwie.fixed,OUwie.boot,OUwie.anc,fix.kappa, check.identify)
+export(OUwie,OUwie.sim,OUwie.fixed,OUwie.boot,OUwie.anc,OUwie.dredge,fix.kappa, check.identify)
 import(ape, corpcor, nloptr, geiger, RColorBrewer)
 importFrom(phytools, make.era.map, getDescendants)
 importFrom(numDeriv, hessian)
