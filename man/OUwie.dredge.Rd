@@ -22,8 +22,6 @@ shift.point=0.5, mserr="none", opts = list("algorithm"="NLOPT_LN_SBPLX",
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }
-\details{
-}
 \value{
 \code{OUwie.fixed} returns an object of class \code{OUwie.fixed}. This is a list with elements:
 \item{$loglik}{the maximum log-likelihood.}

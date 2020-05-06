@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA),
 #and the multiple alphas and sigmas (OUMVA).
 
-OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
 
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
@@ -33,10 +33,11 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
         }
     }
     
-    if(check.identify == TRUE & model != "OU1" & model != "BM1" & model != "BMS" & model != "TrendyM" & model != "TrendyMS"){
-            check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=FALSE, quiet=TRUE)
-            if(check.identify[1] == 0){
-                stop("The supplied regime painting is unidentifiable for multiple regime OU model.", call. = FALSE)
+    if(check.identify == TRUE & get.root.theta == TRUE){
+            identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
+            if(identifiable == 0){
+                get.root.theta=FALSE
+                warning("The supplied regime painting is unidentifiable for the regimes and the starting state. Setting get.root.theta=FALSE", call. = FALSE, immediate.=TRUE)
             }
     }
 
@@ -219,6 +220,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- 2
             param.count <- np + 1
 			bool=root.station
+            if(get.root.theta == TRUE){
+                param.count <- param.count + 1
+            }
 		}
 		if (model == "OUM"){
 			np <- 2
@@ -227,6 +231,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- 2
             param.count<-np+k
 			bool=root.station
+            if(get.root.theta == TRUE){
+                param.count <- param.count + 1
+            }
 		}
 		if (model == "OUMV") {
 			np <- k+1
@@ -235,6 +242,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- 2:(k+1)
             param.count <- np+k
 			bool=root.station
+            if(get.root.theta == TRUE){
+                param.count <- param.count + 1
+            }
 		}
 		if (model == "OUMA") {
 			np <- k+1
@@ -243,6 +253,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- k+1
             param.count <- np+k
 			bool=root.station
+            if(get.root.theta == TRUE){
+                param.count <- param.count + 1
+            }
 		}
 		if (model == "OUMVA") {
 			np <- k*2
@@ -250,6 +263,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[index] <- 1:(k*2)
             param.count <- np+k
 			bool <- root.station
+            if(get.root.theta == TRUE){
+                param.count <- param.count + 1
+            }
 		}
 		if (model == "TrendyM"){
 			index.mat <- matrix(0,3,k)
@@ -310,7 +326,13 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
                 root.par.index = length(p) - 1
                 diag(V) <- diag(V) + (p[length(p)])
             }
-            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+            
+            if(get.root.theta == TRUE){
+                W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+            }else{
+                W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+            }
+
 			theta <- Inf
 			try(theta <- pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x, silent=TRUE)
 			if(any(theta==Inf)){
@@ -473,7 +495,11 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
 		N <- length(x[,1])
 		V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+        if(get.root.theta == TRUE){
+            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+        }else{
+            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+        }
         if(mserr=="known"){
             diag(V) <- diag(V)+(data[,3]^2)
 		}
@@ -543,26 +569,29 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			mserr.est<-NULL
 		}
         
-        #if(root.station == FALSE){
-        #    rates <- cbind(NA, solution, NA)
-        #    thetas <- cbind(t(theta$theta.est[,1]), NA)
-        #    rates <- rbind(rates, thetas)
-        #    weights <- cbind(theta$W, data[,1])
-        #    regime.weights <- rbind(rates, weights)
-        #    rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-        #    colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
-        #}
-        #if(root.station == TRUE){
-            rates <- cbind(solution, NA)
+        if(get.root.theta == TRUE){
+            rates <- cbind(NA, solution, NA)
             thetas <- cbind(t(theta$theta.est[,1]), NA)
             rates <- rbind(rates, thetas)
             weights <- cbind(theta$W, data[,1])
             regime.weights <- rbind(rates, weights)
             rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-            colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
-        #}
+            colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
+        }else{
+            if(model=="TrendyM" | model=="TrendyMS"){
+                regime.weights = NULL
+            }else{
+                rates <- cbind(solution, NA)
+                thetas <- cbind(t(theta$theta.est[,1]), NA)
+                rates <- rbind(rates, thetas)
+                weights <- cbind(theta$W, data[,1])
+                regime.weights <- rbind(rates, weights)
+                rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+                colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
+            }
+        }
 
-		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, regime.weights=regime.weights, eigval=eigval, eigvect=eigvect, new.start=out$new.start)
+		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, get.root.theta=get.root.theta, regime.weights=regime.weights, eigval=eigval, eigvect=eigvect, new.start=out$new.start)
 
 	}
 	if(diagn==FALSE){
@@ -586,30 +615,29 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			mserr.est<-NULL
 		}
         
-        #if(root.station == FALSE){
-        #    rates <- cbind(NA, solution, NA)
-        #    thetas <- cbind(t(theta$theta.est[,1]), NA)
-        #    rates <- rbind(rates, thetas)
-        #    weights <- cbind(theta$W, data[,1])
-        ##    regime.weights <- rbind(rates, weights)
-        #    rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-        #    colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
-        #}
-        #if(root.station == TRUE){
-        if(model=="TrendyM" | model=="TrendyMS"){
-            regime.weights = NULL
-        }else{
-            rates <- cbind(solution, NA)
+        if(get.root.theta == TRUE){
+            rates <- cbind(NA, solution, NA)
             thetas <- cbind(t(theta$theta.est[,1]), NA)
             rates <- rbind(rates, thetas)
             weights <- cbind(theta$W, data[,1])
             regime.weights <- rbind(rates, weights)
             rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-            colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
-        #}
+            colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
+        }else{
+            if(model=="TrendyM" | model=="TrendyMS"){
+                regime.weights = NULL
+            }else{
+                rates <- cbind(solution, NA)
+                thetas <- cbind(t(theta$theta.est[,1]), NA)
+                rates <- rbind(rates, thetas)
+                weights <- cbind(theta$W, data[,1])
+                regime.weights <- rbind(rates, weights)
+                rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+                colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
+            }
         }
-        
-        obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, regime.weights=regime.weights, new.start=out$new.start)
+
+        obj = list(loglik = loglik, AIC = -2*loglik+2*param.count,AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, mserr.est=mserr.est, theta=theta$theta.est, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, opts=opts, data=data, phy=phy, root.station=root.station, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, res=theta$res, rsq=theta$Rsq, get.root.theta=get.root.theta, regime.weights=regime.weights, new.start=out$new.start)
 	}
 	class(obj)<-"OUwie"
 	return(obj)
@@ -648,51 +676,51 @@ print.OUwie<-function(x, ...){
 			print(theta.mat)
 			cat("\n")
 		}
-        #if (x$root.station == TRUE){
-			if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-				param.est<- x$solution
-				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
-				rownames(theta.mat)<-c("estimate", "se")
-				if(x$simmap.tree==FALSE){
-					colnames(theta.mat)<- levels(x$tot.states)
-				}
-				if(x$simmap.tree==TRUE){
-					colnames(theta.mat) <- c(colnames(x$phy$mapped.edge))
-				}
-				cat("\nRates\n")
-				print(param.est)
-				cat("\n")
-				cat("Optima\n")
-				print(theta.mat)
-				cat("\n")
-				cat("\nHalf life (another way of reporting alpha)\n")
-				print(log(2)/param.est['alpha',])
-				cat("\n")
-			}
-            #}
-            #if (x$root.station == FALSE){
-            #if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-            #		param.est<- x$solution
-            #	theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
-            #		rownames(theta.mat)<-c("estimate", "se")
-            #		if(x$simmap.tree==FALSE){
-            #		colnames(theta.mat)<-c("root", levels(x$tot.states))
-            #		}
-            #		if(x$simmap.tree==TRUE){
-            #			colnames(theta.mat)<-c("root", colnames(x$phy$mapped.edge))
-            #		}
-            #	cat("\nRates\n")
-            #	print(param.est)
-            #		cat("\n")
-            #		cat("Optima\n")
-            #		print(theta.mat)
-            #		cat("\n")
-            #		cat("\nHalf life (another way of reporting alpha)\n")
-            #		print(log(2)/param.est['alpha',])
-            #		cat("\n")
-            #}
-            #}
-	}
+        if (x$get.root.theta == FALSE){
+            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+                param.est<- x$solution
+                theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
+                rownames(theta.mat)<-c("estimate", "se")
+                if(x$simmap.tree==FALSE){
+                    colnames(theta.mat)<- levels(x$tot.states)
+                }
+                if(x$simmap.tree==TRUE){
+                    colnames(theta.mat) <- c(colnames(x$phy$mapped.edge))
+                }
+                cat("\nRates\n")
+                print(param.est)
+                cat("\n")
+                cat("Optima\n")
+                print(theta.mat)
+                cat("\n")
+                cat("\nHalf life (another way of reporting alpha)\n")
+                print(log(2)/param.est['alpha',])
+                cat("\n")
+            }
+        }
+        if (x$get.root.theta == TRUE){
+            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+                param.est<- x$solution
+                theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
+                rownames(theta.mat)<-c("estimate", "se")
+                if(x$simmap.tree==FALSE){
+                    colnames(theta.mat)<-c("root", levels(x$tot.states))
+                }
+                if(x$simmap.tree==TRUE){
+                    colnames(theta.mat)<-c("root", colnames(x$phy$mapped.edge))
+                }
+                cat("\nRates\n")
+                print(param.est)
+                cat("\n")
+                cat("Optima\n")
+                print(theta.mat)
+                cat("\n")
+                cat("\nHalf life (another way of reporting alpha)\n")
+                print(log(2)/param.est['alpha',])
+                cat("\n")
+            }
+        }
+    }
 	if(any(x$eigval<0)){
 		index.matrix <- x$index.mat
 		if(x$simmap.tree==FALSE){

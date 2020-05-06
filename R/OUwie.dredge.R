@@ -15,7 +15,7 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
     
     data2 <- data.frame(taxon=as.character(data[,1]), regime=rep(1, length(data[,1])), trait=data[,2], stringsAsFactors=FALSE)
     #phy$node.label <- sample(c(1:2),phy$Nnode, replace=TRUE)
-    start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, root.station=FALSE, scaleHeight=scaleHeight, mserr=mserr, check.identify=FALSE)
+    start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, root.station=TRUE, scaleHeight=scaleHeight, mserr=mserr, check.identify=FALSE)
     cat("Begin optimization routine -- Starting values:", c(start.vals$solution[1,1], start.vals$solution[2,1]), "\n")
     phy$node.label <- NULL
     find.shifts <- GetShiftModel(phy=phy, data=data, nmax=shift.max, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, opts=opts)
@@ -299,7 +299,7 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
     dredge.combos <- DredgeCombinations(shifts=shifts, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k)
     ###########################################
 
-    check.identify <- check.identify(phy=mapping.tree.data$phy, data=mapping.tree.data$data, simmap.tree=FALSE, get.penalty=TRUE, quiet=TRUE)
+    check.identify <- check.identify.dredge(phy=mapping.tree.data$phy, data=mapping.tree.data$data, simmap.tree=FALSE, get.penalty=TRUE, quiet=TRUE)
     if(check.identify[1] == 0){
         best.fit <- NULL
         best.fit$fit.object <- NULL

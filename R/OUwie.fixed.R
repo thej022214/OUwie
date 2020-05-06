@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, quiet=FALSE){
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, quiet=FALSE){
     
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
@@ -16,13 +16,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
-    if(check.identify == TRUE){
-        check.identify <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, get.penalty=FALSE, quiet=TRUE)
-        if(check.identify[1] == 0){
-            stop("The supplied regime painting is unidentifiable.", .call=FALSE)
+    if(check.identify == TRUE & get.root.theta == TRUE){
+        identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
+        if(identifiable == 0){
+            get.root.theta=FALSE
+            warning("The supplied regime painting is unidentifiable for the regimes and the starting state. Setting get.root.theta=FALSE", call. = FALSE, immediate.=TRUE)
         }
     }
-    
+
     if(model == "OUMV" |  model == "OUMA" |  model == "OUMVA"){
         if(root.station == TRUE){
             stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
@@ -235,7 +236,11 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     dev.fixed <- function(){
         N <- length(x[,1])
         V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
-        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+        if(get.root.theta == TRUE){
+            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+        }else{
+            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+        }
         if(mserr=="known"){
             diag(V)<-diag(V)+(data[,3]^2)
         }
@@ -268,17 +273,21 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
     
-    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
-    #if(root.station == FALSE){
-    #    rates <- cbind(NA, Rate.mat, NA)
-    #    thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
-    #    rates <- rbind(rates, thetas)
-    #    weights <- cbind(W, data[,1])
-    #    regime.weights <- rbind(rates, weights)
-    #    rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
-    #    colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
-    #}
-    #if(root.station == TRUE){
+    if(get.root.theta == TRUE){
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+    }else{
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    }
+    
+    if(get.root.theta == TRUE){
+        rates <- cbind(NA, Rate.mat, NA)
+        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+        rates <- rbind(rates, thetas)
+        weights <- cbind(W, data[,1])
+        regime.weights <- rbind(rates, weights)
+        rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
+        colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
+    }else{
         rates <- cbind(Rate.mat, NA)
         thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
         rates <- rbind(rates, thetas)
@@ -286,9 +295,9 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         regime.weights <- rbind(rates, weights)
         rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
         colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
-    #}
+    }
     
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], regime.weights=regime.weights)
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], get.root.theta=get.root.theta, regime.weights=regime.weights)
     class(obj)<-"OUwie.fixed"
     return(obj)
 }
@@ -327,7 +336,7 @@ print.OUwie.fixed<-function(x, ...){
             print(theta.mat)
             cat("\n")
         }
-        #if (x$root.station == TRUE){
+        if (x$get.root.theta == FALSE){
             if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
                 param.est<- x$solution
                 rownames(param.est)<-c("alpha","sigma.sq")
@@ -346,29 +355,29 @@ print.OUwie.fixed<-function(x, ...){
                 print(theta.mat)
                 cat("\n")
             }
-        #}
-            #if (x$root.station == FALSE){
-            #if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-            #    param.est<- x$solution
-            #    rownames(param.est)<-c("alpha","sigma.sq")
-            #    theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
-            #    rownames(theta.mat)<-c("estimate", "se")
-            #    if(x$simmap.tree==FALSE){
-            #        colnames(param.est) <- levels(x$tot.states)
-            #        colnames(theta.mat)<-c("Root", levels(x$tot.states))
-            #    }
-            #    if(x$simmap.tree==TRUE){
-            #        colnames(param.est) <- c(colnames(x$phy$mapped.edge))
-            #        colnames(theta.mat)<-c("Root", colnames(x$phy$mapped.edge))
-            #    }
-            #    cat("\nRates\n")
-            #    print(param.est)
-            #    cat("\n")
-            #    cat("Optima\n")
-            #    print(theta.mat)
-            #    cat("\n")
-            #}
-        #}
+        }
+        if (x$get.root.theta == TRUE){
+            if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
+                param.est<- x$solution
+                rownames(param.est)<-c("alpha","sigma.sq")
+                theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
+                rownames(theta.mat)<-c("estimate", "se")
+                if(x$simmap.tree==FALSE){
+                    colnames(param.est) <- levels(x$tot.states)
+                    colnames(theta.mat)<-c("Root", levels(x$tot.states))
+                }
+                if(x$simmap.tree==TRUE){
+                    colnames(param.est) <- c(colnames(x$phy$mapped.edge))
+                    colnames(theta.mat)<-c("Root", colnames(x$phy$mapped.edge))
+                }
+                cat("\nRates\n")
+                print(param.est)
+                cat("\n")
+                cat("Optima\n")
+                print(theta.mat)
+                cat("\n")
+            }
+        }
     }
 }
 
