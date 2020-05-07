@@ -6,7 +6,7 @@ Author: Jeremy M. Beaulieu <jbeaulieu@nimbios.org>, Brian O'Meara <bomeara@utk.e
 Maintainer: Jeremy Beaulieu <jbeaulieu@nimbios.org>
 Depends: R (>= 3.2.0), ape, corpcor, nloptr, geiger, RColorBrewer
 Suggests: testthat, knitr
-Imports: igraph, numDeriv, phytools, paleotree, phangorn, stats
+Imports: igraph, numDeriv, phytools, paleotree, phangorn, stats, lhs, interp, grDevices
 Description: Estimates rates for continuous character evolution under Brownian motion and a new set of Ornstein-Uhlenbeck based Hansen models that allow both the strength of the pull and stochastic motion to vary across selective regimes. Beaulieu et al (2012) <doi:10.1111/j.1558-5646.2012.01619.x>.
 License: GPL (>= 2)
 VignetteBuilder: knitr

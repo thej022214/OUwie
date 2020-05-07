@@ -59,32 +59,32 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
     }
 
     #Makes sure the data is in the same order as the tip labels
-	if(simmap.tree==FALSE){
+	if(simmap.tree == FALSE){
 		#This is annoying, but the second column has to be in there twice otherwise, error.
-        if(mserr=="none"){
+        if(mserr == "none"){
             data <- data.frame(data[,2], data[,2], row.names=data[,1])
         }
-        if(mserr=="known"){
+        if(mserr == "known"){
             data <- data.frame(data[,2], data[,3], row.names=data[,1])
         }
 
 		data <- data[phy$tip.label,]
 
-		n=max(phy$edge[,1])
-		ntips=length(phy$tip.label)
+		n <- max(phy$edge[,1])
+		ntips <- length(phy$tip.label)
 
-		int.states<-factor(phy$node.label)
-		phy$node.label=as.numeric(int.states)
-		tip.states<-factor(data[,1])
-		data[,1]<-as.numeric(tip.states)
-		tot.states<-factor(c(phy$node.label,as.character(data[,1])))
-		k<-length(levels(tot.states))
+		int.states <- factor(phy$node.label)
+		phy$node.label <- as.numeric(int.states)
+		tip.states <- factor(data[,1])
+		data[,1] <- as.numeric(tip.states)
+		tot.states <- factor(c(phy$node.label,as.character(data[,1])))
+		k <- length(levels(tot.states))
 
 		regime=matrix(rep(0,(n-1)*k), n-1, k)
 
 		#Obtain root state and internal node labels
-		root.state<-phy$node.label[1]
-		int.state<-phy$node.label[-1]
+		root.state <- phy$node.label[1]
+		int.state <- phy$node.label[-1]
 
 		#New tree matrix to be used for subsetting regimes
 		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
@@ -105,14 +105,14 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		edges=cbind(edges,regime)
 
 		#Resort the edge matrix so that it looks like the original matrix order
-		edges=edges[sort.list(edges[,1]),]
+		edges <- edges[sort.list(edges[,1]),]
 
 		oldregime=root.state
 
-		alpha=alpha
+		alpha <- alpha
 		alpha[alpha==0] = 1e-10
-		sigma=sqrt(sigma.sq)
-		theta=theta
+		sigma <- sqrt(sigma.sq)
+		theta  <- theta
 
 		x <- matrix(0, n, 1)
 		TIPS <- 1:ntips
@@ -122,36 +122,34 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		for(i in 1:length(edges[,1])){
 			anc = edges[i,2]
 			desc = edges[i,3]
-			oldtime=edges[i,4]
-			newtime=edges[i,5]
+			oldtime = edges[i,4]
+			newtime = edges[i,5]
 			if(anc%in%edges[,3]){
-				start=which(edges[,3]==anc)
-				oldregime=which(edges[start,6:(k+5)]==1)
-			}
-			else{
+				start <- which(edges[,3]==anc)
+				oldregime <- which(edges[start,6:(k+5)]==1)
+			}else{
 				#For the root:
-				oldregime=oldregime
+				oldregime <- root.state
 			}
 			newregime=which(edges[i,6:(k+5)]==1)
 
 			if(oldregime==newregime){
-				x[edges[i,3],]=x[edges[i,2],]*exp(-alpha[oldregime]*(newtime-oldtime))+(theta[oldregime])*(1-exp(-alpha[oldregime]*(newtime-oldtime)))+sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(newtime-oldtime)))/(2*alpha[oldregime]))
-			}
-			else{
-				shifttime=newtime+((oldtime-newtime) * shift.point)
-				epoch1=x[edges[i,2],]*exp(-alpha[oldregime]*(shifttime-oldtime))+(theta[oldregime])*(1-exp(-alpha[oldregime]*(shifttime-oldtime)))+sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(shifttime-oldtime)))/(2*alpha[oldregime]))
-				oldtime=shifttime
-				newtime=newtime
-				x[edges[i,3],]=epoch1*exp(-alpha[newregime]*(newtime-oldtime))+(theta[newregime])*(1-exp(-alpha[newregime]*(newtime-oldtime)))+sigma[newregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[newregime]*(newtime-oldtime)))/(2*alpha[newregime]))
+				x[edges[i,3],] <- (x[edges[i,2],]*exp(-alpha[oldregime]*(newtime-oldtime))) + (theta[oldregime]*(1-exp(-alpha[oldregime]*(newtime-oldtime)))) + (sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(newtime-oldtime)))/(2*alpha[oldregime])))
+			}else{
+                shifttime <- newtime-((newtime-oldtime) * shift.point)
+				epoch1 <- (x[edges[i,2],]*exp(-alpha[oldregime]*(shifttime-oldtime))) + (theta[oldregime]*(1-exp(-alpha[oldregime]*(shifttime-oldtime)))) + (sigma[oldregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[oldregime]*(shifttime-oldtime)))/(2*alpha[oldregime])))
+				oldtime <- shifttime
+				newtime <- newtime
+				x[edges[i,3],] <- (epoch1*exp(-alpha[newregime]*(newtime-oldtime))) + (theta[newregime]*(1-exp(-alpha[newregime]*(newtime-oldtime)))) + (sigma[newregime]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[newregime]*(newtime-oldtime)))/(2*alpha[newregime])))
 			}
 		}
 
-		sim.dat<-matrix(,ntips,3)
-		sim.dat<-data.frame(sim.dat)
+		sim.dat <- matrix(,ntips,3)
+		sim.dat <- data.frame(sim.dat)
 
-		sim.dat[,1]<-phy$tip.label
-		sim.dat[,2]<-data[,1]
-		sim.dat[,3]<-x[TIPS]
+		sim.dat[,1] <- phy$tip.label
+		sim.dat[,2] <- data[,1]
+		sim.dat[,3] <- x[TIPS]
 
         if(mserr == "known"){
             for(i in TIPS){
@@ -167,7 +165,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 
 		k=length(colnames(phy$mapped.edge))
 
-		regimeindex<-colnames(phy$mapped.edge)
+		regimeindex <- colnames(phy$mapped.edge)
 		##Begins the construction of the edges matrix -- similar to the ouch format##
 		#Makes a vector of absolute times in proportion of the total length of the tree
 		branch.lengths=rep(0,(n-1))

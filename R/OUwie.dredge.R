@@ -48,7 +48,7 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
         mserr.est <- NULL
     }
     
-    obj <- list(loglik = mapped.thetas$loglik, criterion=criterion, criterion.score=find.shifts$model.fit$criterion, shift.model=find.shifts$shiftmodel, solution=solution, mserr.est=mserr.est, theta=mapped.thetas$theta, tot.states=tot.states, index.mat=find.shifts$model.fit$fit.object$index.mat, simmap.tree=FALSE, root.age=root.age, shift.point=shift.point, opts=opts, data=mapped.data, phy=mapped.phy, root.station=root.station, starting.vals=start.vals$solution, regime.weights=regime.weights)
+    obj <- list(loglik = mapped.thetas$loglik, criterion=criterion, criterion.score=find.shifts$model.fit$criterion, shift.model=find.shifts$shiftmodel, solution=solution, mserr.est=mserr.est, theta=mapped.thetas$theta, tot.states=tot.states, index.mat=find.shifts$model.fit$fit.object$index.mat, simmap.tree=FALSE, root.age=root.age, scaleHeight=scaleHeight, shift.point=shift.point, opts=opts, data=mapped.data, phy=mapped.phy, root.station=root.station, starting.vals=start.vals$solution, regime.weights=regime.weights)
     class(obj) <- "OUwie.dredge"
     return(obj)
 }

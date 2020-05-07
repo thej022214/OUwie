@@ -12,7 +12,7 @@ check.identify <- function(phy, data, simmap.tree=FALSE, quiet=FALSE){
     anc <- phy$edge[, 1]
     des <- phy$edge[, 2]
     el <- phy$edge.length
-    data.new <- data.frame(data[,2], data[,3], row.names=data[,1])
+    data.new <- data.frame(data[,2], data[,2], row.names=data[,1])
     data.new <- data.new[phy$tip.label,]
     regime_labs <- c(data.new[,1], phy$node.label)
     regime_shifts <- c()

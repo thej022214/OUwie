@@ -6,6 +6,11 @@
 
 OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, quiet=FALSE){
     
+    if(model=="BMS" & root.station==TRUE){
+        warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
+        get.root.theta = FALSE
+    }
+
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
@@ -16,17 +21,23 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
+    if(model == "OUMV" |  model == "OUMA" |  model == "OUMVA"){
+        if(root.station == TRUE){
+            stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
+        }
+    }
+
+    if(model == "BM1" |  model == "BMS" | model == "TrendyM" | model == "TrendyMS"){
+        if(root.station == FALSE){
+            get.root.theta = TRUE
+        }
+    }
+
     if(check.identify == TRUE & get.root.theta == TRUE){
         identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
         if(identifiable == 0){
             get.root.theta=FALSE
             warning("The supplied regime painting is unidentifiable for the regimes and the starting state. Setting get.root.theta=FALSE", call. = FALSE, immediate.=TRUE)
-        }
-    }
-
-    if(model == "OUMV" |  model == "OUMA" |  model == "OUMVA"){
-        if(root.station == TRUE){
-            stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
         }
     }
 
@@ -297,7 +308,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
     }
     
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, res=fixed.fit[[3]], get.root.theta=get.root.theta, regime.weights=regime.weights)
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, scaleHeight=scaleHeight, res=fixed.fit[[3]], get.root.theta=get.root.theta, regime.weights=regime.weights)
     class(obj)<-"OUwie.fixed"
     return(obj)
 }
