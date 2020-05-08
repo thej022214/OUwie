@@ -3,7 +3,7 @@
 \title{Contour plot}
 \description{A plotting function for visualizing likelihood surface for a pair of parameters using OUwie.contour data.}
 \usage{
-\method{plot}{OUwie.contour}(x, mle.point=NULL, levels=c(0.5,1,1.5,2), xlab=NULL, 
+\method{plot}{OUwie.contour}(x, mle.point=NULL, levels=c(0:20*0.1), xlab=NULL, 
 ylab=NULL, xlim=NULL, ylim=NULL, col=grey.colors(21, start=0, end=1), ...)
 }       
 \arguments{

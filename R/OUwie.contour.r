@@ -130,13 +130,14 @@ OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), fo
 
 
 
-plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0.5,1,1.5,2), xlab=NULL, ylab=NULL, xlim=NULL, ylim=NULL, col=grey.colors(21, start=0, end=1), ...){
+
+plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0:20*0.1), xlab=NULL, ylab=NULL, xlim=NULL, ylim=NULL, col=grey.colors(21, start=0, end=1), ...){
     
     if(is.null(xlab)){
         xlab = x$focal.params[1]
     }
-    if(is.null(xlab)){
-        xlab = x$focal.params[2]
+    if(is.null(ylab)){
+        ylab = x$focal.params[2]
     }
     if(is.null(xlim)){
         xlim = c(x$focal.params.lower[1], x$focal.params.upper[1], 1)

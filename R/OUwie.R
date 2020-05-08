@@ -20,11 +20,11 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
         stop("Check the format of the data column. It's reading as a factor.", call. = FALSE)
     }
 
-    if(is.null(root.age)){
-        if(any(branching.times(phy)<0)){
-            stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", call. = FALSE)
-        }
-    }
+    #if(is.null(root.age)){
+    #    if(any(branching.times(phy)<0)){
+    #        stop("Looks like your tree is producing negative branching times. Must input known root age of tree.", call. = FALSE)
+    #    }
+    #}
 
     if(!is.null(starting.vals[1])){
         if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
