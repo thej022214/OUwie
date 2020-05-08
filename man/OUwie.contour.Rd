@@ -4,7 +4,7 @@
 \description{Generates the likelihood surface for pairs of free parameters for generalized Ornstein-Uhlenbeck-based Hansen models of continuous characters evolving under discrete selective regimes.}
 \usage{
 OUwie.contour(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), 
-focal.params.lower=c(0,0), focal.params.upper=c(5,5), nreps=1000)
+focal.params.lower=c(0,0), focal.params.upper=c(5,5), nreps=1000, n.cores=NULL)
 }       
 \arguments{
 \item{OUwie.obj}{an object of class \dQuote{OUwie} that contains the focal parameters for conducting the likelihood surface search.}
