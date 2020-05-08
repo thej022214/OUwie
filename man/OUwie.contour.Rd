@@ -12,6 +12,7 @@ focal.params.lower=c(0,0), focal.params.upper=c(5,5), nreps=1000)
 \item{focal.params.lower}{a vector specifying the lower bounds for the parameters. The values need to be in the order as the focal parameters.}
 \item{focal.params.upper}{a vector specifying the upper bounds for the parameters. The values need to be in the order as the focal parameters.}
 \item{nreps}{the number points to use to estimate the likelihood surface (see Details).}
+\item{n.cores}{specifies the number of independent processors to conduct the analysis. The default is \code{NULL}.}
 }
 \details{
 This function samples a set of points to estimate the likelihood surface for any pair of parameters, letting the other parameters find their own optima. This process can be very slow, as it involves optimization \code{nrep} times (though with two fewer parameters than with the chosen model, as the focal parameter values are fixed). It uses a latin hypercube design to sample points across the user-defined range of the focal parameters.

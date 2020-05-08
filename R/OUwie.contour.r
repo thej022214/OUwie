@@ -40,33 +40,39 @@ OUwie.semifixed <- function(p, phy, data, num.regimes, index.vector, fixed.pars,
 }
 
 
-contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vector, par.vector, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point, opts) {
+contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vector, par.vector, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point, opts, n.cores) {
     
     nreps <- dim(param.points)[1]
-    res <- matrix(,nreps,3)
-
     max.pars <- max(index.vector)
     init.vals <- unique(par.vector[index.vector<max.pars])
     lower <- rep(-21, length(init.vals))
     upper <- rep(21, length(init.vals))
-
-    for(nrep.index in 1:nreps){
-        
-        print(nrep.index)
-        
-        fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
-        opts <- opts
-        out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point)
-        res[nrep.index,1] <- -out$objective
-        res[nrep.index,2] <- fixed.pars[1]
-        res[nrep.index,3] <- fixed.pars[2]
+    
+    if(is.null(n.cores)){
+        res <- matrix(,nreps,3)
+        for(nrep.index in 1:nreps){
+            print(nrep.index)
+            fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
+            opts <- opts
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point)
+            res[nrep.index,] <- c(-out$objective, fixed.pars[1], fixed.pars[2])
+        }
+    }else{
+        PointEval <- function(nrep.index){
+            fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
+            opts <- opts
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point)
+            return(c(-out$objective, fixed.pars[1], fixed.pars[2]))
+        }
+        res.list <- mclapply(1:nreps, PointEval, mc.cores=n.cores)
+        res <- matrix(unlist(res.list), ncol = 3, byrow = TRUE)
     }
     return(res)
 }
 
 
 
-OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), focal.params.lower=c(0,0), focal.params.upper=c(5,5), nreps=1000){
+OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), focal.params.lower=c(0,0), focal.params.upper=c(5,5), nreps=1000, n.cores=NULL){
     
     new.data <- data.frame(taxon=rownames(OUwie.obj$data), regime=OUwie.obj$data[,1], trait=OUwie.obj$data[,2])
     
@@ -112,7 +118,7 @@ OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), fo
     param.points <- contourSearchPoints(variables=2, lower=focal.params.lower, upper=focal.params.upper, nreps=nreps)
     
     #Step 3: Call contourSearchOUwie -- ISSUE. What if theta is less than 0? Will deal with later...
-    surface.data <- contourSearchOUwie(phy=OUwie.obj$phy, data=new.data, num.regimes=num.regimes, param.points=param.points, index.vector=index.vector, par.vector=par.vector, simmap.tree=OUwie.obj$simmap.tree, scaleHeight=OUwie.obj$scaleHeight, root.station=OUwie.obj$root.station, get.root.theta=OUwie.obj$get.root.theta, shift.point=OUwie.obj$shift.point, opts=OUwie.obj$opts)
+    surface.data <- contourSearchOUwie(phy=OUwie.obj$phy, data=new.data, num.regimes=num.regimes, param.points=param.points, index.vector=index.vector, par.vector=par.vector, simmap.tree=OUwie.obj$simmap.tree, scaleHeight=OUwie.obj$scaleHeight, root.station=OUwie.obj$root.station, get.root.theta=OUwie.obj$get.root.theta, shift.point=OUwie.obj$shift.point, opts=OUwie.obj$opts, n.cores=n.cores)
     
     surface.data <- rbind(mle.dat, surface.data, deparse.level=0)
     #Step 4: Make plot with results
@@ -124,7 +130,7 @@ OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), fo
 
 
 
-plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0.5,1,1.5,2), xlab, ylab, xlim, ylim, col=grey.colors(21, start=0, end=1), ...){
+plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0.5,1,1.5,2), xlab=NULL, ylab=NULL, xlim=NULL, ylim=NULL, col=grey.colors(21, start=0, end=1), ...){
     
     if(is.null(xlab)){
         xlab = x$focal.params[1]
@@ -135,11 +141,11 @@ plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0.5,1,1.5,2), xlab, y
     if(is.null(xlim)){
         xlim = c(x$focal.params.lower[1], x$focal.params.upper[1], 1)
     }
-    if(is.null(xlab)){
+    if(is.null(ylim)){
         ylim = c(x$focal.params.lower[2], x$focal.params.upper[2], 1)
     }
 
-    mydata <- data.frame(x=matrix(x$surface.data,ncol=1),y=matrix(x$surface.data,ncol=1),z=matrix(x$surface.data,ncol=1))
+    mydata <- data.frame(x=matrix(x$surface.data[,2],ncol=1),y=matrix(x$surface.data[,3],ncol=1),z=matrix(x$surface.data[,1],ncol=1))
     mydata$z <- (-1)*mydata$z
     mydata$z <- mydata$z-min(mydata$z)
     
