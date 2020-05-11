@@ -89,8 +89,8 @@ test_that("testing simmap", {
         test$maps[[i]] <- rep(sum(maps)/length(maps), length(maps))
         names(test$maps[[i]]) <- names(maps)
     }
-    ouwiefit.nodes <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
-    ouwiefit.simmap <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
+    ouwiefit.nodes <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, quiet=TRUE)
+    ouwiefit.simmap <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
     comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
     expect_true(comparison)
 }
