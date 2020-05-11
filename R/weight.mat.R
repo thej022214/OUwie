@@ -43,7 +43,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             }
             if(simmap.tree==TRUE){
                 nodevar.k[i] <- 0
-                nodevar.root[i] <- 0
+                nodevar.root.tot[i] <- 0
                 for (regimeindex in 1:length(currentmap)){
                     regimeduration <- currentmap[regimeindex]
                     newtime <- oldtime + regimeduration
