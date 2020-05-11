@@ -41,7 +41,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                     currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
                 }
                 else{
-                    currentmap<-phy$maps[[i]]
+                    currentmap <- phy$maps[[i]]
                 }
                 oldtime=edges[i,4]
                 for (regimeindex in 1:length(currentmap)){
@@ -103,7 +103,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
                     if(i==j){
                         break;
                     }else{
-                        species.total.variances[i,j] <- species.total.variances[j,i] = exp(-(species.variances[i] + species.variances[j]))
+                        species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
                         count=count+1
                     }
                 }

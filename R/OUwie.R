@@ -433,7 +433,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			ip=init.ip
 		}
 		if(model=="OUMV" | model=="OUMA" | model=="OUM"){
-			ip<-c(rep(init.ip[1],length(unique(index.mat[1,]))),rep(init.ip[2],length(unique(index.mat[2,]))))
+			ip <- c(rep(init.ip[1],length(unique(index.mat[1,]))),rep(init.ip[2],length(unique(index.mat[2,]))))
 		}
 		if(model=="OUMVA"){
 			ip<-c(rep(init.ip,k))
@@ -498,7 +498,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 	out$new.starting <- out$solution # note: back in regular param space, not log space used in the search
 	
     #Takes estimated parameters from dev and calculates theta for each regime:
-	dev.theta<-function(p, index.mat, edges=edges, mserr=mserr){
+	dev.theta <- function(p, index.mat, edges=edges, mserr=mserr){
 		tmp<-NULL
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
 		N <- length(x[,1])

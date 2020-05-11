@@ -51,10 +51,9 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
                     if(regimenumber == j){
                         nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
                         nodevar.k[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
-                    }
-                    else{
+                    }else{
                         nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
-                        nodevar.k[i] <- nodevar.k[i]
+                        nodevar.k[i] <- nodevar.k[i] + 0
                     }
                     oldtime <- newtime
                 }

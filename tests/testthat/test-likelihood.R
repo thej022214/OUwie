@@ -74,6 +74,26 @@ test_that("testing OUMVA likelihood", {
 })
 
 
+test_that("testing simmap", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(8)
+    library(phytools)
+    regs <- setNames(trait[,2], trait[,1])
+    test <- make.simmap(tree, regs, model="ER")
+    for(i in 1:dim(test$mapped.edge)[1]){
+        entries <- test$mapped.edge[i,which(test$mapped.edge[i,] > 0)]
+        test$mapped.edge[i,which(test$mapped.edge[i,] > 0)] <- sum(entries)/length(entries)
+        maps <- test$maps[[i]]
+        test$maps[[i]] <- rep(sum(maps)/length(maps), length(maps))
+        names(test$maps[[i]]) <- names(maps)
+    }
+    ouwiefit.nodes <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
+    ouwiefit.simmap <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
+    comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
+    expect_true(comparison)
+}
 
 
 
