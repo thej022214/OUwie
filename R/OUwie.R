@@ -46,11 +46,10 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
         }
     }
 
-    if(check.identify == TRUE & get.root.theta == TRUE){
+    if(check.identify == TRUE){
             identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
             if(identifiable == 0){
-                get.root.theta=FALSE
-                warning("The supplied regime painting is unidentifiable for the regimes and the starting state. Setting get.root.theta=FALSE", call. = FALSE, immediate.=TRUE)
+                warning("The supplied regime painting is unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
             }
     }
 

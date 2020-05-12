@@ -93,7 +93,7 @@ test_that("testing simmap", {
     ouwiefit.simmap <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
     comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
     expect_true(comparison)
-}
+})
 
 
 
