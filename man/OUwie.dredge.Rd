@@ -23,7 +23,7 @@ shift.point=0.5, mserr="none", opts = list("algorithm"="NLOPT_LN_SBPLX",
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }
 \details{
-This is an expanded version of shift point model of Ho and Ane (2014). This is currently being tested, but as of now we strongly recommend using the mBIC criterion when searching for shifts.
+This is an expanded version of the shift point model of Ho and Ane (2014). This is currently being tested, but as of now we strongly recommend using the mBIC criterion when searching for shifts.
 }
 \value{
 \code{OUwie.dredge} returns an object of class \code{OUwie.dredge}. This is a list with elements:
