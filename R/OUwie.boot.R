@@ -2,7 +2,7 @@
 
 #written by Jeremy M. Beaulieu
 
-OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", diagn=FALSE, quiet=TRUE, warn=FALSE){
+OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", diagn=FALSE, quiet=TRUE, warn=FALSE){
 	
     if(is.null(root.age)){
         if(any(branching.times(phy)<0)){
@@ -46,7 +46,7 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
             data[,3] <- tmp[,3]
         }
 		#Now run OUwie, using the measurement error if it is contained within the data, to estimate the parameters from the simulated data:
-		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn)
+		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn)
 		#Now bind all the relevant output together
 		if(model == "BM1" | model == "BMS" | model == "OU1"){
 			res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[1,1]))

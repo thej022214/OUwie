@@ -5,8 +5,8 @@
 \usage{
 OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
  nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL,
- scaleHeight=FALSE, root.station=TRUE, shift.point=0.5, clade=NULL, mserr="none", 
- diagn=FALSE, quiet=TRUE, warn=FALSE)
+ scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, 
+ clade=NULL, mserr="none", diagn=FALSE, quiet=TRUE, warn=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -19,6 +19,7 @@ OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
 \item{theta0}{a numeric indicating the starting state, \eqn{\theta_0}{theta_0}}
 \item{simmap.tree}{a logical indicating whether the input tree is in SIMMAP format. The default is \code{FALSE}.} 
 \item{root.age}{indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is \code{NULL} meaning latest tip is modern day.}
+\item{get.root.theta}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).}
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}

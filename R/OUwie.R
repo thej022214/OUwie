@@ -552,7 +552,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
     
 	#Calculates the Hessian for use in calculating standard errors and whether the maximum likelihood solution was found
 	if(diagn==TRUE){
-		h <- hessian(x=log(out$solution), func=dev, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy)
+		h <- hessian(x=log(out$solution), func=dev, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy, get.root.theta=get.root.theta)
 		#Using the corpcor package here to overcome possible NAs with calculating the SE
 		solution <- matrix(out$solution[index.mat], dim(index.mat))
 		solution.se <- matrix(sqrt(diag(pseudoinverse(h)))[index.mat], dim(index.mat))

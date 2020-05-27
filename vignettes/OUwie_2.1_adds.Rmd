@@ -7,7 +7,7 @@ output:
     fig_caption: yes
 vignette: >
    %\VignetteEngine{knitr::rmarkdown}
-   %\VignetteIndexEntry{Running hisse}
+   %\VignetteIndexEntry{New additions as of OUwie 2.1}
    \usepackage[utf8]{inputenc}
 ---
 
