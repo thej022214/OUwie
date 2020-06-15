@@ -31,7 +31,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
         alpha[which(is.na(alpha))] <- 0
         sigma.sq <- fitted.object$solution['sigma.sq',]
         
-        if(mserr ! = "none"){
+        if(mserr != "none"){
             warning("measurement error is not yet handled for simulations from fitted.object")
         }
         
@@ -49,7 +49,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
         }
         if (fitted.object$root.station == FALSE & grepl("OU", fitted.object$model)){
             if (fitted.object$model != "OU1"){
-                if(get.root.theta == TRUE){
+                if(fitted.object$get.root.theta == TRUE){
                     theta.all <- matrix(t(fitted.object$theta), 2, 1:length(levels(fitted.object$tot.states))+1)[1,]
                     theta <- theta.all[2:length(theta.all)]
                     theta0 <- theta.all[1]
