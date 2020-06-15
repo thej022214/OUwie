@@ -30,25 +30,33 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
         alpha <- fitted.object$solution['alpha',]
         alpha[which(is.na(alpha))] <- 0
         sigma.sq <- fitted.object$solution['sigma.sq',]
-        warning("measurement error is not yet handled for simulations from fitted.object")
+        
+        if(mserr ! = "none"){
+            warning("measurement error is not yet handled for simulations from fitted.object")
+        }
+        
         if (fitted.object$root.station == TRUE | fitted.object$root.station==FALSE){
             if (fitted.object$model == "OU1"){
                 theta <- matrix(t(fitted.object$theta[1,]), 2, length(levels(fitted.object$tot.states)))[1,]
                 theta0 <- theta[phy$node.label[1]]
-                
             }
         }
         if (fitted.object$root.station == TRUE | !grepl("OU", fitted.object$model)){ # BM1 or BMS as well
             if (fitted.object$model != "OU1"){
                 theta <- matrix(t(fitted.object$theta), 2, length(levels(fitted.object$tot.states)))[1,]
                 theta0 <- theta[phy$node.label[1]]
-                
             }
         }
         if (fitted.object$root.station == FALSE & grepl("OU", fitted.object$model)){
             if (fitted.object$model != "OU1"){
-                theta <- matrix(t(fitted.object$theta), 2, length(levels(fitted.object$tot.states))+1)[,1]
-                theta0 <- fitted.object$theta[1,1]
+                if(get.root.theta == TRUE){
+                    theta.all <- matrix(t(fitted.object$theta), 2, 1:length(levels(fitted.object$tot.states))+1)[1,]
+                    theta <- theta.all[2:length(theta.all)]
+                    theta0 <- theta.all[1]
+                }else{
+                    theta <- matrix(t(fitted.object$theta), 2, length(levels(fitted.object$tot.states)))[1,]
+                    theta0 <- theta[phy$node.label[1]]
+                }
             }
         }
     }
