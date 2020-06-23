@@ -168,19 +168,19 @@ Since `OUwie` was first released we've received a deluge of requests to allow fo
 These people probably know better than anyone about the power and limitations of the OU model in phylogenetics. So, don't listen to us, listen to them!
 
 Still determined? Ok, fair enough. It is straightforward to run the ancestral trait reconstruction in `OUwie`. All you need is an object of class `OUwie`, which is plugged directly into the new `OUwie.anc()` function:
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=TRUE}
 data(tworegime)
 set.seed(42)
-ouwiefit <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE)
+ouwiefit <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, quiet=TRUE, check.identify=FALSE)
 ```
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=FALSE, echo=TRUE}
 recon <- OUwie.anc(ouwiefit)
 ```
 
 Ah! If you run the code above a somewhat snarky response is printed to the screen. Since you are here reading this, we think this is sufficient, and you are at least aware that we are not huge fans of this approach. So, there is no need to read the manual (it's basically the same as what you see here), and the proper way to call the `OUwie.anc()` function call is simply add in `knowledge=TRUE`: 
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=TRUE}
 recon <- OUwie.anc(ouwiefit, knowledge=TRUE)
 ```
 
