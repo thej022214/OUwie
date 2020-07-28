@@ -46,7 +46,7 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
             data[,3] <- tmp[,3]
         }
 		#Now run OUwie, using the measurement error if it is contained within the data, to estimate the parameters from the simulated data:
-		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn)
+		tmp <- OUwie(phy, data, model=model, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, clade=clade, mserr=mserr, diagn=diagn, quiet=quiet, warn=warn, check.identify=FALSE)
 		#Now bind all the relevant output together
 		if(model == "BM1" | model == "BMS" | model == "OU1"){
 			res <- rbind(res, c(tmp$solution[1,], tmp$solution[2,], tmp$theta[1,1]))
@@ -75,14 +75,25 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 			colnames(res) <- c(paste("alpha", levels(tmp$tot.states),sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"), paste("theta", colnames(theta.mat), sep="_"))
 		}
 	}else{
-		theta.mat<-matrix(t(tmp$theta), 2, length(levels(tmp$tot.states))+1)
-		rownames(theta.mat)<-c("estimate", "se")
-		if(tmp$simmap.tree==FALSE){
-			colnames(theta.mat)<-c("root", levels(tmp$tot.states))
-		}
-		if(tmp$simmap.tree==TRUE){
-			colnames(theta.mat)<-c("root", colnames(tmp$phy$mapped.edge))
-		}
+        if(get.root.theta == TRUE){
+            theta.mat<-matrix(t(tmp$theta), 2, length(levels(tmp$tot.states))+1)
+            rownames(theta.mat)<-c("estimate", "se")
+            if(tmp$simmap.tree==FALSE){
+                colnames(theta.mat)<-c("root", levels(tmp$tot.states))
+            }
+            if(tmp$simmap.tree==TRUE){
+                colnames(theta.mat)<-c("root", colnames(tmp$phy$mapped.edge))
+            }
+        }else{
+            theta.mat<-matrix(t(tmp$theta), 2, length(levels(tmp$tot.states)))
+            rownames(theta.mat)<-c("estimate", "se")
+            if(tmp$simmap.tree==FALSE){
+                colnames(theta.mat)<-c(levels(tmp$tot.states))
+            }
+            if(tmp$simmap.tree==TRUE){
+                colnames(theta.mat)<-c(colnames(tmp$phy$mapped.edge))
+            }
+        }
 		if(model=="BMS"){
 			colnames(res) <- c(paste("alpha", levels(tmp$tot.states), sep="_"), paste("sigma.sq", levels(tmp$tot.states), sep="_"),paste("theta", "root", sep="_"))
 		}else{

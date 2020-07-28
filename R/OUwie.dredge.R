@@ -157,7 +157,6 @@ GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mB
 #start.values <- start.vals
 #GetShiftModel(phy, dat, nmax=1, criterion="mBIC", alpha.max.k=1, sigma.sq.max.k=1, start.vals=start.values, root.station=TRUE)
 
-
 GetShiftMap <- function(curmodel, phy, data){
     phy = reorder(phy, "pruningwise")
     regimes <- length(curmodel)
@@ -292,10 +291,10 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
         return(best.fit)
     }
     
-    ####GENERATE TREE PAINTING AND DATA SET####
+    #### GENERATE TREE PAINTING AND DATA SET ####
     mapping.tree.data <- GetShiftMap(curmodel, phy, data)
     shifts <- k <- length(curmodel)
-    ####GET MODEL COMBINATIONS###
+    #### GET MODEL COMBINATIONS ####
     dredge.combos <- DredgeCombinations(shifts=shifts, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k)
     ###########################################
 
