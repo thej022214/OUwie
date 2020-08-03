@@ -10,8 +10,8 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         vcv <- quickVCV(phy=phy, alpha=alpha, sigma.sq=sigma, scaleHeight=scaleHeight)
     }else{
         if(is.null(root.state)) {
-            root.state<-which(edges[dim(edges)[1],]==1)-5
-            edges<-edges[-1*dim(edges)[1],]
+            root.state <- which(edges[dim(edges)[1],]==1)-5
+            edges <- edges[-1*dim(edges)[1],]
         }
         n=max(phy$edge[,1])
         ntips=length(phy$tip.label)
@@ -22,6 +22,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             mm<-dim(edges)
             k<-length(6:mm[2])
         }
+        
         pp <- prop.part(phy)
         oldregime=root.state
         nodevar1=rep(0,max(edges[,3]))
@@ -100,15 +101,10 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             count=0
             for(i in 1:dim(vcv1)[2]) {
                 for(j in 1:dim(vcv1)[2]){
-                    if(i==j){
-                        break;
-                    }else{
-                        species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
-                        count=count+1
-                    }
+                    species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
+                    count=count+1
                 }
             }
-            diag(species.total.variances) <- exp(-2 * diag(vcv1))
             vcv <- species.total.variances * vcv2
         }else{
             if(is.null(root.age)){

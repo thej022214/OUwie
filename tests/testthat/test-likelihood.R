@@ -96,4 +96,36 @@ test_that("testing simmap", {
 })
 
 
+## For testing BM1 and BMS models:
+#test_that("testing BM1", {
+#    skip_on_cran()
+
+#    library(phytools)
+#    library(geiger)
+#    library(OUwie)
+
+    ## simulate some data
+#    tree<-pbtree(n=26)
+#    Q<-matrix(c(-1,1,1,-1),2,2,dimnames=list(letters[1:2],
+#    letters[1:2]))
+#    tree<-sim.history(tree,Q)
+#    plot(tree)
+#    x<-as.factor(getStates(tree,"tips"))
+#    y<-fastBM(tree)
+
+    ## fit using brownie.lite
+#    brownie.lite(tree,y)
+
+    ## fit using OUwie
+#    test.data<-data.frame(Genus_species=tree$tip.label,Reg=x,X=y)
+#    OUwie(tree,test.data,model="BM1",simmap.tree=TRUE, root.station=FALSE)
+
+    ## fit using fitContinuous
+#    fitContinuous(tree,y)
+#})
+
+
+
+
+
 

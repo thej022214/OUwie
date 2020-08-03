@@ -49,10 +49,9 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
     if(check.identify == TRUE){
             identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
             if(identifiable == 0){
-                warning("The supplied regime painting is unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
+                warning("The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
             }
     }
-
 
     #Makes sure the data is in the same order as the tip labels
     if(mserr == "none" | mserr == "est"){
@@ -99,8 +98,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 		tip.states <- factor(data[,1])
 		data[,1] <- as.numeric(tip.states)
 
-		#A boolean for whether the root theta should be estimated -- default is that it should be.
-		root.station=root.station
 		#Obtains the state at the root
 		root.state=which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
 		##Begins the construction of the edges matrix -- similar to the ouch format##
@@ -151,21 +148,21 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
                 tot.states <- factor(c(phy$node.label,as.character(data[,1])))
                 k <- length(levels(tot.states))
                 int.states <- factor(phy$node.label)
-                phy$node.label=as.numeric(int.states)
+                phy$node.label <- as.numeric(int.states)
                 tip.states <- factor(data[,1])
                 data[,1] <- as.numeric(tip.states)
 				#Obtain root state and internal node labels
 				root.state <- phy$node.label[1]
 				int.state <- phy$node.label[-1]
 				#New tree matrix to be used for subsetting regimes
-                edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
+                edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 				if(scaleHeight==TRUE){
-					edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
-                    root.age = 1
+					edges[,4:5] <- edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
+                    root.age <- 1
 				}
 				edges=edges[sort.list(edges[,3]),]
 
-				mm<-c(data[,1],int.state)
+				mm <- c(data[,1],int.state)
 				regime <- matrix(0,nrow=length(mm),ncol=k)
 				#Generates an indicator matrix from the regime vector
 				for (i in 1:length(mm)) {
@@ -176,7 +173,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			}
 		}
 		#Resort the edge matrix so that it looks like the original matrix order
-		edges=edges[sort.list(edges[,1]),]
+		edges <- edges[sort.list(edges[,1]),]
 	}
 
     #Initializes an integer specifying whether or not the trendy model is to be invoked. Assume 0, unless otherwise stated later:
@@ -186,10 +183,10 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 
 	#Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
-		index.mat <- matrix(0,2,k)
+		index.mat <- matrix(0, 2,k)
 		Rate.mat <- matrix(1, 2, k)
 		if (model == "BM1"){
-			np=1
+			np <- 1
 			index <- matrix(TRUE,2,k)
 			if(mserr=="est"){
 				index.mat[1,1:k] <- np+2
@@ -199,9 +196,8 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			}
 			index.mat[2,1:k] <- 1
 			param.count <- np+1
-			bool <- TRUE
 		}
-		#The group mean model of Thomas et al, is trivial: set bool to be TRUE:
+		#The group mean model of Thomas et al, is trivial: set root.station to be TRUE:
 		if (model == "BMS"){
 			np <- k
 			index <- matrix(TRUE,2,k)
@@ -218,7 +214,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
             if(root.station==FALSE){
                 param.count <- np+1
             }
-			bool <- root.station
 		}
 		if (model == "OU1"){
 			np <- 2
@@ -226,7 +221,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[1,1:k] <- 1
 			index.mat[2,1:k] <- 2
             param.count <- np + 1
-			bool=root.station
             if(get.root.theta == TRUE){
                 param.count <- param.count + 1
             }
@@ -237,7 +231,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[1,1:k] <- 1
 			index.mat[2,1:k] <- 2
             param.count<-np+k
-			bool=root.station
             if(get.root.theta == TRUE){
                 param.count <- param.count + 1
             }
@@ -248,7 +241,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[1,1:k] <- 1
 			index.mat[2,1:k] <- 2:(k+1)
             param.count <- np+k
-			bool=root.station
             if(get.root.theta == TRUE){
                 param.count <- param.count + 1
             }
@@ -259,7 +251,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[1,1:k] <- 1:k
 			index.mat[2,1:k] <- k+1
             param.count <- np+k
-			bool=root.station
             if(get.root.theta == TRUE){
                 param.count <- param.count + 1
             }
@@ -269,7 +260,6 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index <- matrix(TRUE,2,k)
 			index.mat[index] <- 1:(k*2)
             param.count <- np+k
-			bool <- root.station
             if(get.root.theta == TRUE){
                 param.count <- param.count + 1
             }
@@ -288,7 +278,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- 1
 			index.mat[3,1:k] <- 2:(np-1)
 			param.count<-np
-			bool=TRUE
+			root.station=TRUE
 			trendy=1
 		}
 		if (model == "TrendyMS"){
@@ -305,7 +295,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			index.mat[2,1:k] <- 1:k
 			index.mat[3,1:k] <- (k+1):(np-1)
 			param.count <- np
-			bool=FALSE
+			root.station=FALSE
 			trendy=1
 		}
 	}
@@ -318,13 +308,15 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 
 	#Likelihood function for estimating model parameters
 	dev <- function(p, index.mat, edges, mserr, trendy, get.root.theta){
-
+        
 		if(trendy == 0){
             p <- exp(p)
             Rate.mat[] <- c(p, 1e-10)[index.mat]
+
             N <- length(x[,1])
             root.par.index <- length(p)
-            V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+            V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
+            
             if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(1000000)
             if(mserr=="known"){
                 diag(V) <- diag(V)+(data[,3]^2)
@@ -340,7 +332,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
                 W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
             }
 
-			theta <- Inf
+            theta <- Inf
 			try(theta <- pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x, silent=TRUE)
 			if(any(theta==Inf)){
 				return(10000000)
@@ -358,7 +350,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
             Rate.mat[] <- c(p, 1e-10)[index.mat]
             N <- length(x[,1])
             root.par.index <- length(p)
-            V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+            V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
             if (any(is.nan(diag(V))) || any(is.infinite(diag(V)))) return(1000000)
             if(mserr=="known"){
                 diag(V)<-diag(V)+(data[,3]^2)
@@ -403,7 +395,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 	if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
 		if(scaleHeight==TRUE){
 			d <- max(diag(vcv.phylo(phy)))
-			phy$edge.length<-(phy$edge.length/d)
+			phy$edge.length <- (phy$edge.length/d)
 		}
 		C.mat <- vcv.phylo(phy)
 		a <- as.numeric(colSums(solve(C.mat))%*%x/sum(solve(C.mat)))
@@ -429,16 +421,16 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
             init.ip <- starting.vals
         }
 		if(model=="OU1"){
-			ip=init.ip
+			ip <- init.ip
 		}
 		if(model=="OUMV" | model=="OUMA" | model=="OUM"){
 			ip <- c(rep(init.ip[1],length(unique(index.mat[1,]))),rep(init.ip[2],length(unique(index.mat[2,]))))
 		}
 		if(model=="OUMVA"){
-			ip<-c(rep(init.ip,k))
+			ip <- c(rep(init.ip,k))
 		}
 		if(mserr=="est"){
-			ip<-c(ip,sig)
+			ip <- c(ip,sig)
 			lower = c(lower,0)
 			upper = c(upper,ub)
 		}
@@ -501,12 +493,14 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 		tmp<-NULL
 		Rate.mat[] <- c(p, 1e-10)[index.mat]
 		N <- length(x[,1])
-		V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+		V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
+        
         if(get.root.theta == TRUE){
             W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
         }else{
             W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
         }
+        
         if(mserr=="known"){
             diag(V) <- diag(V)+(data[,3]^2)
 		}
@@ -514,6 +508,7 @@ OUwie <- function(phy,data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA
 			diag(V) <- diag(V)+(p[length(p)])
 		}
 		theta <- pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
+        
         #Calculates the hat matrix:
 		#H.mat<-W%*%pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)
 		#Standard error of theta -- uses pseudoinverse to overcome singularity issues

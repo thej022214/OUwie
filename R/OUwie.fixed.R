@@ -36,7 +36,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     if(check.identify == TRUE){
         identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
         if(identifiable == 0){
-            warning("The supplied regime painting is unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
+            warning("The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
         }
     }
 
@@ -88,8 +88,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         tip.states<-factor(data[,1])
         data[,1]<-as.numeric(tip.states)
         
-        #A boolean for whether the root theta should be estimated -- default is that it should be.
-        root.station=root.station
         #Obtains the state at the root
         root.state=which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
         ##Begins the construction of the edges matrix -- similar to the ouch format##
@@ -183,7 +181,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- 1e-10
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+1
-            bool <- TRUE
         }
         if (model == "BMS"){
             np <- k
@@ -196,7 +193,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             if(root.station == FALSE){
                 param.count <- np+1
             }
-            bool <- root.station
         }
         if (model == "OU1"){
             np <- 2
@@ -204,7 +200,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+1
-            bool <- root.station
         }
         if (model == "OUM"){
             np <- 2
@@ -212,7 +207,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+k
-            bool <- root.station
         }
         if (model == "OUMV") {
             np <- k+1
@@ -220,7 +214,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+k
-            bool <- root.station
         }
         if (model == "OUMA") {
             np <- k+1
@@ -228,7 +221,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+k
-            bool <- root.station
         }
         if (model == "OUMVA") {
             np <- k*2
@@ -236,7 +228,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
             param.count <- np+k
-            bool <- root.station
         }
     }
     
@@ -245,7 +236,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     #Likelihood function for estimating model parameters
     dev.fixed <- function(){
         N <- length(x[,1])
-        V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=bool, shift.point=shift.point)
+        V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
         if(get.root.theta == TRUE){
             W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
         }else{
