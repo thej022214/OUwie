@@ -5,9 +5,9 @@
 \usage{
 OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
-root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", 
-starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE, 
-opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000", 
+root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none",
+starting.vals=NULL, check.identify=TRUE, diagn=FALSE, quiet=FALSE, warn=TRUE,
+opts = list(algorithm = "NLOPT_LN_SBPLX", maxeval = "1000",
 ftol_rel = .Machine$double.eps^0.5))
 }
 \arguments{
@@ -34,7 +34,7 @@ This function fits various likelihood models for continuous characters evolving 
 
 Possible models are as follows: single-rate Brownian motion (\code{model=BM1}), Brownian motion with different rate parameters for each state on a tree (\code{model=BMS}), Ornstein-Uhlenbeck model with a single optimum for all species (\code{model=OU1}), Ornstein-Uhlenbeck model with different state means and a single \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} acting all selective regimes (\code{model=OUM}), and new Ornstein-Uhlenbeck models that assume different state means as well as either multiple \eqn{\sigma^2}{sigma^2} (\code{model=OUMV}), multiple \eqn{\alpha}{alpha} (\code{model=OUMA}), or multiple \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} per selective regime (\code{model=OUMVA}).
 
-By default, we drop the root optima and absorb the weight into whatever regime the root is in. In previous version we used to incorrectly refer to this as "stationarity". True stationarity assumes that the starting state comes from a distribution, and the covariance requires an additional variance term to account for the fact that, up until T=0, the lineage is assumed to have been evolving in the ancestral regime. We have added this in for the OU1 and OUM models only (root.station=TRUE). 
+By default, we drop the root optima and absorb the weight into whatever regime the root is in. In previous version we used to incorrectly refer to this as "stationarity". True stationarity assumes that the starting state comes from a distribution, and the covariance requires an additional variance term to account for the fact that, up until T=0, the lineage is assumed to have been evolving in the ancestral regime. We have added this in for the OU1 and OUM models only (root.station=TRUE).
 
 Note, too, that when specifying the BMS model also be mindful of the root.station flag. When root.station=FALSE, the non-censored model of O'Meara et al. 2006 is invoked (i.e., a single regime at the root is estimated), and when root.station==TRUE the group mean model of Thomas et al. 2006 (i.e., the number of means equals the number of regimes). The latter case appears to be a strange special case of OU, in that it behaves similarly to the OUMV model, but without selection. I would say that this is more consistent with the censored test of O'Meara et al. (2006), as opposed to having any real connection to OU. In any case, more work is clearly needed to understand the behavior of the group means model, and therefore, I recommend setting root.station=FALSE in the BMS case.
 
@@ -94,10 +94,10 @@ nodelabels(pch=21, bg=select.reg)
 trait[1:5,]
 
 #Now fit an OU model that allows different sigma^2:
-OUwie(tree,trait,model=c("OUMV"),root.station=TRUE)
+OUwie(tree,trait,model=c("OUMV"))
 
 #Fit an OU model based on a clade of interest:
-OUwie(tree,trait,model=c("OUMV"), root.station=TRUE, clade=c("t50", "t64"))
+OUwie(tree,trait,model=c("OUMV"), clade=c("t50", "t64"))
 
 #For large trees, it may be useful to have ways to restart the search (due to
 #finite time per run on a computing cluster, for example). You can do this
@@ -112,7 +112,7 @@ save(run1, file="run1.rda")
 
 load("run1.rda")
 
-run2 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
+run2 <- OUwie(tree,trait,model=c("OUMV"), opts =
 list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001),
 starting.vals=run1$new.start)
 
