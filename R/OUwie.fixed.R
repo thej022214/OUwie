@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, quiet=FALSE){
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), quiet=FALSE){
     
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
@@ -39,9 +39,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             warning("The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
         }
     }
-
+    
+    if(algorithm == "three.point"){
+        simmap.tree = TRUE
+        phy <- makeSimmapFromNode(phy)
+    }
+    
     #Makes sure the data is in the same order as the tip labels
-    if(mserr=="none" | mserr=="est"){
+    if(mserr=="none"){
         data<-data.frame(data[,2], data[,3], row.names=data[,1])
         data<-data[phy$tip.label,]
     }
@@ -169,8 +174,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         #Resort the edge matrix so that it looks like the original matrix order
         edges=edges[sort.list(edges[,1]),]
     }
-    x<-as.matrix(data[,2])
     
+    if(algorithm == "three.point"){
+        x <- data[,2]
+        names(x) <- rownames(data)
+    }else{
+        x <- as.matrix(data[,2])
+    }
+    print(head(x))
     #Matches the model with the appropriate parameter matrix structure
     if (is.character(model)) {
         Rate.mat <- matrix(1, 2, k)
@@ -199,13 +210,21 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             index <- matrix(TRUE,2,k)
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
-            param.count <- np+1
+            if(algorithm == "three.point"){
+                index <- rbind(index, TRUE)
+                Rate.mat <- rbind(Rate.mat, theta)
+            }
+            param.count <- np + 1
         }
         if (model == "OUM"){
             np <- 2
             index <- matrix(TRUE,2,k)
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
+            if(algorithm == "three.point"){
+                index <- rbind(index, TRUE)
+                Rate.mat <- rbind(Rate.mat, theta)
+            }
             param.count <- np+k
         }
         if (model == "OUMV") {
@@ -213,6 +232,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             index <- matrix(TRUE,2,k)
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
+            if(algorithm == "three.point"){
+                index <- rbind(index, TRUE)
+                Rate.mat <- rbind(Rate.mat, theta)
+            }
             param.count <- np+k
         }
         if (model == "OUMA") {
@@ -220,6 +243,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             index <- matrix(TRUE,2,k)
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
+            if(algorithm == "three.point"){
+                index <- rbind(index, TRUE)
+                Rate.mat <- rbind(Rate.mat, theta)
+            }
             param.count <- np+k
         }
         if (model == "OUMVA") {
@@ -227,45 +254,64 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             index <- matrix(TRUE,2,k)
             Rate.mat[1,1:k] <- alpha
             Rate.mat[2,1:k] <- sigma.sq
-            param.count <- np+k
+            if(algorithm == "three.point"){
+                index <- rbind(index, TRUE)
+                Rate.mat <- rbind(Rate.mat, theta)
+            }
+            param.count <- np + k
         }
     }
-    
+
     obj<-NULL
     
     #Likelihood function for estimating model parameters
     dev.fixed <- function(){
-        N <- length(x[,1])
-        V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
+        
         if(get.root.theta == TRUE){
             W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
         }else{
             W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
         }
-        if(mserr=="known"){
-            diag(V)<-diag(V)+(data[,3]^2)
-        }
-        if(is.null(theta)){
-            theta<-pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
-            se<-sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
-        }
-        else{
-            theta=theta
-            se=rep(NA,length(theta))
-        }
         
-        theta.est <- cbind(theta,se)
-        res <- W%*%theta-x
-        #When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
-        DET <- sum(log(abs(Re(diag(qr(V)$qr)))))
-        #However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
-        if(!is.finite(DET)){
-            DET <- determinant(V, logarithm=TRUE)
-            logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
-        }else{
-            logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET)-.5*(N*log(2*pi))
+        if(algorithm == "invert"){
+            
+            N <- length(x[,1])
+            V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
+            
+            if(mserr=="known"){
+                diag(V) <- diag(V)+(data[,3]^2)
+            }
+            
+            if(is.null(theta)){
+                theta <- pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
+                se <- sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))
+            }else{
+                se=rep(NA,length(theta))
+            }
+            
+            theta.est <- cbind(theta,se)
+            #When the model includes alpha, the values of V can get too small, the modulus does not seem correct and the loglik becomes unstable. This is one solution:
+            DET <- sum(log(abs(Re(diag(qr(V)$qr)))))
+            #However, sometimes this fails (not sure yet why) so I just toggle between this and another approach:
+            if(!is.finite(DET)){
+                DET <- determinant(V, logarithm=TRUE)
+                logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET$modulus)-.5*(N*log(2*pi))
+            }else{
+                logl <- -.5*(t(x-W%*%theta)%*%pseudoinverse(V)%*%(x-W%*%theta))-.5*as.numeric(DET)-.5*(N*log(2*pi))
+            }
+            return(list(-logl,theta.est))
         }
-        list(-logl,theta.est,res)
+        if(algorithm == "three.point"){
+            pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, dimnames = list(levels(tot.states), c("opt", "sig", "alp")))
+            expected.vals <- colSums(t(W) * pars[,1])
+            names(expected.vals) <- phy$tip.label
+            transformed.tree <- transformPhy(phy, pars)
+            comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
+            logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
+            se <- rep(NA,length(theta))
+            theta.est <- cbind(theta,se)
+            return(list(-logl, theta.est))
+        }
     }
     if(quiet==FALSE){
         cat("Calculating likelihood using fixed parameter values:",c(alpha,sigma.sq,theta), "\n")
@@ -281,24 +327,32 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     
     if(get.root.theta == TRUE){
-        rates <- cbind(NA, Rate.mat, NA)
-        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
-        rates <- rbind(rates, thetas)
+        if(algorithm == "invert"){
+            rates <- cbind(NA, Rate.mat, NA)
+            thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+            rates <- rbind(rates, thetas)
+        }else{
+            rates <- cbind(NA, Rate.mat, NA)
+        }
         weights <- cbind(W, data[,1])
         regime.weights <- rbind(rates, weights)
         rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
         colnames(regime.weights) <- c("Root", levels(tot.states), "Tip_regime")
     }else{
-        rates <- cbind(Rate.mat, NA)
-        thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
-        rates <- rbind(rates, thetas)
+        if(algorithm == "invert"){
+            rates <- cbind(Rate.mat, NA)
+            thetas <- cbind(t(fixed.fit[[2]][,1]), NA)
+            rates <- rbind(rates, thetas)
+        }else{
+            rates <- cbind(Rate.mat, NA)
+        }
         weights <- cbind(W, data[,1])
         regime.weights <- rbind(rates, weights)
         rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
         colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
     }
-    
-    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, scaleHeight=scaleHeight, res=fixed.fit[[3]], get.root.theta=get.root.theta, regime.weights=regime.weights)
+
+    obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, scaleHeight=scaleHeight, get.root.theta=get.root.theta, regime.weights=regime.weights)
     class(obj)<-"OUwie.fixed"
     return(obj)
 }
@@ -315,7 +369,7 @@ print.OUwie.fixed<-function(x, ...){
     
     if (is.character(x$model)) {
         if (x$model == "BM1" | x$model == "BMS"){
-            param.est <- x$solution
+            param.est <- x$solution[1:2,]
             rownames(param.est)<-c("alpha","sigma.sq")
             if(x$root.station==FALSE){
                 theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
@@ -339,7 +393,7 @@ print.OUwie.fixed<-function(x, ...){
         }
         if (x$get.root.theta == FALSE){
             if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-                param.est<- x$solution
+                param.est<- x$solution[1:2,]
                 rownames(param.est)<-c("alpha","sigma.sq")
                 theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
                 rownames(theta.mat)<-c("estimate", "se")
@@ -359,7 +413,7 @@ print.OUwie.fixed<-function(x, ...){
         }
         if (x$get.root.theta == TRUE){
             if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
-                param.est<- x$solution
+                param.est <- x$solution[1:2,]
                 rownames(param.est)<-c("alpha","sigma.sq")
                 theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states))+1)
                 rownames(theta.mat)<-c("estimate", "se")

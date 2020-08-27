@@ -48,7 +48,6 @@ The input is a tree and a data file. The tree must be of class \dQuote{phylo} an
 \item{$phy}{User-supplied tree}
 \item{$root.station}{A logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated}
 \item{$scaleHeight}{Indicates whether the tree was constrained to a total height of 1.}
-\item{$res}{A vector of residuals from the model fit.  The residuals are ordered in the same way as the tips in the tree.}
 \item{$get.root.theta}{Indicates whether the root.theta was included in the model.}
 \item{$regime.weights}{A table containing parameter estimates and the weights for time spent in each regime for each tip.}
 

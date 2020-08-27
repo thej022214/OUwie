@@ -67,8 +67,6 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$lb}{The lower bound set}
 \item{$ub}{The upper bound set}
 \item{$iterations}{Number of iterations of the likelihood search that were executed}
-\item{$mserr.est}{The estimated measurement error if mserr="est". Otherwise, the value is NULL.}
-\item{$res}{A vector of residuals from the model fit.  The residuals are ordered in the same way as the tips in the tree.}
 \item{$get.root.theta}{Indicates whether the root.theta was included in the model.}
 \item{$regime.weights}{A table containing parameter estimates and the weights for time spent in each regime for each tip.}
 \item{$eigval}{The eigenvalues from the decomposition of the Hessian of the likelihood function. If any \code{eigval<0} then one or more parameters were not optimized during the likelihood search (see Details)}
