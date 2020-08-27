@@ -3,20 +3,35 @@
 #written by James D. Boyko
 
 
-# takes a node based reconstruction and transforms it into a simmap
-makeSimmapFromNode <- function(phy){
-    Map <- vector("list", dim(phy$edge)[1])
-    NodeLabels <- phy$node.label[phy$edge[,1] - Ntip(phy)]
-    for(i in 1:dim(phy$edge)[1]){
-        tmp <- phy$edge.length[i]
-        names(tmp) <- NodeLabels[i]
-        Map[[i]] <- tmp
+## takes a node based reconstruction and returns a map (identical to a map from simmap)
+getMapFromNode <- function(phy, tipstates, nodestates, shift.point){
+  Map <- vector("list", dim(phy$edge)[1])
+  Data <- c(tipstates, nodestates)
+  NodeStates <- cbind(Data[phy$edge[,1]], Data[phy$edge[,2]])
+  for(i in 1:dim(phy$edge)[1]){
+    from <- as.character(NodeStates[i,1])
+    to <- as.character(NodeStates[i,2])
+    if(from == to){
+      tmp <- phy$edge.length[i]
+      names(tmp) <- from
+      Map[[i]] <- tmp
+    }else{
+      shift.time <- shift.point * phy$edge.length[i]
+      tmp <- c(phy$edge.length[i] - shift.time, shift.time)
+      names(tmp) <- c(from, to)
+      Map[[i]] <- tmp
     }
-    phy$maps <- Map
-    phy$mapped.edge <- corHMM:::convertSubHistoryToEdge(tree, Map)
-    class(phy) <-  c("simmap", setdiff(class(phy), "simmap"))
-    return(phy)
+  }
+  return(Map)
 }
+
+# data(tworegime)
+# phy <- tree
+# tipstates <- trait[,2]
+# nodestates <- phy$node.label
+# shift.point <- 0.5
+# getMapFromNode(phy, round(runif(length(phy$tip.label), 1, 2)), nodestates, 0.5)
+# getMapFromNode(phy, tipstates, nodestates, 0)
 
 
 # gets the path from a vertex to the root as an index of the edge matrix
@@ -38,12 +53,12 @@ getPathToRoot <- function(phy, tip){
 
 
 # transforms the phylogeny based on a set of paramaters and a simmap
-transformPhy <- function(phy, pars){
+transformPhy <- function(phy, map, pars){
     # phy must be of class simmap
     nTip <- length(phy$tip.label)
     RootAge <- max(branching.times(phy))
     NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
-    ModMap <- Map <- phy$maps
+    ModMap <- Map <- map
     D <- V_Tilde <- numeric(dim(phy$edge)[1])
     for(i in 1:dim(phy$edge)[1]){
         # evaluate the map for this particular edge and calculate the tipward variance
@@ -51,7 +66,6 @@ transformPhy <- function(phy, pars){
         DistRoot_i <- RootAge - NodeAge_i
         Map_i <- Map[[i]]
         # the age of epoch j starts at the node age
-        # EpochAge_j <- NodeAge_i
         Dist_rootward <- DistRoot_i
         w <- v <- 0
         for(j in 1:length(Map_i)){
@@ -96,6 +110,7 @@ getOULik <- function(phy, y, X, pars){
     lik <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
     return(lik)
 }
+
 
 
 

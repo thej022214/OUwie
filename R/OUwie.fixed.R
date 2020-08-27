@@ -40,10 +40,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
-    if(algorithm == "three.point"){
-        simmap.tree = TRUE
-        phy <- makeSimmapFromNode(phy)
-    }
+    # if(algorithm == "three.point"){
+    #     simmap.tree = TRUE
+    #     phy <- makeSimmapFromNode(phy)
+    # }
     
     #Makes sure the data is in the same order as the tip labels
     if(mserr=="none"){
@@ -116,6 +116,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         int.states<-factor(phy$node.label)
         phy$node.label=as.numeric(int.states)
         tip.states<-factor(data[,1])
+        node.states <- factor(phy$node.label)
         data[,1]<-as.numeric(tip.states)
  
         #A boolean for whether the root theta should be estimated -- default is that it should be.
@@ -305,7 +306,13 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, dimnames = list(levels(tot.states), c("opt", "sig", "alp")))
             expected.vals <- colSums(t(W) * pars[,1])
             names(expected.vals) <- phy$tip.label
-            transformed.tree <- transformPhy(phy, pars)
+            # generate a map from node based reconstructions
+            if(simmap.tree == FALSE){
+              map <- getMapFromNode(phy, tip.states, node.states, shift.point)
+            }else{
+              map <- phy$maps
+            }
+            transformed.tree <- transformPhy(phy, map, pars)
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))
