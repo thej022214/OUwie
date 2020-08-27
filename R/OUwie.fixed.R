@@ -181,7 +181,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }else{
         x <- as.matrix(data[,2])
     }
-    print(head(x))
+
     #Matches the model with the appropriate parameter matrix structure
     if (is.character(model)) {
         Rate.mat <- matrix(1, 2, k)
