@@ -21,6 +21,29 @@ test_that("testing OUM likelihood stationary", {
     expect_true(comparison)
 })
 
+
+test_that("testing BM1 likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="BM1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -21.95911)
+    expect_true(comparison)
+})
+
+
+test_that("testing BMS likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="BMS", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -17.85074)
+    expect_true(comparison)
+})
+
+
 test_that("testing OU1 likelihood", {
     skip_on_cran()
     
@@ -28,7 +51,6 @@ test_that("testing OU1 likelihood", {
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
     comparison <- identical(round(ouwiefit$loglik,5), -21.74538)
-    #####PRINT FUNCTION FAILS FOR HALF-LIFE
     expect_true(comparison)
 })
 
@@ -43,6 +65,7 @@ test_that("testing OUM likelihood", {
     expect_true(comparison)
 })
 
+
 test_that("testing OUMV likelihood", {
     skip_on_cran()
     
@@ -52,6 +75,7 @@ test_that("testing OUMV likelihood", {
     comparison <- identical(round(ouwiefit$loglik,5), -14.79506)
     expect_true(comparison)
 })
+
 
 test_that("testing OUMA likelihood", {
     skip_on_cran()
@@ -96,6 +120,38 @@ test_that("testing simmap", {
     expect_true(comparison)
 })
 
+
+test_that("testing BM1 likelihood invert vs three.point", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    
+    sigma.sq=c(0.4669113, 0.4669113)
+    theta=c(1.326483, 1.326483)
+    
+    BM1Invert <- OUwie.fixed(tree, trait, model=c("BM1"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, sigma.sq=sigma.sq, shift.point=0.5, algorithm="invert")
+    BM13Point <- OUwie.fixed(tree, trait, model=c("BM1"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, sigma.sq=sigma.sq, theta=theta, shift.point=0.5, algorithm="three.point")
+    comparison <- identical(round(as.numeric(BM1Invert$loglik),5), round(as.numeric(BM13Point$loglik),5))
+    expect_true(comparison)
+})
+
+
+test_that("testing BMS likelihood invert vs three.point", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    
+    sigma.sq=c(0.2424788, 0.7007112)
+    theta <- c(1.4719377, 1.4719377)
+    BMSInvert <- OUwie.fixed(tree, trait, model=c("BMS"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, sigma.sq=sigma.sq, shift.point=0.5, algorithm="invert")
+    BMS3Point <- OUwie.fixed(tree, trait, model=c("BM1"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, sigma.sq=sigma.sq, theta=theta, shift.point=0.5, algorithm="three.point")
+    comparison <- identical(round(as.numeric(BMSInvert$loglik),5), round(as.numeric(BMS3Point$loglik),5))
+    expect_true(comparison)
+})
+
+
 test_that("testing OU1 likelihood invert vs three.point", {
     skip_on_cran()
     
@@ -107,8 +163,7 @@ test_that("testing OU1 likelihood invert vs three.point", {
     theta=c( 1.3301447, 1.3301447)
     
     OU1Invert <- OUwie.fixed(tree, trait, model=c("OU1"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq,theta=theta, shift.point=0.5, algorithm="invert")
-    ####FAILS IF RUNNING AS OU1:
-    OU13Point <- OUwie.fixed(tree, trait, model=c("OUM"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq,theta=theta, shift.point=0.5, algorithm="three.point")
+    OU13Point <- OUwie.fixed(tree, trait, model=c("OU1"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq,theta=theta, shift.point=0.5, algorithm="three.point")
     comparison <- identical(round(as.numeric(OU1Invert$loglik),5), round(as.numeric(OU13Point$loglik),5))
     expect_true(comparison)
 })
@@ -180,6 +235,84 @@ test_that("testing OUMVA likelihood invert vs three.point", {
     comparison <- identical(round(as.numeric(OUMVAInvert$loglik),5), round(as.numeric(OUMVA3Point$loglik),5))
     expect_true(comparison)
 })
+
+
+test_that("testing BM1 three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="BM1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -21.95911)
+    expect_true(comparison)
+})
+
+
+test_that("testing BMS three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="BMS", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -17.85074)
+    expect_true(comparison)
+})
+
+
+test_that("testing OU1 three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -21.74538)
+    expect_true(comparison)
+})
+
+
+test_that("testing OUM three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="OUM", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -19.51388)
+    expect_true(comparison)
+})
+
+
+test_that("testing OUMV three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="OUMV", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -14.79506)
+    expect_true(comparison)
+})
+
+
+test_that("testing OUMA three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="OUMA", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -19.42678)
+    expect_true(comparison)
+})
+
+
+test_that("testing OUMVA three-point likelihood", {
+    skip_on_cran()
+    
+    data(tworegime)
+    set.seed(42)
+    ouwiefit <- OUwie(tree, trait, model="OUMVA", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+    comparison <- identical(round(ouwiefit$loglik,5), -14.06695)
+    expect_true(comparison)
+})
+
 
 ## For testing BM1 and BMS models:
 #test_that("testing BM1", {

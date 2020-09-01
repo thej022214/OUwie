@@ -443,9 +443,13 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 			ip <- c(rep(init.ip,k))
 		}
         if(algorithm == "three.point"){
-            means.by.regime <- with(data, tapply(data[,2], data[,1], mean))
-            names(means.by.regime) <- NULL
-            ip <- c(ip, means.by.regime)
+            if(model == "OU1"){
+                ip <- c(ip, mean(x))
+            }else{
+                means.by.regime <- with(data, tapply(data[,2], data[,1], mean))
+                names(means.by.regime) <- NULL
+                ip <- c(ip, means.by.regime)
+            }
             lower <- c(lower, rep(-20, k))
             upper <- c(upper, rep( 20, k))
             if(get.root.theta == TRUE){
@@ -737,7 +741,11 @@ print.OUwie<-function(x, ...){
                 print(theta.mat)
                 cat("\n")
                 cat("\nHalf life (another way of reporting alpha)\n")
-                print(log(2)/param.est['alpha',])
+                if(x$model == "OU1"){
+                    print(log(2)/param.est[1])
+                }else{
+                    print(log(2)/param.est['alpha',])
+                }
                 cat("\n")
             }
         }
@@ -759,7 +767,11 @@ print.OUwie<-function(x, ...){
                 print(theta.mat)
                 cat("\n")
                 cat("\nHalf life (another way of reporting alpha)\n")
-                print(log(2)/param.est['alpha',])
+                if(x$model == "OU1"){
+                    print(log(2)/param.est[1])
+                }else{
+                    print(log(2)/param.est['alpha',])
+                }
                 cat("\n")
             }
         }
