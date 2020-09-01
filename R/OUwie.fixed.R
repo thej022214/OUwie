@@ -268,7 +268,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
 
     if(algorithm == "three.point"){
         if(simmap.tree == FALSE){
-            map <- getMapFromNode(phy, tip.states, int.states, shift.point)
+            map <- getMapFromNode(phy, tip.states, node.states, shift.point)
         }else{
             map <- phy$maps
         }
