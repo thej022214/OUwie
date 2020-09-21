@@ -6,7 +6,8 @@
 OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
  nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL,
  scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, 
- clade=NULL, mserr="none", diagn=FALSE, quiet=TRUE, warn=FALSE)
+ clade=NULL, mserr="none", algorithm=c("invert", "three.point"), 
+ diagn=FALSE, quiet=TRUE, warn=FALSE)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -25,6 +26,7 @@ OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest.}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{algorithm}{designates whether the standard matrix inversion (slow) or the three-point algorithm (fast) of Ho and Ane (2013) should be used.}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{TRUE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{FALSE}.}
@@ -47,14 +49,15 @@ Note that if \code{root.station} is \code{TRUE} (the default), \eqn{\theta_0}{th
 data(tworegime)
 
 ##First step is estimate parameters under a particular model:
-#pp <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE)
+pp <- OUwie(tree,trait,model=c("OUMV"),root.station=FALSE, algorithm="three.point")
 
 ##Second step is to run bootstrap replicates:
 boot.reps <- OUwie.boot(tree,trait,model="OUMV", nboot=10, alpha=pp$solution[1,], 
-sigma.sq=pp$solution[2,],theta=pp$theta[,1], theta0=pp$theta[1,1])
+sigma.sq=pp$solution[2,],theta=pp$theta[,1], theta0=pp$theta[1,1], 
+algorithm="three.point")
 
 ##Finally summarize to obtain the desired confidence -- here is the 95% CI:
-#apply(boot.reps, 2, quantile, probs=c(0.025,0.975))
+apply(boot.reps, 2, quantile, probs=c(0.025,0.975))
 
 }
 }

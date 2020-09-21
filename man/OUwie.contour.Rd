@@ -25,7 +25,7 @@ This returns a data.frame with the last two columns being the values of the poin
 \item{surface.data}{the parameter values and loglik}
 \item{focal.params}{the vector specifying the parameter pair for which likelihood surface is evaluated}
 \item{focal.params.lower}{the vector specifying the lower bounds for the parameter pair.}
-\item{focal.params.upper}{the vector specifying the uuper bounds for the parameter pair.}
+\item{focal.params.upper}{the vector specifying the upper bounds for the parameter pair.}
 }
 \references{
 Beaulieu J.M., Jhwueng D.C., Boettiger C., and O'Meara B.C. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution 66:2369-2383.

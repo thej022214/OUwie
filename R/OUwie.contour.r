@@ -17,7 +17,7 @@ contourSearchPoints <- function(variables, lower, upper, nreps){
 }
 
 
-OUwie.semifixed <- function(p, phy, data, num.regimes, index.vector, fixed.pars, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point){
+OUwie.semifixed <- function(p, phy, data, num.regimes, index.vector, fixed.pars, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point, algorithm){
     
     new.p <- exp(p)
     
@@ -31,7 +31,7 @@ OUwie.semifixed <- function(p, phy, data, num.regimes, index.vector, fixed.pars,
     rates <- rates[-c(1:num.regimes)]
     theta <- rates
     pp <- NA
-    try(pp <- OUwie.fixed(phy=phy, data=data, model="OUMVA", simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, alpha=alpha, sigma.sq=sigma.sq, theta=theta, check.identify=FALSE, quiet=TRUE), silent=TRUE)
+    try(pp <- OUwie.fixed(phy=phy, data=data, model="OUMVA", simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, alpha=alpha, sigma.sq=sigma.sq, theta=theta, check.identify=FALSE, algorithm=algorithm, quiet=TRUE), silent=TRUE)
     if(is.na(pp[1])){
         return(1000000)
     }else{
@@ -40,7 +40,7 @@ OUwie.semifixed <- function(p, phy, data, num.regimes, index.vector, fixed.pars,
 }
 
 
-contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vector, par.vector, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point, opts, n.cores) {
+contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vector, par.vector, simmap.tree, scaleHeight, root.station, get.root.theta, shift.point, algorithm, opts, n.cores) {
     
     nreps <- dim(param.points)[1]
     max.pars <- max(index.vector)
@@ -54,14 +54,14 @@ contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vecto
             print(nrep.index)
             fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
             opts <- opts
-            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point)
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
             res[nrep.index,] <- c(-out$objective, fixed.pars[1], fixed.pars[2])
         }
     }else{
         PointEval <- function(nrep.index){
             fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
             opts <- opts
-            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point)
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
             return(c(-out$objective, fixed.pars[1], fixed.pars[2]))
         }
         res.list <- mclapply(1:nreps, PointEval, mc.cores=n.cores)
@@ -118,7 +118,7 @@ OUwie.contour <- function(OUwie.obj, focal.params=c("alpha_1", "sigma.sq_1"), fo
     param.points <- contourSearchPoints(variables=2, lower=focal.params.lower, upper=focal.params.upper, nreps=nreps)
     
     #Step 3: Call contourSearchOUwie -- ISSUE. What if theta is less than 0? Will deal with later...
-    surface.data <- contourSearchOUwie(phy=OUwie.obj$phy, data=new.data, num.regimes=num.regimes, param.points=param.points, index.vector=index.vector, par.vector=par.vector, simmap.tree=OUwie.obj$simmap.tree, scaleHeight=OUwie.obj$scaleHeight, root.station=OUwie.obj$root.station, get.root.theta=OUwie.obj$get.root.theta, shift.point=OUwie.obj$shift.point, opts=OUwie.obj$opts, n.cores=n.cores)
+    surface.data <- contourSearchOUwie(phy=OUwie.obj$phy, data=new.data, num.regimes=num.regimes, param.points=param.points, index.vector=index.vector, par.vector=par.vector, simmap.tree=OUwie.obj$simmap.tree, scaleHeight=OUwie.obj$scaleHeight, root.station=OUwie.obj$root.station, get.root.theta=OUwie.obj$get.root.theta, shift.point=OUwie.obj$shift.point, algorithm=OUwie.obj$algorithm, opts=OUwie.obj$opts, n.cores=n.cores)
     
     surface.data <- rbind(mle.dat, surface.data, deparse.level=0)
     #Step 4: Make plot with results

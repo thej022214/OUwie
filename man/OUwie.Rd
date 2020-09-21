@@ -24,7 +24,7 @@ maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{starting.vals}{a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.}
 \item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
-\item{algorithm}{designates whether matrix inversion (slow) or the three-point algorithm (fast) of Ho and Ane (2013) should be used.}
+\item{algorithm}{designates whether the standard matrix inversion (slow) or the three-point algorithm (fast) of Ho and Ane (2013) should be used.}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
@@ -50,29 +50,30 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$AICc}{Akaike information criterion corrected for sample-size.}
 \item{$BIC}{Bayesian information criterion.}
 \item{$mBIC}{modified Bayesian information criterion of Ho and Ane (2014).}
-\item{$model}{The model being fit}
+\item{$model}{The model being fit.}
 \item{$param.count}{The number of parameters counted in the model.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
 \item{$theta}{a matrix containing the maximum likelihood estimates of \eqn{\theta}{theta} and its standard error.}
 \item{$solution.se}{a matrix containing the approximate standard errors of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}. The standard error is calculated as the diagonal of the inverse of the Hessian matrix.}
 \item{$tot.state}{A vector of names for the different regimes}
-\item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}
+\item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details).}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
 \item{$root.age}{The user-supplied age at the root of the tree.}
 \item{$split.point}{The user-supplied point at which regime changes are assumed to have occurred.}
-\item{$opts}{Internal settings of the likelihood search}
-\item{$data}{User-supplied dataset}
-\item{$phy}{User-supplied tree}
-\item{$root.station}{A logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated}
+\item{$opts}{Internal settings of the likelihood search.}
+\item{$data}{User-supplied dataset.}
+\item{$phy}{User-supplied tree.}
+\item{$root.station}{A logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated.}
 \item{$starting.vals}{A vector of user-supplied initial search parameters.}
-\item{$lb}{The lower bound set}
-\item{$ub}{The upper bound set}
-\item{$iterations}{Number of iterations of the likelihood search that were executed}
+\item{$lb}{The lower bound set.}
+\item{$ub}{The upper bound set.}
+\item{$iterations}{Number of iterations of the likelihood search that were executed.}
 \item{$get.root.theta}{Indicates whether the root.theta was included in the model.}
 \item{$regime.weights}{A table containing parameter estimates and the weights for time spent in each regime for each tip.}
-\item{$eigval}{The eigenvalues from the decomposition of the Hessian of the likelihood function. If any \code{eigval<0} then one or more parameters were not optimized during the likelihood search (see Details)}
-\item{$eigvect}{The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details)}
-\item{$new.start}{The vector of values to use if you want to restart the run from this point (starting.vals for a new run)}
+\item{$eigval}{The eigenvalues from the decomposition of the Hessian of the likelihood function. If any \code{eigval<0} then one or more parameters were not optimized during the likelihood search (see Details).}
+\item{$eigvect}{The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details).}
+\item{$new.start}{The vector of values to use if you want to restart the run from this point (starting.vals for a new run).}
+\item{$algorithm}{The algorithm used to estimate parameters}
 }
 \examples{
 \donttest{
@@ -96,14 +97,14 @@ trait[1:5,]
 OUwie(tree,trait,model=c("OUMV"))
 
 #Fit an OU model based on a clade of interest:
-OUwie(tree,trait,model=c("OUMV"), clade=c("t50", "t64"))
+OUwie(tree,trait,model=c("OUMV"), clade=c("t50", "t64"), algorithm="three.point")
 
 #For large trees, it may be useful to have ways to restart the search (due to
 #finite time per run on a computing cluster, for example). You can do this
 #by changing settings of OUwie runs. For example:
 
-run1 <- OUwie(tree,trait,model=c("OUMV"),root.station=TRUE, opts =
-list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001))
+run1 <- OUwie(tree,trait,model=c("OUMV"), root.station=FALSE, algorithm="invert", 
+opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001))
 
 save(run1, file="run1.rda")
 
@@ -111,8 +112,8 @@ save(run1, file="run1.rda")
 
 load("run1.rda")
 
-run2 <- OUwie(tree,trait,model=c("OUMV"), opts =
-list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001),
+run2 <- OUwie(tree, trait, model=c("OUMV"), algorithm="three.point", 
+opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="500", "ftol_abs"=0.001),
 starting.vals=run1$new.start)
 
 #run2 will start off where run1 stopped.

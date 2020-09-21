@@ -52,7 +52,7 @@ The input is a tree and a data file. The tree must be of class \dQuote{phylo} an
 \item{$scaleHeight}{Indicates whether the tree was constrained to a total height of 1.}
 \item{$get.root.theta}{Indicates whether the root.theta was included in the model.}
 \item{$regime.weights}{A table containing parameter estimates and the weights for time spent in each regime for each tip.}
-
+\item{$algorithm}{The algorithm used to estimate parameters.}
 }
 
 \examples{
@@ -66,7 +66,7 @@ sigma.sq=c(0.1064417,0.3461386)
 theta=c(1.678196,0.4185894)
 
 OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE,
-clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta)
+clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm="three.point")
 }
 }
 \author{Jeremy M. Beaulieu}
