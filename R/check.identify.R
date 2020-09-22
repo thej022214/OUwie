@@ -53,7 +53,7 @@ check.identify <- function(phy, data, simmap.tree=FALSE, quiet=FALSE){
 
 
 check.identify.dredge <- function(phy, data, simmap.tree=FALSE, get.penalty=FALSE, quiet=FALSE){
-    
+
     phy <- reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
     N <- dim(phy$edge)[1]
@@ -123,7 +123,7 @@ check <- function(model, ROOT, n, N, v, des) {
         pen = (2*numchange - 1)*log(n)
         for (j in 1:numchange)
         pen = pen + log(length(which(as.factor(checkpar)==levels(as.factor(checkpar))[j])))
-        #return(c(1,pen))
+        return(c(1,pen))
     } else return(c(0,0))
 }
 
