@@ -2,9 +2,9 @@
 
 # exported function with all the bells and whistles
 hOUwie <- function(phy, data, 
-                   rate.cat, rate.mat=NULL, model="ARD", root.p="yang", lb=1e-7, ub=10, 
+                   rate.cat, rate.mat=NULL, model.cor="ARD", root.p="yang", lb=1e-7, ub=10,
+                   model.ou, root.station.ou=FALSE, get.root.theta=FALSE, shift.point=0.5,
                    p=NULL, ip=NULL, nSim=1000, nCores=1){
-  
   # check that tips and data match
   # check for invariance of tip states and not that non-invariance isn't just ambiguity
   
@@ -20,9 +20,7 @@ hOUwie <- function(phy, data,
   nObs <- length(hOUwie.dat$ObservedTraits)
   
   #Some initial values for use later
-  lb <- log(lb)
-  ub <- log(ub)
-  model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
+  model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model.cor)
   phy <- reorder(phy, "pruningwise")
   
   # this allows for custom rate matricies!
@@ -45,11 +43,11 @@ hOUwie <- function(phy, data,
     ###############################
   }
   
+  # get the appropriate OU model structure
+  index.ou <- getParamStructure(model.ou, "three.point", root.station.ou, get.root.theta, model.set.final$np)
   # p is organized into 2 groups with the first set being corHMM and the second set being OUwie
-  lower = rep(lb, model.set.final$np)
-  upper = rep(ub, model.set.final$np)
-  p <- c(trans.rt, alpha, sigma.sq, theta)
-  
+  # organized as c(trans.rt, alpha, sigma.sq, theta)
+  est.p <- numeric(model.set.final$np + max(index.ou, na.rm=TRUE))
   # MLE search options
   opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
   
@@ -58,27 +56,50 @@ hOUwie <- function(phy, data,
     cat("Calculating likelihood from a set of fixed parameters", "\n")
     out<-NULL
     est.pars<-log(p)
-    out$objective <- hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, nSim = nSim, nCores = nCores)
+    out$objective <- hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
     loglik <- -out$objective
     est.pars <- exp(est.pars)
   }else{
     cat("This feature is not yet implemented\n")
-    # out = nloptr(x0=log(starts), eval_f=dev.corhmm, lb=lower, ub=upper, opts=opts, phy=phy, liks=model.set.final$liks,Q=model.set.final$Q,rate=model.set.final$rate,root.p=root.p, rate.cat = rate.cat, order.test = order.test, lewis.asc.bias = lewis.asc.bias)
+    out<-NULL
+    start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
+    alpha <- rep(1e-9, length(index.ou[1,]))
+    sig2 <- rep(var(data.ou[,3]), length(index.ou[2,]))
+    theta <- rep(mean(data.ou[,3]), length(index.ou[3,]))
+    start.ou <- cbind(alpha, sig2, theta)[t(!is.na(index.ou))]
+    starts = c(start.cor, start.ou)
+    
+    if(model.ou == "BMS" | model.ou == "BM1"){
+      lower = log(c(rep(lb, model.set.final$np), rep(1e-5, length(sig2))))
+      upper = log(c(rep(ub, model.set.final$np), rep(10, length(sig2))))
+    }else{
+      lower = log(c(rep(lb, model.set.final$np), rep(1e-9, length(alpha)), rep(1e-5, length(sig2)), rep(1e-10, length(theta))))
+      upper = log(c(rep(ub, model.set.final$np), rep(10, length(alpha)), rep(10, length(sig2)), rep(10, length(theta))))
+    }
+    # out$objective <- hOUwie.dev(log(starts), phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
+    # loglik <- -out$objective
+    # est.pars <- exp(est.pars)
+    out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
   }
-  return(list(loglik = loglik, est.pars = est.pars))
+  return(out)
 }
 
 # for a single set of parameters, evaluate the hOUwie likelihood
-hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.cat, nSim, nCores){
+hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.cat, index.ou, model.ou, nSim, nCores){
   
   # params are given in log form
   p <- exp(p)
   # define which params are for the HMM
-  p.mk = p[1:(max(rate)-1)]
+  k <- max(rate)-1
+  p.mk <- p[1:k]
   # set the OU params
-  alpha = p[3:4]
-  sigma.sq = p[5:6]
-  theta = p[7:8]
+  p.ou <- p[(k+1):length(p)] 
+  Rate.mat <- matrix(1, 3, dim(rate)[2])
+  Rate.mat[] <- c(p.ou, 1e-10)[index.ou]
+  alpha = Rate.mat[1,]
+  sigma.sq = Rate.mat[2,]
+  theta = Rate.mat[3,]
+  
   # fit the corHMM model. if rate.cat > 1, then ensure the order of the state mats is fast to slow.
   if(rate.cat == 1){
     Mk.loglik <- -corHMM:::dev.corhmm(p.mk, phy, liks, Q, rate, root.p, rate.cat, FALSE, FALSE)
@@ -93,7 +114,12 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   # simulate a set of simmaps
   simmap <- mclapply(1:nSim, function(x) makeSimmap(phy, lik.anc$lik.tip.states, lik.anc$lik.anc.states, Q, 1, 1)[[1]], mc.cores = nCores)
   # fit the OU models to the simmaps
-  OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=c("OUMVA"), simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert")$loglik, mc.cores = nCores)
+  if(model.ou == "BMS" | model.ou == "BM1"){
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, algorithm="invert")$loglik, mc.cores = nCores)
+  }else{
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert")$loglik, mc.cores = nCores)
+  }
+  
   OU.loglik <- mean(unlist(OU.loglik))
   
   return(OU.loglik + Mk.loglik)
@@ -112,37 +138,172 @@ organizeHOUwieDat <- function(data){
               data.ou = data.ou))
 }
 
+# different OU models have different parameter structures. This will evaluate the appropriate one.
+getParamStructure <- function(model, algorithm, root.station, get.root.theta, k){
+  index.mat <- matrix(0, 2,k)
+  if(algorithm == "three.point"){
+    Rate.mat <- matrix(1, 3, k)
+  }else{
+    Rate.mat <- matrix(1, 2, k)
+  }
+  if (model == "BM1"){
+    np <- 1
+    index.mat[1,1:k] <- NA
+    index.mat[2,1:k] <- 1
+    if(algorithm == "three.point"){
+      index.mat <- rbind(index.mat, rep(NA,k))
+    }
+    param.count <- np+1
+  }
+  #The group mean model of Thomas et al, is trivial: set root.station to be TRUE:
+  if (model == "BMS"){
+    np <- k
+    index.mat[1,1:k] <- NA
+    index.mat[2,1:k] <- 1:np
+    if(root.station==TRUE){
+      if(algorithm == "three.point"){
+        max.par.so.far <- max(index.mat)
+        index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
+      }
+      param.count <- np+k
+    }
+    if(root.station==FALSE){
+      if(algorithm == "three.point"){
+        index.mat <- rbind(index.mat, rep(NA,k))
+      }
+      param.count <- np+1
+    }
+  }
+  if (model == "OU1"){
+    np <- 2
+    index.mat[1,1:k] <- 1
+    index.mat[2,1:k] <- 2
+    if(algorithm == "three.point"){
+      max.par.so.far <- max(index.mat)
+      index.mat <- rbind(index.mat, rep(3,k))
+    }
+    param.count <- np + 1
+    if(get.root.theta == TRUE){
+      param.count <- param.count + 1
+    }
+  }
+  if (model == "OUM"){
+    np <- 2
+    index.mat[1,1:k] <- 1
+    index.mat[2,1:k] <- 2
+    if(algorithm == "three.point"){
+      max.par.so.far <- max(index.mat)
+      index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
+    }
+    param.count <- np + k
+    if(get.root.theta == TRUE){
+      param.count <- param.count + 1
+    }
+  }
+  if (model == "OUMV") {
+    np <- k+1
+    index.mat[1,1:k] <- 1
+    index.mat[2,1:k] <- 2:(k+1)
+    if(algorithm == "three.point"){
+      max.par.so.far <- max(index.mat)
+      index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
+    }
+    param.count <- np + k
+    if(get.root.theta == TRUE){
+      param.count <- param.count + 1
+    }
+  }
+  if (model == "OUMA") {
+    np <- k+1
+    index.mat[1,1:k] <- 1:k
+    index.mat[2,1:k] <- k+1
+    if(algorithm == "three.point"){
+      max.par.so.far <- max(index.mat)
+      index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
+    }
+    param.count <- np+k
+    if(get.root.theta == TRUE){
+      param.count <- param.count + 1
+    }
+  }
+  if (model == "OUMVA") {
+    np <- k*2
+    index <- matrix(TRUE,2,k)
+    index.mat[index] <- 1:(k*2)
+    if(algorithm == "three.point"){
+      max.par.so.far <- max(index.mat)
+      index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
+    }
+    param.count <- np+k
+    if(get.root.theta == TRUE){
+      param.count <- param.count + 1
+    }
+  }
+  if (model == "TrendyM"){
+    index.mat <- matrix(0,3,k)
+    np <- k+2 #We have k regimes, but 1 sigma, plus the root value
+    index.mat[1,1:k] <- np+1
+    index.mat[2,1:k] <- 1
+    index.mat[3,1:k] <- 2:(np-1)
+    param.count<-np
+    root.station=TRUE
+    trendy=1
+  }
+  if (model == "TrendyMS"){
+    index.mat <- matrix(0,3,k)
+    np <- (k*2)+1 #We have k regimes and assume k trends and k sigmas, plus the root value
+    index.mat[1,1:k] <- np+1
+    index.mat[2,1:k] <- 1:k
+    index.mat[3,1:k] <- (k+1):(np-1)
+    param.count <- np
+    root.station=FALSE
+    trendy=1
+  }
+  return(index.mat)
+}
+
 
 # testing
 
-# require(corHMM)
-# require(OUwie)
-# require(parallel)
-# data(tworegime)
+require(corHMM)
+require(OUwie)
+require(parallel)
+data(tworegime)
+
+tree$node.label <- NULL
+data <- trait
+phy <- tree
+rate.cat <- 1
+model <- "ARD"
+root.p <- "yang"
+
+trans.rt=c(0.01607089, 0.01707089)
+alpha=c(0.5632459,0.1726052)
+sigma.sq=c(0.1064417,0.3461386)
+theta=c(1.678196,0.4185894)
+
+p <- c(trans.rt, alpha, sigma.sq, theta)
+hOUwie.dat <- organizeHOUwieDat(data)
+nObs <- length(hOUwie.dat$ObservedTraits)
+lb <- log(1e-7)
+ub <- log(10)
+model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
+phy <- reorder(phy, "pruningwise")
+est.pars<-log(p)
+data.cor=hOUwie.dat$data.cor
+data.ou=hOUwie.dat$data.ou
+liks=model.set.final$liks
+Q=model.set.final$Q
+rate=model.set.final$rate
+
+nSim <- 100
+nCores <- 2
 # 
-# tree$node.label <- NULL
-# data <- trait
-# phy <- tree
-# rate.cat <- 1
-# model <- "ARD"
-# root.p <- "yang"
-# 
-# trans.rt=c(0.01607089, 0.01707089)
-# alpha=c(0.5632459,0.1726052)
-# sigma.sq=c(0.1064417,0.3461386)
-# theta=c(1.678196,0.4185894)
-# 
-# p <- c(trans.rt, alpha, sigma.sq, theta)
-# hOUwie.dat <- organizeHOUwieDat(data)
-# nObs <- length(hOUwie.dat$ObservedTraits)
-# lb <- log(1e-7)
-# ub <- log(10)
-# model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
-# phy <- reorder(phy, "pruningwise")
-# est.pars<-log(p)
-# 
-# nSim <- 100
-# nCores <- 2
-# 
-# hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, nSim = nSim, nCores = nCores)
+# hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor, data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, index.ou = index.ou, model.ou = model.ou, nSim = nSim, nCores = nCores)
+
+tst <- hOUwie(phy = phy, data = data, 
+       rate.cat = 1, rate.mat = NULL, model.cor = "ER", root.p = "yang", 
+       model.ou = "OUM", nSim = 10)
+debug(hOUwie)
+
 
