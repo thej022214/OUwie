@@ -2,8 +2,8 @@
 
 # exported function with all the bells and whistles
 hOUwie <- function(phy, data, 
-                   rate.cat, rate.mat=NULL, model.cor="ARD", root.p="yang", lb=1e-7, ub=10,
-                   model.ou, root.station.ou=FALSE, get.root.theta=FALSE, shift.point=0.5,
+                   rate.cat, rate.mat=NULL, model.cor="ARD", root.p="yang", lb=1e-3, ub=10,
+                   model.ou="BM1", root.station.ou=FALSE, get.root.theta=FALSE, shift.point=0.5,
                    p=NULL, ip=NULL, nSim=1000, nCores=1){
   # check that tips and data match
   # check for invariance of tip states and not that non-invariance isn't just ambiguity
@@ -50,7 +50,7 @@ hOUwie <- function(phy, data,
   est.p <- numeric(model.set.final$np + max(index.ou, na.rm=TRUE))
   # MLE search options
   opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
-  
+  opts.quick <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.1)
   # evaluate likelihood
   if(!is.null(p)){
     cat("Calculating likelihood from a set of fixed parameters", "\n")
@@ -60,12 +60,12 @@ hOUwie <- function(phy, data,
     loglik <- -out$objective
     est.pars <- exp(est.pars)
   }else{
-    cat("This feature is not yet implemented\n")
+    cat("This feature is not yet finzalized\n")
     out<-NULL
     start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
     alpha <- rep(1e-9, length(index.ou[1,]))
-    sig2 <- rep(var(data.ou[,3]), length(index.ou[2,]))
-    theta <- rep(mean(data.ou[,3]), length(index.ou[3,]))
+    sig2 <- rep(var(hOUwie.dat$data.ou[,3]), length(index.ou[2,]))
+    theta <- rep(mean(hOUwie.dat$data.ou[,3]), length(index.ou[3,]))
     start.ou <- cbind(alpha, sig2, theta)[t(!is.na(index.ou))]
     starts = c(start.cor, start.ou)
     
@@ -76,9 +76,10 @@ hOUwie <- function(phy, data,
       lower = log(c(rep(lb, model.set.final$np), rep(1e-9, length(alpha)), rep(1e-5, length(sig2)), rep(1e-10, length(theta))))
       upper = log(c(rep(ub, model.set.final$np), rep(10, length(alpha)), rep(10, length(sig2)), rep(10, length(theta))))
     }
-    # out$objective <- hOUwie.dev(log(starts), phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
-    # loglik <- -out$objective
-    # est.pars <- exp(est.pars)
+    cat("Starting an initial search of parameters with a single simmap...\n")
+    out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1, nCores=nCores)
+    cat("\n\nStarting the final ML search with informed parameters...\n")
+    starts <- exp(out$solution)
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
   }
   return(out)
@@ -115,14 +116,14 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   simmap <- mclapply(1:nSim, function(x) makeSimmap(phy, lik.anc$lik.tip.states, lik.anc$lik.anc.states, Q, 1, 1)[[1]], mc.cores = nCores)
   # fit the OU models to the simmaps
   if(model.ou == "BMS" | model.ou == "BM1"){
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, algorithm="invert")$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, algorithm="invert", quiet = TRUE)$loglik, mc.cores = nCores)
   }else{
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert")$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert", quiet = TRUE)$loglik, mc.cores = nCores)
   }
-  
   OU.loglik <- mean(unlist(OU.loglik))
+  cat("\rpars =", round(p, 5), "lik =", OU.loglik + Mk.loglik, "                ")
   
-  return(OU.loglik + Mk.loglik)
+  return(-(OU.loglik + Mk.loglik))
 }
 
 # hOUwie's input data will be similar to OUwie, with the exception that there can be more than a single trait being evaluated thus it's defined as column 1 is species name, the last column is the continuous trait and anything in between are discrete characters
@@ -277,33 +278,9 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # model <- "ARD"
 # root.p <- "yang"
 # 
-# trans.rt=c(0.01607089, 0.01707089)
-# alpha=c(0.5632459,0.1726052)
-# sigma.sq=c(0.1064417,0.3461386)
-# theta=c(1.678196,0.4185894)
-# 
-# p <- c(trans.rt, alpha, sigma.sq, theta)
-# hOUwie.dat <- organizeHOUwieDat(data)
-# nObs <- length(hOUwie.dat$ObservedTraits)
-# lb <- log(1e-7)
-# ub <- log(10)
-# model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
-# phy <- reorder(phy, "pruningwise")
-# est.pars<-log(p)
-# data.cor=hOUwie.dat$data.cor
-# data.ou=hOUwie.dat$data.ou
-# liks=model.set.final$liks
-# Q=model.set.final$Q
-# rate=model.set.final$rate
-# 
-# nSim <- 100
-# nCores <- 2
-# # 
-# # hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor, data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, index.ou = index.ou, model.ou = model.ou, nSim = nSim, nCores = nCores)
-# 
-# tst <- hOUwie(phy = phy, data = data, 
-#        rate.cat = 1, rate.mat = NULL, model.cor = "ER", root.p = "yang", 
-#        model.ou = "OUM", nSim = 10)
-# debug(hOUwie)
+# test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OU1", ub = 3, nSim = 100, nCores = 2)
+# debug(OUwie:::hOUwie)
 
-
+# 
+# 
+# 
