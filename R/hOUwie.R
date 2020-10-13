@@ -88,6 +88,7 @@ hOUwie <- function(phy, data,
 # for a single set of parameters, evaluate the hOUwie likelihood
 hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.cat, index.ou, model.ou, nSim, nCores){
   
+  # need to organize the parameters within this funciton. currently optimizing too many...
   # params are given in log form
   p <- exp(p)
   # define which params are for the HMM
@@ -275,12 +276,23 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # data <- trait
 # phy <- tree
 # rate.cat <- 1
-# model <- "ARD"
+# model.cor <- "ARD"
+# model.ou <- "OUMV"
 # root.p <- "yang"
 # 
-# test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OU1", ub = 3, nSim = 100, nCores = 2)
-# debug(OUwie:::hOUwie)
-
+# test <- OUwie:::hOUwie(phy, data, 1, model.ou = model.ou, ub = 3, nSim = 2)
+# #debug(OUwie:::hOUwie)
+# 
+# p = c(0.001, 0.001, 0.1027, 0.14834, 1.33008, 0.19581, 3.52749, 4.23788)
+# hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
+# nObs <- length(hOUwie.dat$ObservedTraits)
+# model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model.cor)
+# phy <- reorder(phy, "pruningwise")
+# index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, model.set.final$np)
+# 
+# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1000, nCores=1)
+# 
+# undebug(OUwie:::hOUwie.dev)
 # 
 # 
 # 
