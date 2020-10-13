@@ -265,45 +265,45 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 
 # testing
 
-require(corHMM)
-require(OUwie)
-require(parallel)
-data(tworegime)
-
-tree$node.label <- NULL
-data <- trait
-phy <- tree
-rate.cat <- 1
-model <- "ARD"
-root.p <- "yang"
-
-trans.rt=c(0.01607089, 0.01707089)
-alpha=c(0.5632459,0.1726052)
-sigma.sq=c(0.1064417,0.3461386)
-theta=c(1.678196,0.4185894)
-
-p <- c(trans.rt, alpha, sigma.sq, theta)
-hOUwie.dat <- organizeHOUwieDat(data)
-nObs <- length(hOUwie.dat$ObservedTraits)
-lb <- log(1e-7)
-ub <- log(10)
-model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
-phy <- reorder(phy, "pruningwise")
-est.pars<-log(p)
-data.cor=hOUwie.dat$data.cor
-data.ou=hOUwie.dat$data.ou
-liks=model.set.final$liks
-Q=model.set.final$Q
-rate=model.set.final$rate
-
-nSim <- 100
-nCores <- 2
+# require(corHMM)
+# require(OUwie)
+# require(parallel)
+# data(tworegime)
 # 
-# hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor, data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, index.ou = index.ou, model.ou = model.ou, nSim = nSim, nCores = nCores)
-
-tst <- hOUwie(phy = phy, data = data, 
-       rate.cat = 1, rate.mat = NULL, model.cor = "ER", root.p = "yang", 
-       model.ou = "OUM", nSim = 10)
-debug(hOUwie)
+# tree$node.label <- NULL
+# data <- trait
+# phy <- tree
+# rate.cat <- 1
+# model <- "ARD"
+# root.p <- "yang"
+# 
+# trans.rt=c(0.01607089, 0.01707089)
+# alpha=c(0.5632459,0.1726052)
+# sigma.sq=c(0.1064417,0.3461386)
+# theta=c(1.678196,0.4185894)
+# 
+# p <- c(trans.rt, alpha, sigma.sq, theta)
+# hOUwie.dat <- organizeHOUwieDat(data)
+# nObs <- length(hOUwie.dat$ObservedTraits)
+# lb <- log(1e-7)
+# ub <- log(10)
+# model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model)
+# phy <- reorder(phy, "pruningwise")
+# est.pars<-log(p)
+# data.cor=hOUwie.dat$data.cor
+# data.ou=hOUwie.dat$data.ou
+# liks=model.set.final$liks
+# Q=model.set.final$Q
+# rate=model.set.final$rate
+# 
+# nSim <- 100
+# nCores <- 2
+# # 
+# # hOUwie.dev(est.pars, phy=phy, data.cor=hOUwie.dat$data.cor, data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat = rate.cat, index.ou = index.ou, model.ou = model.ou, nSim = nSim, nCores = nCores)
+# 
+# tst <- hOUwie(phy = phy, data = data, 
+#        rate.cat = 1, rate.mat = NULL, model.cor = "ER", root.p = "yang", 
+#        model.ou = "OUM", nSim = 10)
+# debug(hOUwie)
 
 
