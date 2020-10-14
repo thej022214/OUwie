@@ -62,20 +62,15 @@ hOUwie <- function(phy, data,
   }else{
     cat("This feature is not yet finzalized\n")
     out<-NULL
+    index.ou[is.na(index.ou)] <- 0
     start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
-    alpha <- rep(1e-9, length(index.ou[1,]))
-    sig2 <- rep(var(hOUwie.dat$data.ou[,3]), length(index.ou[2,]))
-    theta <- rep(mean(hOUwie.dat$data.ou[,3]), length(index.ou[3,]))
-    start.ou <- cbind(alpha, sig2, theta)[t(!is.na(index.ou))]
+    start.ou <- c(rep(1e-9, max(index.ou[1,])), 
+                  rep(var(hOUwie.dat$data.ou[,3]), max(index.ou[2,])), 
+                  rep(mean(hOUwie.dat$data.ou[,3]), max(index.ou[3,])))
     starts = c(start.cor, start.ou)
-    
-    if(model.ou == "BMS" | model.ou == "BM1"){
-      lower = log(c(rep(lb, model.set.final$np), rep(1e-5, length(sig2))))
-      upper = log(c(rep(ub, model.set.final$np), rep(10, length(sig2))))
-    }else{
-      lower = log(c(rep(lb, model.set.final$np), rep(1e-9, length(alpha)), rep(1e-5, length(sig2)), rep(1e-10, length(theta))))
-      upper = log(c(rep(ub, model.set.final$np), rep(10, length(alpha)), rep(10, length(sig2)), rep(10, length(theta))))
-    }
+    lower = log(c(rep(lb, model.set.final$np), rep(1e-9, max(index.ou[1,])), rep(1e-5, max(index.ou[2,])), rep(1e-10, max(index.ou[3,]))))
+    upper = log(c(rep(ub, model.set.final$np), rep(10, max(index.ou[1,])), rep(10, max(index.ou[2,])), rep(10, max(index.ou[3,]))))
+    index.ou[index.ou == 0] <- NA
     cat("Starting an initial search of parameters with a single simmap...\n")
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1, nCores=nCores)
     cat("\n\nStarting the final ML search with informed parameters...\n")
@@ -277,11 +272,11 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # phy <- tree
 # rate.cat <- 1
 # model.cor <- "ARD"
-# model.ou <- "OUMV"
+# model.ou <- "OUM"
 # root.p <- "yang"
 # 
-# test <- OUwie:::hOUwie(phy, data, 1, model.ou = model.ou, ub = 3, nSim = 2)
-# #debug(OUwie:::hOUwie)
+# test <- OUwie:::hOUwie(phy, data, 1, model.ou = model.ou, ub = 3, nSim = 10)
+# debug(OUwie:::hOUwie)
 # 
 # p = c(0.001, 0.001, 0.1027, 0.14834, 1.33008, 0.19581, 3.52749, 4.23788)
 # hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
@@ -290,9 +285,9 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # phy <- reorder(phy, "pruningwise")
 # index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, model.set.final$np)
 # 
-# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1000, nCores=1)
+# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1)
 # 
 # undebug(OUwie:::hOUwie.dev)
 # 
-# 
-# 
+# Rprof(filename = "~/2020_hOUwie/Rprof.out", append = FALSE, line.profiling = TRUE)
+# summaryRprof("2020_hOUwie/Rprof.out")
