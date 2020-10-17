@@ -16,6 +16,7 @@ hOUwie <- function(phy, data,
   }
   
   # organize the data into the corHMM data and the OUwie data
+  # need to add a way to shift negative continuous variables to positive then shift back
   hOUwie.dat <- organizeHOUwieDat(data)
   nObs <- length(hOUwie.dat$ObservedTraits)
   
@@ -50,7 +51,7 @@ hOUwie <- function(phy, data,
   est.p <- numeric(model.set.final$np + max(index.ou, na.rm=TRUE))
   # MLE search options
   opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
-  opts.quick <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.1)
+  opts.quick <- list("algorithm"="NLOPT_GN_CRS2_LM", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.3)
   # evaluate likelihood
   if(!is.null(p)){
     cat("Calculating likelihood from a set of fixed parameters", "\n")
@@ -71,9 +72,9 @@ hOUwie <- function(phy, data,
     lower = log(c(rep(lb, model.set.final$np), rep(1e-9, max(index.ou[1,])), rep(1e-5, max(index.ou[2,])), rep(1e-10, max(index.ou[3,]))))
     upper = log(c(rep(ub, model.set.final$np), rep(10, max(index.ou[1,])), rep(10, max(index.ou[2,])), rep(10, max(index.ou[3,]))))
     index.ou[index.ou == 0] <- NA
-    cat("Starting an initial search of parameters with a single simmap...\n")
+    cat("Starting a global search of parameters with a single simmap...\n")
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1, nCores=nCores)
-    cat("\n\nStarting the final ML search with informed parameters...\n")
+    cat("\n\nStarting a local serch of parameters with", nSim, "simmaps...\n")
     starts <- exp(out$solution)
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
   }
@@ -117,7 +118,7 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
     OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert", quiet = TRUE)$loglik, mc.cores = nCores)
   }
   OU.loglik <- mean(unlist(OU.loglik))
-  cat("\rpars =", round(p, 5), "lik =", OU.loglik + Mk.loglik, "                ")
+  cat("\rpars =", round(p, 5), "lik =", OU.loglik, "+" ,Mk.loglik, "                ")
   
   return(-(OU.loglik + Mk.loglik))
 }
@@ -259,9 +260,29 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
   return(index.mat)
 }
 
+# simulate a hOUwie model
+hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
+  # simulate an Mk dataset
+  dat.cor <- corHMM:::simMarkov(phy = phy, Q = Q, root.freqs = root.freqs)
+  # simulate a stochastic map with true Q
+  tip.states <- matrix(0, length(phy$tip.label), dim(Q)[1])
+  node.states <- matrix(0, length(phy$tip.label)-1, dim(Q)[1])
+  for(i in 1:length(phy$tip.label)){
+    tip.states[i,dat.cor$TipStates[i]] <- 1
+  }
+  for(i in 1:(length(phy$tip.label)-1)){
+    node.states[i,dat.cor$NodeStates[i]] <- 1
+  }
+  simmap <- makeSimmap(phy, tip.states, node.states, Q, 1)[[1]]
+  # simulate the ou dataset
+  dat.ou <- OUwie.sim(simmap, simmap.tree = TRUE, alpha = alpha, sigma.sq = sig2, theta0 = theta0, theta = theta)
+  # return true params and data
+  data <- data.frame(sp = dat.ou[,1], reg = dat.cor$TipStates, x = dat.ou[,2])
+  return(list(data = data, simmap = simmap))
+}
 
 # testing
-
+# 
 # require(corHMM)
 # require(OUwie)
 # require(parallel)
@@ -272,11 +293,11 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # phy <- tree
 # rate.cat <- 1
 # model.cor <- "ARD"
-# model.ou <- "OUM"
+# model.ou <- "BM1"
 # root.p <- "yang"
 # 
 # test <- OUwie:::hOUwie(phy, data, 1, model.ou = model.ou, ub = 3, nSim = 10)
-# debug(OUwie:::hOUwie)
+# undebug(OUwie:::hOUwie)
 # 
 # p = c(0.001, 0.001, 0.1027, 0.14834, 1.33008, 0.19581, 3.52749, 4.23788)
 # hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
@@ -285,9 +306,27 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 # phy <- reorder(phy, "pruningwise")
 # index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, model.set.final$np)
 # 
-# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1)
+# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1000, nCores=1)
 # 
 # undebug(OUwie:::hOUwie.dev)
 # 
 # Rprof(filename = "~/2020_hOUwie/Rprof.out", append = FALSE, line.profiling = TRUE)
 # summaryRprof("2020_hOUwie/Rprof.out")
+# 
+# simulation tests
+# require(corHMM)
+# require(OUwie)
+# require(parallel)
+# data(tworegime)
+# 
+# data <- trait
+# phy <- tree
+# Q = matrix(c(-1,0.5,1,-0.5), 2, 2)
+# root.p = c(0.5, 0.5)
+# alpha = c(0.1, 0.5)
+# sig2= c(0.2, 0.3)
+# theta0 = 5
+# theta = c(2, 7)
+# 
+# OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)
+
