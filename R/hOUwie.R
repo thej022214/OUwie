@@ -63,21 +63,19 @@ hOUwie <- function(phy, data,
   }else{
     cat("This feature is not yet finzalized\n")
     out<-NULL
-    index.ou[is.na(index.ou)] <- 0
     start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
-    start.ou <- c(rep(var(hOUwie.dat$data.ou[,3]), length(unique(index.ou[1,]))), 
-                  rep(var(hOUwie.dat$data.ou[,3]), length(unique(index.ou[2,]))), 
-                  rep(mean(hOUwie.dat$data.ou[,3]), length(unique(index.ou[3,]))))
+    start.ou <- c(rep(var(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[1,])))), 
+                  rep(var(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[2,])))), 
+                  rep(mean(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[3,])))))
     starts = c(start.cor, start.ou)
     lower = log(c(rep(lb, model.set.final$np), 
-                  rep(1e-5, length(unique(index.ou[1,]))), 
-                  rep(1e-5, length(unique(index.ou[2,]))), 
-                  rep(1e-9, length(unique(index.ou[3,])))))
+                  rep(1e-5, length(unique(na.omit(index.ou[1,])))), 
+                  rep(1e-5, length(unique(na.omit(index.ou[2,])))), 
+                  rep(1e-9, length(unique(na.omit(index.ou[3,]))))))
     upper = log(c(rep(ub, model.set.final$np), 
-                  rep(10, length(unique(index.ou[1,]))), 
-                  rep(10, length(unique(index.ou[2,]))), 
-                  rep(10, length(unique(index.ou[3,])))))
-    index.ou[index.ou == 0] <- NA
+                  rep(10, length(unique(na.omit(index.ou[1,])))), 
+                  rep(10, length(unique(na.omit(index.ou[2,])))), 
+                  rep(10, length(unique(na.omit(index.ou[3,]))))))
     cat("Starting a global search of parameters with a single simmap...\n")
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=2, nCores=nCores)
     cat("\n\nStarting a local serch of parameters with", nSim, "simmaps...\n")
@@ -328,14 +326,18 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # data <- trait
 # phy <- tree
 # phy$node.label <- NULL
-# Q = matrix(c(-0.6,0.1,0.6,-0.1), 2, 2)
 # root.p = c(0.5, 0.5)
+# p.mk <- c(0.5, 0.5)
 # alpha = c(0.5, 0.5)
 # sig2= c(0.1, 0.1)
 # theta = c(3, 8)
+# Q = matrix(c(-p.mk[1],p.mk[2],p.mk[1],-p.mk[2]), 2, 2)
 # theta0 = 8
 # 
 # data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[1]]
 # test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", ub = 3, nSim = 50)
+# 
+# OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", p = c(p.mk, alpha[1], sig2[1], theta), nSim = 1000)
+
 # 
 # undebug(OUwie:::hOUwie.dev)
