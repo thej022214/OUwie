@@ -51,7 +51,7 @@ hOUwie <- function(phy, data,
   est.p <- numeric(model.set.final$np + max(index.ou, na.rm=TRUE))
   # MLE search options
   opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
-  opts.quick <- list("algorithm"="NLOPT_GN_CRS2_LM", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.3)
+  opts.quick <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.1)
   # evaluate likelihood
   if(!is.null(p)){
     cat("Calculating likelihood from a set of fixed parameters", "\n")
@@ -65,15 +65,21 @@ hOUwie <- function(phy, data,
     out<-NULL
     index.ou[is.na(index.ou)] <- 0
     start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
-    start.ou <- c(rep(1e-9, max(index.ou[1,])), 
-                  rep(var(hOUwie.dat$data.ou[,3]), max(index.ou[2,])), 
-                  rep(mean(hOUwie.dat$data.ou[,3]), max(index.ou[3,])))
+    start.ou <- c(rep(var(hOUwie.dat$data.ou[,3]), length(unique(index.ou[1,]))), 
+                  rep(var(hOUwie.dat$data.ou[,3]), length(unique(index.ou[2,]))), 
+                  rep(mean(hOUwie.dat$data.ou[,3]), length(unique(index.ou[3,]))))
     starts = c(start.cor, start.ou)
-    lower = log(c(rep(lb, model.set.final$np), rep(1e-9, max(index.ou[1,])), rep(1e-5, max(index.ou[2,])), rep(1e-10, max(index.ou[3,]))))
-    upper = log(c(rep(ub, model.set.final$np), rep(10, max(index.ou[1,])), rep(10, max(index.ou[2,])), rep(10, max(index.ou[3,]))))
+    lower = log(c(rep(lb, model.set.final$np), 
+                  rep(1e-5, length(unique(index.ou[1,]))), 
+                  rep(1e-5, length(unique(index.ou[2,]))), 
+                  rep(1e-9, length(unique(index.ou[3,])))))
+    upper = log(c(rep(ub, model.set.final$np), 
+                  rep(10, length(unique(index.ou[1,]))), 
+                  rep(10, length(unique(index.ou[2,]))), 
+                  rep(10, length(unique(index.ou[3,])))))
     index.ou[index.ou == 0] <- NA
     cat("Starting a global search of parameters with a single simmap...\n")
-    out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1, nCores=nCores)
+    out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts.quick, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=2, nCores=nCores)
     cat("\n\nStarting a local serch of parameters with", nSim, "simmaps...\n")
     starts <- exp(out$solution)
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores)
@@ -118,7 +124,7 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
     OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="invert", quiet = TRUE)$loglik, mc.cores = nCores)
   }
   OU.loglik <- mean(unlist(OU.loglik))
-  cat("\rpars =", round(p, 5), "lik =", OU.loglik, "+" ,Mk.loglik, "                ")
+  cat("\rpars =", round(p, 5), "lik =", -(OU.loglik + Mk.loglik), "                ")
   
   return(-(OU.loglik + Mk.loglik))
 }
@@ -321,12 +327,15 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # 
 # data <- trait
 # phy <- tree
-# Q = matrix(c(-1,0.5,1,-0.5), 2, 2)
+# phy$node.label <- NULL
+# Q = matrix(c(-0.6,0.1,0.6,-0.1), 2, 2)
 # root.p = c(0.5, 0.5)
-# alpha = c(0.1, 0.5)
-# sig2= c(0.2, 0.3)
-# theta0 = 5
-# theta = c(2, 7)
+# alpha = c(0.5, 0.5)
+# sig2= c(0.1, 0.1)
+# theta = c(3, 8)
+# theta0 = 8
 # 
-# OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)
-
+# data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[1]]
+# test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", ub = 3, nSim = 50)
+# 
+# undebug(OUwie:::hOUwie.dev)
