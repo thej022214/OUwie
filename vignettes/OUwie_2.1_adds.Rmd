@@ -192,7 +192,7 @@ plot(recon, fsize=0.5)
 
 ### Generalized three-point structured algorithm
 
-A long time complaint about `OUwie` is that it does not scale well when trees exceed 1000 species. This was largely due to the fact that we relied completely on linear algebra functions, in particular, computing the determinant of the variance-covariance matrix, $V$, as well as inverting it to obtain the log-likelihood. Starting with `OUwie` version 2.5, we have modified the generalize three-point algorithm of Ho and Ane (2014b) that bypasses the need for these inefficient calculations. The details of this algorithm are beyond the scope of this vignette and readers should consult Ho and Ane (2014b). The generalized three-point structured algorithm can now be specified in the `OUwie()` function call:
+A long time complaint about `OUwie` is that it does not scale well when trees exceed 1000 species. This was largely due to the fact that we relied completely on linear algebra functions, in particular, computing the determinant of the variance-covariance matrix, $V$, as well as inverting it to obtain the log-likelihood and calculate $\theta_i$. Starting with `OUwie` version 2.5, we include the generalize three-point algorithm of Ho and Ane (2014b) that bypasses the need for these inefficient calculations. The details of this algorithm are beyond the scope of this vignette and readers should consult Ho and Ane (2014b). The generalized three-point structured algorithm can now be specified in the `OUwie()` function call:
 
 ```{r, eval=TRUE, echo=TRUE}
 data(tworegime)
@@ -208,7 +208,7 @@ invert <- OUwie(tree, trait, model="OUMV", root.station=FALSE, scaleHeight=TRUE,
 invert
 ```
 
-In this particular example, the log-likelihoods are identical. However, users are cautioned that some slight differences between the `algorithm="invert"` and `algorithm="three.point"` will likely be common. The use of the three-point structured algorithm requires that $\theta_i$ be optimized like any other parameter in the model, whereas with the matrix inversion $\theta_i$ are solved numerically. This means that when there are differences in the log-likelihood it is likely because one or more of $\theta_i$ is not at the MLE after using the three-point algorithm. Users are encouraged then to examine the contours of pairs of $\theta_i$. Also note, that the speed-ups afforded by the three-point algorithm is most observable when the tree size exceeds 500 taxa.
+In this particular example, the log-likelihoods are identical. However, users are cautioned that some slight differences between the `algorithm="invert"` and `algorithm="three.point"` will likely be common. The use of the three-point structured algorithm requires that $\theta_i$ be optimized like any other parameter in the model, whereas with the matrix inversion approach $\theta_i$ are solved numerically. This means that when there are differences in the log-likelihood it is likely because one or more of $\theta_i$ is not at the MLE after using the three-point algorithm. Users are encouraged then to examine the contours of pairs of $\theta_i$. Also note, that the speed-ups afforded by the three-point algorithm is most observable when the tree size exceeds 500 taxa.
 
 
 # References
