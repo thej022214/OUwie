@@ -118,9 +118,9 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   simmap <- makeSimmap(phy, data.cor, Q, rate.cat, nSim = nSim, nCores)
   # fit the OU models to the simmaps
   if(model.ou == "BMS" | model.ou == "BM1"){
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, algorithm=algorithm, quiet = TRUE)$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=TRUE, clade=NULL, sigma.sq=sigma.sq, algorithm=algorithm, quiet = TRUE)$loglik, mc.cores = nCores)
   }else{
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm=algorithm, quiet = TRUE)$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm=algorithm, quiet = TRUE)$loglik, mc.cores = nCores)
   }
   if(weighted == TRUE){
     # get the likelihoods of the simmaps
@@ -363,7 +363,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # phy <- drop.extinct(phy)
 # root.p = c(0.5, 0.5)
 # p.mk <- c(0.1, 0.1)
-# alpha = c(5, 5)
+# alpha = c(1, 1)
 # sig2= c(0.1, 0.1)
 # theta = c(3, 8)
 # Q = matrix(c(-p.mk[1],p.mk[2],p.mk[1],-p.mk[2]), 2, 2)

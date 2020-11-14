@@ -109,6 +109,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             Tmax <- max(MakeAgeTable(phy, root.age=root.age))
             edges[,4:5]<-edges[,4:5]/Tmax
             root.age <-  1
+            phy$maps <- lapply(phy$maps, function(x) x/Tmax)
         }
         
         edges <- edges[sort.list(edges[,3]),]
