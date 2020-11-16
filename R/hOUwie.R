@@ -299,6 +299,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 
 # testing
 # 
+#
 # require(corHMM)
 # require(OUwie)
 # require(parallel)
