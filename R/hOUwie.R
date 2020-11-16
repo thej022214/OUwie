@@ -373,7 +373,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # model.ou = "OUM"
 # 
 # data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[2]]
-# p = c(0.1, 5, 0.1, 3, 8)
+# p = c(0.1, 0.01, 0.1, 3, 8)
 # hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
 # nObs <- length(hOUwie.dat$ObservedTraits)
 # model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model.cor)
@@ -387,10 +387,9 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # # unweigthed <- sapply(1:100, function(x) OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1))
 # 
 # 
-# system.time(OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1, algorithm = "invert"))
+# pd <- profileExpr(OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1, algorithm = "invert"))
 # 
-# hotPaths(pd.three, total.pct = 10.0)
-# hotPaths(pd.invert, total.pct = 10.0)
+# hotPaths(pd, total.pct = 10.0)
 # 
 # # weighted.search <- OUwie:::hOUwie(phy, data, rate.cat, model.cor = model.cor, model.ou = model.ou, weighted = TRUE, nSim = 10)
 # unweighted.search <- OUwie:::hOUwie(phy, data, rate.cat, model.cor = model.cor, model.ou = model.ou, weighted = FALSE, nSim = 100)
