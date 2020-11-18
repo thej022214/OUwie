@@ -104,7 +104,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
         ##Begins the construction of the edges matrix -- similar to the ouch format##
         edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
-        
         if(scaleHeight == TRUE){
             Tmax <- max(MakeAgeTable(phy, root.age=root.age))
             edges[,4:5]<-edges[,4:5]/Tmax
@@ -113,7 +112,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
         
         edges <- edges[sort.list(edges[,3]),]
-        
         #Resort the edge matrix so that it looks like the original matrix order
         edges <- edges[sort.list(edges[,1]),]
     }
@@ -268,8 +266,6 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     if(scaleHeight==TRUE){
         phy$edge.length <- phy$edge.length/Tmax
         Tmax <- 1
-    }else{
-        Tmax <- max(branching.times(phy))
     }
 
     if(algorithm == "three.point"){

@@ -280,14 +280,6 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
   dat.cor <- corHMM:::simMarkov(phy = phy, Q = Q, root.freqs = root.freqs)
   dat.cor <- data.frame(sp=names(dat.cor$TipStates), d=dat.cor$TipStates)
   # simulate a stochastic map with true Q
-  # tip.states <- matrix(0, length(phy$tip.label), dim(Q)[1])
-  # node.states <- matrix(0, length(phy$tip.label)-1, dim(Q)[1])
-  # for(i in 1:length(phy$tip.label)){
-  #   tip.states[i,dat.cor$TipStates[i]] <- 1
-  # }
-  # for(i in 1:(length(phy$tip.label)-1)){
-  #   node.states[i,dat.cor$NodeStates[i]] <- 1
-  # }
   simmap <- makeSimmap(phy, dat.cor, Q, 1, 1)[[1]]
   lik <- corHMM:::getSimmapLik(simmap, Q)
   # simulate the ou dataset
@@ -330,7 +322,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # require(OUwie)
 # require(parallel)
 # data(tworegime)
-# 
+#
 # data <- trait
 # phy <- tree
 # phy$node.label <- NULL
@@ -341,18 +333,18 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # theta = c(3, 8)
 # Q = matrix(c(-p.mk[1],p.mk[2],p.mk[1],-p.mk[2]), 2, 2)
 # theta0 = 5
-# 
+#
 # data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[2]]
 # test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", ub = 3, nSim = 10, weighted = TRUE)
 # test <- OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", ub = 3, nSim = 10, weighted = FALSE)
-# 
-# 
+#
+#
 # OUwie:::hOUwie(phy, data, 1, model.ou = "OUM", p = c(p.mk, alpha[1], sig2[1], theta), nSim = 1000)
 
-# 
+#
 # undebug(OUwie:::hOUwie.dev)
 
-# 
+#
 # require(corHMM)
 # require(OUwie)
 # require(parallel)

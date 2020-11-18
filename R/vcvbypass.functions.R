@@ -92,7 +92,7 @@ transformPhy <- function(phy, map, pars){
     for(i in 1:nTip){
         DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
     }
-    
+
     phy$edge.length <- V_Tilde
     phy$maps <- ModMap
     obj <- list(tree = phy, diag = DiagWt)

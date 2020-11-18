@@ -1,9 +1,11 @@
 #Weight matrix generator taken from Butler and King (2004) and modified to allow multiple alpha parameters
-
+ 
 #written by Jeremy M. Beaulieu
 
 weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, assume.station=TRUE, shift.point=0.5){
     
+    age.table <- MakeAgeTable(phy, root.age=root.age)
+    Tmax <- max(age.table)
     n <- max(phy$edge[,1])
     ntips <- length(phy$tip.label)
     if(is.null(root.state)) {
@@ -35,7 +37,7 @@ weight.mat<-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.a
             newtime <- edges[i,5]
             if(simmap.tree == TRUE){
                 if(scaleHeight == TRUE){
-                    currentmap <- phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
+                    currentmap <- phy$maps[[i]]/Tmax
                 }
                 else{
                     currentmap <- phy$maps[[i]]
