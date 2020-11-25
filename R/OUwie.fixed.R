@@ -278,15 +278,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
 
     obj <- NULL
     
+    if(get.root.theta == TRUE){
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+    }else{
+        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    }
+    
     #Likelihood function for estimating model parameters
     dev.fixed <- function(){
-        
-        if(get.root.theta == TRUE){
-            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
-        }else{
-            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
-        }
-        
         if(algorithm == "invert"){
             
             N <- length(x[,1])
@@ -339,13 +338,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
-    
-    if(get.root.theta == TRUE){
-        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
-    }else{
-        W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
-    }
-    
+
     if(get.root.theta == TRUE){
         if(algorithm == "invert"){
             rates <- cbind(NA, Rate.mat, NA)

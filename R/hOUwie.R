@@ -117,9 +117,9 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   simmap <-makeSimmap(phy, data.cor, Q, rate.cat, nSim = nSim)
   # fit the OU models to the simmaps
   if(model.ou == "BMS" | model.ou == "BM1"){
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, algorithm=algorithm, tip.paths = tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, check.identify=FALSE, algorithm=algorithm, tip.paths = tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
   }else{
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm=algorithm, tip.paths=tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
+    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, check.identify=FALSE, algorithm=algorithm, tip.paths=tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
   }
   if(weighted == TRUE){
     # get the likelihoods of the simmaps
