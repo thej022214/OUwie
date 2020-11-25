@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), quiet=FALSE){
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), tip.paths=NULL, quiet=FALSE){
         
     if(length(algorithm) == 2){
         algorithm = "invert"
@@ -325,7 +325,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 names(expected.vals) <- phy$tip.label
             }
             # generate a map from node based reconstructions
-            transformed.tree <- transformPhy(phy, map, pars)
+            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))

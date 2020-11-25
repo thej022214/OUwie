@@ -53,7 +53,7 @@ getPathToRoot <- function(phy, tip){
 
 
 # transforms the phylogeny based on a set of paramaters and a simmap
-transformPhy <- function(phy, map, pars){
+transformPhy <- function(phy, map, pars, tip.paths=NULL){
     # phy must be of class simmap
     nTip <- length(phy$tip.label)
     RootAge <- max(branching.times(phy))
@@ -89,10 +89,15 @@ transformPhy <- function(phy, map, pars){
     # calculates the diagonal matrix for each tip i
     DiagWt <- numeric(nTip)
     names(DiagWt) <- phy$tip.label
-    for(i in 1:nTip){
+    if(is.null(tip.paths)){
+      for(i in 1:nTip){
         DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+      }
+    }else{
+      for(i in 1:nTip){
+        DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+      }
     }
-
     phy$edge.length <- V_Tilde
     phy$maps <- ModMap
     obj <- list(tree = phy, diag = DiagWt)
