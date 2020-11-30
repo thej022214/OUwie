@@ -36,96 +36,84 @@ getMapFromNode <- function(phy, tipstates, nodestates, shift.point){
 
 # gets the path from a vertex to the root as an index of the edge matrix
 getPathToRoot <- function(phy, tip){
-    nTip <- length(phy$tip.label)
-    root <- nTip + 1
-    path <- 0
-    count <- 1
-    while(tip != root){
-        tip.ind <- which(phy$edge[,2] == tip)
-        path <- c(path, tip.ind)
-        count <- count + 1
-        tip <- phy$edge[tip.ind,1]
-    }
-    path <- path[-1]
-    
-    return(path)
+  nTip <- length(phy$tip.label)
+  root <- nTip + 1
+  path <- 0
+  count <- 1
+  while(tip != root){
+    tip.ind <- which(phy$edge[,2] == tip)
+    path <- c(path, tip.ind)
+    count <- count + 1
+    tip <- phy$edge[tip.ind,1]
+  }
+  path <- path[-1]
+  
+  return(path)
 }
 
 
 # transforms the phylogeny based on a set of paramaters and a simmap
 transformPhy <- function(phy, map, pars, tip.paths=NULL){
-    # phy must be of class simmap
-    nTip <- length(phy$tip.label)
-    RootAge <- max(branching.times(phy))
-    NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
-    ModMap <- Map <- map
-    D <- V_Tilde <- Expct <- numeric(dim(phy$edge)[1])
-    for(i in 1:dim(phy$edge)[1]){
-        # evaluate the map for this particular edge and calculate the tipward variance
-        NodeAge_i <- NodeAges[i]
-        DistRoot_i <- RootAge - NodeAge_i
-        Map_i <- Map[[i]]
-        # the age of epoch j starts at the node age
-        Dist_rootward <- DistRoot_i
-        w <- v <- u <- 0
-        for(j in 1:length(Map_i)){
-            # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
-            Dist_tipward <- Dist_rootward + Map_i[j]
-            # the length of the epoch is scaled by the alpha parameter of that epoch
-            Optim_j <- pars[,1][match(names(Map_i)[j], rownames(pars))]
-            Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
-            Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
-            # calculate the descendant distance from the root based on a fixed root distribution
-            tmp <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
-            v <- v + tmp
-            ModMap[[i]][j] <- tmp
-            w <- w + (Alpha_j * (Dist_tipward - Dist_rootward))
-            # calculating expectation
-            u <- u + Optim_j * exp(-Alpha_j * RootAge) * ((exp(Alpha_j * Dist_tipward) - exp(Alpha_j * Dist_rootward)))
-            # The new distance from nodes
-            Dist_rootward <- Dist_tipward
-        }
-        Expct[i] <- u
-        V_Tilde[i] <- v
-        D[i] <- w
+  # phy must be of class simmap
+  nTip <- length(phy$tip.label)
+  RootAge <- max(branching.times(phy))
+  NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
+  ModMap <- Map <- map
+  D <- V_Tilde <- numeric(dim(phy$edge)[1])
+  for(i in 1:dim(phy$edge)[1]){
+    # evaluate the map for this particular edge and calculate the tipward variance
+    NodeAge_i <- NodeAges[i]
+    DistRoot_i <- RootAge - NodeAge_i
+    Map_i <- Map[[i]]
+    # the age of epoch j starts at the node age
+    Dist_rootward <- DistRoot_i
+    w <- v <- 0
+    for(j in 1:length(Map_i)){
+      # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
+      Dist_tipward <- Dist_rootward + Map_i[j]
+      # the length of the epoch is scaled by the alpha parameter of that epoch
+      Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
+      Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
+      # calculate the descendent distance from the root based on a fixed root distribution
+      tmp <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
+      v <- v + tmp
+      ModMap[[i]][j] <- tmp
+      w <- w + (Alpha_j * (Dist_tipward - Dist_rootward))
+      # The new distance from nodes
+      Dist_rootward <- Dist_tipward
     }
-    # calculates the diagonal matrix for each tip i
-    X <- DiagWt <- numeric(nTip)
-    names(DiagWt) <- names(X) <- phy$tip.label
-    if(is.null(tip.paths)){
-      for(i in 1:nTip){
-        DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
-        X[i] <- sum(Expct[getPathToRoot(phy, i)])
-      }
-    }else{
-      for(i in 1:nTip){
-        DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
-        X[i] <- sum(Expct[tip.paths[[i]]])
-      }
+    V_Tilde[i] <- v
+    D[i] <- w
+  }
+  
+  # calculates the diagonal matrix for each tip i
+  DiagWt <- numeric(nTip)
+  names(DiagWt) <- phy$tip.label
+  if(is.null(tip.paths)){
+    for(i in 1:nTip){
+      DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
     }
-    # the last evaluation is the root.state 
-    if(phy$edge[i,1] == min(phy$edge[,1])){
-      RootValue <- Optim_j * exp(-Alpha_j * RootAge)
-      X <- X + RootValue
-    }else{
-      X = NULL
+  }else{
+    for(i in 1:nTip){
+      DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
     }
-    phy$edge.length <- V_Tilde
-    phy$maps <- ModMap
-    obj <- list(tree = phy, diag = DiagWt, X = X)
-    
-    return(obj)
+  }
+  phy$edge.length <- V_Tilde
+  phy$maps <- ModMap
+  obj <- list(tree = phy, diag = DiagWt)
+  
+  return(obj)
 }
 
 
 getOULik <- function(phy, y, X, pars){
-    # transform the phylogeny based on params
-    tre <- transformPhy(phy, pars)
-    # use the transformed phylogeny for the three point algorithm
-    comp <- three.point.compute(tre$tree, y, X, tre$diag)
-    # calculate the likelihood
-    lik <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
-    return(lik)
+  # transform the phylogeny based on params
+  tre <- transformPhy(phy, pars)
+  # use the transformed phylogeny for the three point algorithm
+  comp <- three.point.compute(tre$tree, y, X, tre$diag)
+  # calculate the likelihood
+  lik <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
+  return(lik)
 }
 
 

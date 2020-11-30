@@ -4,18 +4,18 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), get.regime.weights=FALSE, tip.paths=NULL, quiet=FALSE){
-        
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), tip.paths=NULL, quiet=FALSE){
+    
     if(length(algorithm) == 2){
         algorithm = "invert"
         warning("An algorithm was not specified. Defaulting to computing the determinant and inversion of the vcv.", call.=FALSE, immediate.=TRUE)
     }
-
+    
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)
         get.root.theta = FALSE
     }
-
+    
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
@@ -31,7 +31,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             stop("Assuming stationarity at the root is no longer allowed under these models. Try OU1 and OUM.", call. = FALSE)
         }
     }
-
+    
     if(model == "BM1" |  model == "BMS" | model == "TrendyM" | model == "TrendyMS"){
         if(root.station == FALSE){
             get.root.theta = TRUE
@@ -44,14 +44,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             theta <- theta[-1]
         }
     }
-
+    
     if(check.identify == TRUE){
         identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
         if(identifiable == 0){
             warning("The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.", call. = FALSE, immediate.=TRUE)
         }
     }
-
+    
     #Makes sure the data is in the same order as the tip labels
     if(mserr=="none"){
         data <- data.frame(data[,2], data[,3], row.names=data[,1])
@@ -125,7 +125,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         tip.states <- factor(data[,1])
         node.states <- factor(phy$node.label)
         data[,1] <- as.numeric(tip.states)
- 
+        
         if (is.character(model)) {
             if (model == "BM1"| model == "OU1"){
                 ##Begins the construction of the edges matrix -- similar to the ouch format##
@@ -189,7 +189,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }else{
         x <- as.matrix(data[,2])
     }
-
+    
     #Matches the model with the appropriate parameter matrix structure
     if (is.character(model)) {
         Rate.mat <- matrix(1, 2, k)
@@ -262,12 +262,12 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             param.count <- np + k
         }
     }
-
+    
     if(scaleHeight==TRUE){
         phy$edge.length <- phy$edge.length/Tmax
         Tmax <- 1
     }
-
+    
     if(algorithm == "three.point"){
         if(simmap.tree == FALSE){
             map <- getMapFromNode(phy, tip.states, node.states, shift.point)
@@ -275,22 +275,13 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             map <- phy$maps
         }
     }
-
+    
     obj <- NULL
-    # we can avoid calcuating weight.mat if root.theta == FALSE
+    
     if(get.root.theta == TRUE){
         W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
-    }
-    if(get.root.theta == FALSE & algorithm == "invert"){
+    }else{
         W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
-    }
-    if(get.root.theta == FALSE & algorithm == "three.point"){
-        # this is here for output
-        if(get.regime.weights == FALSE){
-            W <- matrix(NA, dim(data)[1], k)
-        }else{
-            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
-        }
     }
     
     #Likelihood function for estimating model parameters
@@ -325,14 +316,15 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
         if(algorithm == "three.point"){
             pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, dimnames = list(levels(tot.states), c("opt", "sig", "alp")))
-            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             if(get.root.theta == TRUE){
                 expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
                 names(expected.vals) <- phy$tip.label
             }else{
-                expected.vals <- transformed.tree$X
+                expected.vals <- colSums(t(W) * pars[,1])
+                names(expected.vals) <- phy$tip.label
             }
             # generate a map from node based reconstructions
+            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))
@@ -346,7 +338,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     
     fixed.fit <- dev.fixed()
     loglik<- -fixed.fit[[1]]
-
+    
     if(get.root.theta == TRUE){
         if(algorithm == "invert"){
             rates <- cbind(NA, Rate.mat, NA)
@@ -372,7 +364,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         rownames(regime.weights) <- c("alpha", "sigma.sq", "theta", phy$tip.label)
         colnames(regime.weights) <- c(levels(tot.states), "Tip_regime")
     }
-
+    
     obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC=-2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=Rate.mat, theta=fixed.fit[[2]], tot.states=tot.states, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, data=data, phy=phy, root.station=root.station, scaleHeight=scaleHeight, get.root.theta=get.root.theta, regime.weights=regime.weights, algorithm=algorithm)
     class(obj)<-"OUwie.fixed"
     return(obj)
