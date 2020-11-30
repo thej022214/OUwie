@@ -59,7 +59,7 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
     RootAge <- max(branching.times(phy))
     NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
     ModMap <- Map <- map
-    D <- V_Tilde <- numeric(dim(phy$edge)[1])
+    D <- V_Tilde <- Expct <- numeric(dim(phy$edge)[1])
     for(i in 1:dim(phy$edge)[1]){
         # evaluate the map for this particular edge and calculate the tipward variance
         NodeAge_i <- NodeAges[i]
@@ -67,40 +67,52 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
         Map_i <- Map[[i]]
         # the age of epoch j starts at the node age
         Dist_rootward <- DistRoot_i
-        w <- v <- 0
+        w <- v <- u <- 0
         for(j in 1:length(Map_i)){
             # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
             Dist_tipward <- Dist_rootward + Map_i[j]
             # the length of the epoch is scaled by the alpha parameter of that epoch
+            Optim_j <- pars[,1][match(names(Map_i)[j], rownames(pars))]
             Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
             Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
-            # calculate the descendent distance from the root based on a fixed root distribution
+            # calculate the descendant distance from the root based on a fixed root distribution
             tmp <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
             v <- v + tmp
             ModMap[[i]][j] <- tmp
             w <- w + (Alpha_j * (Dist_tipward - Dist_rootward))
+            # calculating expectation
+            u <- u + Optim_j * exp(-Alpha_j * RootAge) * ((exp(Alpha_j * Dist_tipward) - exp(Alpha_j * Dist_rootward)))
             # The new distance from nodes
             Dist_rootward <- Dist_tipward
         }
+        Expct[i] <- u
         V_Tilde[i] <- v
         D[i] <- w
     }
-    
     # calculates the diagonal matrix for each tip i
-    DiagWt <- numeric(nTip)
-    names(DiagWt) <- phy$tip.label
+    X <- DiagWt <- numeric(nTip)
+    names(DiagWt) <- names(X) <- phy$tip.label
     if(is.null(tip.paths)){
       for(i in 1:nTip){
         DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+        X[i] <- sum(Expct[getPathToRoot(phy, i)])
       }
     }else{
       for(i in 1:nTip){
         DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+        X[i] <- sum(Expct[tip.paths[[i]]])
       }
+    }
+    # the last evaluation is the root.state 
+    if(phy$edge[i,1] == min(phy$edge[,1])){
+      RootValue <- Optim_j * exp(-Alpha_j * RootAge)
+      X <- X + RootValue
+    }else{
+      X = NULL
     }
     phy$edge.length <- V_Tilde
     phy$maps <- ModMap
-    obj <- list(tree = phy, diag = DiagWt)
+    obj <- list(tree = phy, diag = DiagWt, X = X)
     
     return(obj)
 }

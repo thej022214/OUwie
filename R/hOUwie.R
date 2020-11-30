@@ -52,7 +52,7 @@ hOUwie <- function(phy, data,
   index.ou <- getParamStructure(model.ou, "three.point", root.station.ou, get.root.theta, dim(model.set.final$Q)[1])
   # default MLE search options
   if(is.null(opts)){
-    opts <- list("algorithm"=algorithm.opt, "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
+    opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
   }
   # p is organized into 2 groups with the first set being corHMM and the second set being OUwie
   # organized as c(trans.rt, alpha, sigma.sq, theta)
@@ -114,7 +114,7 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   # lik.anc <- corHMM:::dev.ancRECON.marginal(p.mk, phy, liks, Q, rate, root.p, rate.cat, FALSE)
   #corHMM:::ancRECON(phy, data.cor, method = "joint", rate.cat = 1, p = p.mk)
   # simulate a set of simmaps
-  simmap <-makeSimmap(phy, data.cor, Q, rate.cat, nSim = nSim)
+  simmap <- corHMM:::makeSimmap(phy, data.cor, Q, rate.cat, nSim = nSim)
   # fit the OU models to the simmaps
   if(model.ou == "BMS" | model.ou == "BM1"){
     OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, check.identify=FALSE, algorithm=algorithm, tip.paths = tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
@@ -279,7 +279,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
   dat.cor <- rTraitDisc(phy, Q, states = 1:dim(Q)[1], root.value = sample(1:dim(Q)[1], 1, prob = root.freqs))
   dat.cor <- data.frame(sp=names(dat.cor), d=dat.cor)
   # simulate a stochastic map with true Q
-  simmap <- makeSimmap(phy, dat.cor, Q, 1, 1)[[1]]
+  simmap <- corHMM:::makeSimmap(phy, dat.cor, Q, 1, 1)[[1]]
   # lik <- corHMM:::getSimmapLik(simmap, Q)
   # simulate the ou dataset
   dat.ou <- OUwie.sim(simmap, simmap.tree = TRUE, alpha = alpha, sigma.sq = sig2, theta0 = theta0, theta = theta)

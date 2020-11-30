@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), tip.paths=NULL, quiet=FALSE){
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), get.regime.weights=FALSE, tip.paths=NULL, quiet=FALSE){
         
     if(length(algorithm) == 2){
         algorithm = "invert"
@@ -277,11 +277,20 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
 
     obj <- NULL
-    
+    # we can avoid calcuating weight.mat if root.theta == FALSE
     if(get.root.theta == TRUE){
         W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
-    }else{
+    }
+    if(get.root.theta == FALSE & algorithm == "invert"){
         W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    }
+    if(get.root.theta == FALSE & algorithm == "three.point"){
+        # this is here for output
+        if(get.regime.weights == FALSE){
+            W <- matrix(NA, dim(data)[1], k)
+        }else{
+            W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+        }
     }
     
     #Likelihood function for estimating model parameters
@@ -316,15 +325,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
         if(algorithm == "three.point"){
             pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, dimnames = list(levels(tot.states), c("opt", "sig", "alp")))
+            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             if(get.root.theta == TRUE){
                 expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
                 names(expected.vals) <- phy$tip.label
             }else{
-                expected.vals <- colSums(t(W) * pars[,1])
-                names(expected.vals) <- phy$tip.label
+                expected.vals <- transformed.tree$X
             }
             # generate a map from node based reconstructions
-            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))
