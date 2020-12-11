@@ -77,9 +77,9 @@ hOUwie <- function(phy, data,
                   rep(1e-5, length(unique(na.omit(index.ou[2,])))), 
                   rep(1e-9, length(unique(na.omit(index.ou[3,]))))))
     upper = log(c(rep(ub, model.set.final$np), 
-                  rep(10, length(unique(na.omit(index.ou[1,])))), 
-                  rep(10, length(unique(na.omit(index.ou[2,])))), 
-                  rep(10, length(unique(na.omit(index.ou[3,]))))))
+                  rep(100, length(unique(na.omit(index.ou[1,])))), 
+                  rep(100, length(unique(na.omit(index.ou[2,])))), 
+                  rep(100, length(unique(na.omit(index.ou[3,]))))))
     cat("\nStarting a serch of parameters with", nSim, "simmaps...\n")
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores, algorithm=algorithm, tip.paths=tip.paths, weighted=weighted)
     cat("\nFinished.\n")
@@ -116,21 +116,21 @@ hOUwie.dev <- function(p, phy, data.cor, data.ou, liks, Q, rate, root.p, rate.ca
   # simulate a set of simmaps
   simmap <-corHMM:::makeSimmap(phy, data.cor, Q, rate.cat, nSim = nSim)
   # fit the OU models to the simmaps
-  if(model.ou == "BMS" | model.ou == "BM1"){
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, check.identify=FALSE, algorithm=algorithm, tip.paths = tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
-  }else{
-    OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, check.identify=FALSE, algorithm=algorithm, tip.paths=tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
-  }
+  # if(model.ou == "BMS" | model.ou == "BM1"){
+  #   OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, sigma.sq=sigma.sq, check.identify=FALSE, algorithm=algorithm, tip.paths = tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
+  # }else{
+  OU.loglik <- mclapply(simmap, function(x) OUwie.fixed(x, data.ou, model=model.ou, simmap.tree=TRUE, scaleHeight=FALSE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq, theta=theta, check.identify=FALSE, algorithm=algorithm, tip.paths=tip.paths, quiet=TRUE)$loglik, mc.cores = nCores)
+  # }
   if(weighted == TRUE){
     # get the likelihoods of the simmaps
-    lik.simmap <- unlist(lapply(simmap, function(x) corHMM:::getSimmapLik(x, Q)))
-    weights <- lik.simmap/sum(lik.simmap)
-    loglik <- sum(weights * unlist(OU.loglik)) + Mk.loglik
-    # loglik <- mean(unlist(OU.loglik)) + mean(log(lik.simmap))
-    cat("\rpars =", round(p, 5), "lik =", -(loglik), "                ")
-    return(-loglik)
+    OU.loglik <- max(unlist(OU.loglik))
+    # OU.loglik <- log(mean(exp(unlist(OU.loglik)-comp)))+comp
+    cat("\rpars =", round(p, 5), "lik =", -(OU.loglik + Mk.loglik), "                ")
+    return(-(OU.loglik + Mk.loglik))
   }else{
-    OU.loglik <- mean(unlist(OU.loglik))
+    # comp <- max(unlist(OU.loglik))
+    OU.loglik <- log(mean(exp(unlist(OU.loglik))))
+    # OU.loglik <- log(mean(exp(unlist(OU.loglik)-comp)))+comp
     cat("\rpars =", round(p, 5), "lik =", -(OU.loglik + Mk.loglik), "                ")
     return(-(OU.loglik + Mk.loglik))
   }
@@ -162,7 +162,7 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
     index.mat[1,1:k] <- NA
     index.mat[2,1:k] <- 1
     if(algorithm == "three.point"){
-      index.mat <- rbind(index.mat, rep(NA,k))
+      index.mat <- rbind(index.mat, rep(3,k))
     }
     param.count <- np+1
   }
@@ -173,16 +173,17 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
     index.mat[2,1:k] <- 1:np
     if(root.station==TRUE){
       if(algorithm == "three.point"){
-        max.par.so.far <- max(index.mat)
+        max.par.so.far <- max(index.mat, na.rm = TRUE)
         index.mat <- rbind(index.mat, (max.par.so.far + 1):(max.par.so.far + k))
       }
       param.count <- np+k
     }
     if(root.station==FALSE){
       if(algorithm == "three.point"){
-        index.mat <- rbind(index.mat, rep(NA,k))
+        max.par.so.far <- max(index.mat, na.rm = TRUE)
+        index.mat <- rbind(index.mat, max.par.so.far+1)
       }
-      param.count <- np+1
+      param.count <- np+k
     }
   }
   if (model == "OU1"){
@@ -274,17 +275,19 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 }
 
 # simulate a hOUwie model
-hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
+hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta, nMap=1){
   # simulate an Mk dataset
   dat.cor <- rTraitDisc(phy, Q, states = 1:dim(Q)[1], root.value = sample(1:dim(Q)[1], 1, prob = root.freqs))
   dat.cor <- data.frame(sp=names(dat.cor), d=dat.cor)
   # simulate a stochastic map with true Q
-  simmap <- corHMM:::makeSimmap(phy, dat.cor, Q, 1, 1)[[1]]
+  simmap <- corHMM:::makeSimmap(phy, dat.cor, Q, 1, nSim=nMap)
   # lik <- corHMM:::getSimmapLik(simmap, Q)
   # simulate the ou dataset
-  dat.ou <- OUwie.sim(simmap, simmap.tree = TRUE, alpha = alpha, sigma.sq = sig2, theta0 = theta0, theta = theta)
+  dat.ou <- lapply(simmap, function(x) OUwie.sim(x, simmap.tree = TRUE, alpha = alpha, sigma.sq = sig2, theta0 = theta0, theta = theta)[,2])
+  dat.ou <- colMeans(do.call(rbind, dat.ou))
+  # dat.ou <- OUwie.sim(simmap, simmap.tree = TRUE, alpha = alpha, sigma.sq = sig2, theta0 = theta0, theta = theta)
   # return true params and data
-  data <- data.frame(sp = dat.ou[,1], reg = dat.cor[,2], x = dat.ou[,2])
+  data <- data.frame(sp = phy$tip.label, reg = dat.cor[,2], x = dat.ou)
   return(list(data = data, simmap = simmap))
 }
 
@@ -294,7 +297,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # require(OUwie)
 # require(parallel)
 # data(tworegime)
-# 
+#
 # tree$node.label <- NULL
 # data <- trait
 # phy <- tree
@@ -302,20 +305,20 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # model.cor <- "ARD"
 # model.ou <- "OUM"
 # root.p <- "yang"
-# 
+#
 # test <- OUwie:::hOUwie(phy, data, 1, model.ou = model.ou, ub = 3, nSim = 10, weighted = FALSE)
 # undebug(OUwie:::hOUwie.dev)
-# 
+#
 # OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1)
 
 # hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1)
 
 
 # undebug(OUwie:::hOUwie.dev)
-# 
+#
 # Rprof(filename = "~/2020_hOUwie/Rprof.out", append = FALSE, line.profiling = TRUE)
 # summaryRprof("2020_hOUwie/Rprof.out")
-# 
+#
 # simulation tests
 # require(corHMM)
 # require(OUwie)
@@ -363,7 +366,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # model.cor = "ER"
 # model.ou = "OUM"
 # 
-# data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[2]]
+# data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[1]]
 # p = c(0.1, 0.01, 0.1, 3, 8)
 # hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
 # nObs <- length(hOUwie.dat$ObservedTraits)
@@ -372,7 +375,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta){
 # index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, dim(model.set.final$Q)[2])
 # # phy$edge.length <- phy$edge.length/max(branching.times(phy))
 # 
-# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=50, nCores=2, algorithm = "three.point")
+# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=100, nCores=1, algorithm = "three.point")
 # 
 # # weigthed <- sapply(1:100, function(x) OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=10, nCores=1, weighted = TRUE))
 # 
