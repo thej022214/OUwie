@@ -327,10 +327,15 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             if(mserr=="known"){
                 TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
-                transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + data[,3]^2
-                transformed.tree$diag <- transformed.tree$diag + data[,3]^2
+                sigma2_error <- data[,3]^2
+                errEdge <- unlist(lapply(transformed.tree$tree$maps[TIPS], 
+                                         function(x) x[length(x)]))
+                errAlph <- pars[match(names(errEdge), rownames(pars)), 3]
+                errSig2 <- pars[match(names(errEdge), rownames(pars)), 3]
+                sigma2_error <- sigma2_error * 2 * errAlph/errSig2
+                errAdd <-  sigma2_error * exp(-2 * errAlph * errEdge)
+                transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + errAdd
             }
-            
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))

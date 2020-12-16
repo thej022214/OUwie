@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA),
 #and the multiple alphas and sigmas (OUMVA).
 
-OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"), diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"), diagn=FALSE, quiet=FALSE, warn=TRUE, lb = 1e-9, ub = 100,opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
 
     if(length(algorithm) == 2){
         algorithm = "invert"
@@ -412,10 +412,8 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		cat("Initializing...", "\n")
 	}
 
-	lb = -20
-	ub = log(100)
-	lower = rep(-20, np)
-	upper = rep(log(100), np)
+	lower = rep(log(lb), np)
+	upper = rep(log(ub), np)
 
     if(scaleHeight==TRUE){
         phy$edge.length <- phy$edge.length/Tmax
@@ -456,12 +454,12 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                 names(means.by.regime) <- NULL
                 ip <- c(ip, means.by.regime)
             }
-            lower <- c(lower, rep(-20, k))
-            upper <- c(upper, rep( 20, k))
+            lower <- c(lower, rep(log(lb), k))
+            upper <- c(upper, rep(log(ub), k))
             if(get.root.theta == TRUE){
                 ip <- c(ip, means.by.regime[root.state])
-                lower <- c(lower, -20)
-                upper <- c(upper, 20)
+                lower <- c(lower, log(lb))
+                upper <- c(upper, log(ub))
             }
         }
 		if(quiet==FALSE){
@@ -480,8 +478,8 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 			ip <- rep(sig, k)
             if(get.root.theta == TRUE){
                 ip <- c(ip, mean(x))
-                lower <- c(lower, -20)
-                upper <- c(upper, 20)
+                lower <- c(lower, log(lb))
+                upper <- c(upper, log(ub))
             }
 		}
 		else{
@@ -489,21 +487,21 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 				ip <- sig
                 if(get.root.theta == TRUE){
                     ip <- c(ip, mean(x))
-                    lower <- c(lower, -20)
-                    upper <- c(upper, 20)
+                    lower <- c(lower, log(lb))
+                    upper <- c(upper, log(ub))
                 }
 			}
 			if(model=="TrendyM"){
 				#We assume that the starting trend values are zero:
 				ip <- c(sig, rep(exp(-20), param.count-2), mean(x))
-				lower <- c(lb,rep(-20, param.count-2), -20)
-				upper <- c(ub,rep(20, param.count-2), 20)
+				lower <- c(lb,rep(log(lb), param.count-2), log(lb))
+				upper <- c(ub,rep(log(ub), param.count-2), log(ub))
 			}
 			if(model == "TrendyMS"){
 				#We assume that the starting trend values are zero:
 				ip <- c(rep(sig, k), rep(exp(-20), (np-1) - k), mean(x))
-				lower <- c(rep(lb,k), rep(-20, (np-1) - k), -20)
-				upper <- c(rep(ub,k), rep(20, (np-1) - k), 20)
+				lower <- c(rep(lb,k), rep(log(lb), (np-1) - k), log(lb))
+				upper <- c(rep(ub,k), rep(log(ub), (np-1) - k), log(ub))
 			}
 		}
 		if(quiet==FALSE){
