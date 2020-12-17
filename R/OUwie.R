@@ -580,7 +580,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
         
         if(get.root.theta == TRUE){
             if(model == "BM1" | model == "BMS"){
-                W <- matrix(0, Ntip(phy), k)
+                W <- matrix(0, Ntip(phy), k + 1)
                 W[,1] <- 1
             }else{
                 W <- weight.mat(phy, edges, Rate.mat=solution, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
