@@ -278,6 +278,9 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
 hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta, nMap=1){
   # simulate an Mk dataset
   dat.cor <- rTraitDisc(phy, Q, states = 1:dim(Q)[1], root.value = sample(1:dim(Q)[1], 1, prob = root.freqs))
+  while(!all(levels(dat.cor) %in% dat.cor)){
+    dat.cor <- rTraitDisc(phy, Q, states = 1:dim(Q)[1], root.value = sample(1:dim(Q)[1], 1, prob = root.freqs))
+  }
   dat.cor <- data.frame(sp=names(dat.cor), d=dat.cor)
   # simulate a stochastic map with true Q
   simmap <- corHMM:::makeSimmap(phy, dat.cor, Q, 1, nSim=nMap)
