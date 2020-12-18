@@ -326,10 +326,12 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             # generate a map from node based reconstructions
             transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             if(mserr=="known"){
+                # TIPS <- phy$edge[,2] <= length(phy$tip.label)
+                # phy$edge.length[TIPS] <- phy$edge.length[TIPS] + (data[,3]^2)
+                # transformed.tree <- transformPhy(phy, map, pars, tip.paths)
                 TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                 sigma2_error <- data[,3]^2
-                errEdge <- unlist(lapply(transformed.tree$tree$maps[TIPS], 
-                                         function(x) x[length(x)]))
+                errEdge <- unlist(lapply(transformed.tree$tree$maps[TIPS], function(x) x[length(x)]))
                 errAlph <- pars[match(names(errEdge), rownames(pars)), 3]
                 errSig2 <- pars[match(names(errEdge), rownames(pars)), 3]
                 sigma2_error <- sigma2_error * 2 * errAlph/errSig2
