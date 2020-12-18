@@ -58,6 +58,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         data <- data[phy$tip.label,]
     }
     if(mserr=="known"){
+        algorithm = "invert"
         if(!dim(data)[2]==4){
             stop("You specified measurement error should be incorporated, but this information is missing.", call. = FALSE)
         }
