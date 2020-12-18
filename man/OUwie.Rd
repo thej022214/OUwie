@@ -7,8 +7,8 @@ OUwie(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA",
 "TrendyM","TrendyMS"), simmap.tree=FALSE, root.age=NULL,scaleHeight=FALSE,
 root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none",
 starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"),
-diagn=FALSE, quiet=FALSE, warn=TRUE, opts = list(algorithm = "NLOPT_LN_SBPLX",
-maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
+diagn=FALSE, quiet=FALSE, warn=TRUE, lb = 1e-9, ub = 100, opts = list(algorithm = 
+"NLOPT_LN_SBPLX", maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -28,6 +28,8 @@ maxeval = "1000", ftol_rel = .Machine$double.eps^0.5))
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
+\item{lb}{sets the lower bound for the parameter search. Note that this value is log transformed internally.}
+\item{ub}{sets the upper bound for the parameter search. Note that this value is log transformed internally.}
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }
 \details{
