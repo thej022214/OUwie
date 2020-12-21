@@ -53,13 +53,14 @@ getPathToRoot <- function(phy, tip){
 
 
 # transforms the phylogeny based on a set of paramaters and a simmap
-transformPhy <- function(phy, map, pars, tip.paths=NULL){
+transformPhy <- function(phy, map, pars, tip.paths=NULL, mserr=NULL){
   # phy must be of class simmap
   nTip <- length(phy$tip.label)
   RootAge <- max(branching.times(phy))
   NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
   ModMap <- Map <- map
   D <- V_Tilde <- numeric(dim(phy$edge)[1])
+  TIPS <- which(phy$edge[,2] <= length(phy$tip.label))
   for(i in 1:dim(phy$edge)[1]){
     # evaluate the map for this particular edge and calculate the tipward variance
     NodeAge_i <- NodeAges[i]
@@ -74,6 +75,10 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
       # the length of the epoch is scaled by the alpha parameter of that epoch
       Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
       Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
+      if(!is.null(mserr) & i %in% TIPS){
+        mserr_i <- mserr[phy$edge[i,2]]
+        Sigma_j <- Sigma_j + mserr_i
+      }
       # calculate the descendent distance from the root based on a fixed root distribution
       tmp <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
       v <- v + tmp
