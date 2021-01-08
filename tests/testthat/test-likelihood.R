@@ -243,7 +243,7 @@ test_that("testing BM1 three-point likelihood", {
     data(tworegime)
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="BM1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
-    comparison <- identical(round(ouwiefit$loglik,3), round(-21.95911,3))
+    comparison <- identical(round(ouwiefit$loglik,5), round(-21.95911, 5))
     expect_true(comparison)
 })
 
@@ -254,7 +254,7 @@ test_that("testing BMS three-point likelihood", {
     data(tworegime)
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="BMS", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
-    comparison <- identical(round(ouwiefit$loglik,3), round(-17.85074,3))
+    comparison <- identical(round(ouwiefit$loglik,5), round(-17.85074,5))
     expect_true(comparison)
 })
 
@@ -265,7 +265,7 @@ test_that("testing OU1 three-point likelihood", {
     data(tworegime)
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
-    comparison <- identical(round(ouwiefit$loglik,3), round(-21.74538,3))
+    comparison <- identical(round(ouwiefit$loglik,5), round(-21.74538,5))
     expect_true(comparison)
 })
 
@@ -310,6 +310,22 @@ test_that("testing OUMVA three-point likelihood", {
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="OUMVA", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
     comparison <- identical(round(ouwiefit$loglik,3), round(-14.03592,3))
+    expect_true(comparison)
+})
+
+
+test_that("testing msserr vs three point", {
+    skip_on_cran()
+    
+    data(tworegime)
+    trait[,4] <- abs(rnorm(length(tree$tip.label), mean = 1, sd = 1/10))
+    alpha=c(5, 10)
+    sigma.sq=c(1, 2)
+    theta=c(5, 10)
+    INV <- c(OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "invert", quiet=TRUE)$loglik)
+    TPT <- OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "three.point", quiet=TRUE)$loglik
+    
+    comparison <- identical(round(INV, 5), round(TPT, 5))
     expect_true(comparison)
 })
 

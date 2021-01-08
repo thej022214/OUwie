@@ -58,7 +58,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         data <- data[phy$tip.label,]
     }
     if(mserr=="known"){
-        algorithm = "invert"
+        # algorithm = "invert"
         if(!dim(data)[2]==4){
             stop("You specified measurement error should be incorporated, but this information is missing.", call. = FALSE)
         }
@@ -324,14 +324,45 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 expected.vals <- colSums(t(W) * pars[,1])
                 names(expected.vals) <- phy$tip.label
             }
+            transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             # generate a map from node based reconstructions
-            transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=NULL)
             if(mserr=="known"){
-                sigma2_error <- data[,3]^2
-                transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=sigma2_error)
+                # transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=data[,3]^2)
+                
+                # TIPS <- phy$edge[,2] <= length(phy$tip.label)
+                # transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=NULL)
+                # # sig <- pars[1,2]
+                # # alp <- pars[1,3]
+                # # toAdd <-  (data[,3]^2)*2*alp/sig
+                # # toAdd <- toAdd * exp(-2 * alp * max(branching.times(phy)))
+                # toAdd <-  (data[,3]^2)
+                # transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + toAdd
+                
+                # sigma2_error <- data[,3]^2
+                # expected.sig <- colSums(t(W) * pars[,2])
+                # expected.alp <- colSums(t(W) * pars[,3])
+                # expected.v <- expected.sig / 2 * expected.alp
+                # sigma2_error <- sigma2_error/expected.v
+                # transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=NULL)
+                # TIPS <- phy$edge[,2] <= length(phy$tip.label)
+                # transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + sigma2_error
+                # comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
+                # logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
+                
                 # TIPS <- phy$edge[,2] <= length(phy$tip.label)
                 # phy$edge.length[TIPS] <- phy$edge.length[TIPS] + (data[,3]^2)
+                # for(i in 1:length(phy$tip.label)){
+                #     j <- which(phy$edge[,2] == i)
+                #     sig <- pars[1,2]
+                #     alp <- pars[1,3]
+                #     toAdd <-  (data[i,3]^2)*2*alp/sig
+                #     toAdd <- toAdd * exp(-2 * alp * max(branching.times(phy)))
+                #     map[[j]][length(map[[j]])] <- map[[i]][length(map[[i]])] + toAdd
+                # }
                 # transformed.tree <- transformPhy(phy, map, pars, tip.paths)
+                # comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
+                
+                # transformed.tree <- transformPhy(phy, map, pars, tip.paths, mserr=NULL)
                 # TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                 # sigma2_error <- data[,3]^2
                 # errEdge <- unlist(lapply(transformed.tree$tree$maps[TIPS], function(x) x[length(x)]))
@@ -340,8 +371,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 # sigma2_error <- sigma2_error * 2 * errAlph/errSig2
                 # errAdd <-  sigma2_error * exp(-2 * errAlph * errEdge)
                 # transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + errAdd
+                TIPS <- transformed.tree$edge[,2] <= length(transformed.tree$tip.label)
+                # expected.sig <- colSums(t(W) * pars[,2])
+                # expected.alp <- colSums(t(W) * pars[,3])
+                # expected.v <- expected.sig / 2 * expected.alp
+                transformed.tree$edge.length[TIPS] <- transformed.tree$edge.length[TIPS] + data[,3]^2
+                
             }
-            comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
+            comp <- phylolm::three.point.compute(transformed.tree, x, expected.vals)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))
             theta.est <- cbind(theta,se)

@@ -102,7 +102,7 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
             for(i in 1:dim(vcv1)[2]) {
                 for(j in 1:dim(vcv1)[2]){
                     species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
-                    count=count+1
+                    count=count+1 # the count is always watching
                 }
             }
             vcv <- species.total.variances * vcv2

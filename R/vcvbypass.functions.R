@@ -53,13 +53,13 @@ getPathToRoot <- function(phy, tip){
 
 
 # transforms the phylogeny based on a set of paramaters and a simmap
-transformPhy <- function(phy, map, pars, tip.paths=NULL, mserr=NULL){
+transformPhy <- function(phy, map, pars, tip.paths=NULL){
   # phy must be of class simmap
   nTip <- length(phy$tip.label)
   RootAge <- max(branching.times(phy))
   NodeAges <- branching.times(phy)[phy$edge[,1] - nTip]
   ModMap <- Map <- map
-  D <- V_Tilde <- numeric(dim(phy$edge)[1])
+  ErrEdge <- D <- V_Tilde <- numeric(dim(phy$edge)[1])
   TIPS <- which(phy$edge[,2] <= length(phy$tip.label))
   for(i in 1:dim(phy$edge)[1]){
     # evaluate the map for this particular edge and calculate the tipward variance
@@ -68,46 +68,74 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL, mserr=NULL){
     Map_i <- Map[[i]]
     # the age of epoch j starts at the node age
     Dist_rootward <- DistRoot_i
-    w <- v <- 0
+    z <- w <- v <- 0
     for(j in 1:length(Map_i)){
       # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
       Dist_tipward <- Dist_rootward + Map_i[j]
       # the length of the epoch is scaled by the alpha parameter of that epoch
       Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
       Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
-      if(!is.null(mserr) & i %in% TIPS){
-        mserr_i <- mserr[phy$edge[i,2]]
-        Sigma_j <- Sigma_j + mserr_i
-      }
       # calculate the descendent distance from the root based on a fixed root distribution
-      tmp <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
-      v <- v + tmp
-      ModMap[[i]][j] <- tmp
-      w <- w + (Alpha_j * (Dist_tipward - Dist_rootward))
+      tmp.w <- Alpha_j * (Dist_tipward - Dist_rootward)
+      tmp.v <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
+      v <- v + tmp.v
+      w <- w + tmp.w
+      ModMap[[i]][j] <- tmp.v
       # The new distance from nodes
       Dist_rootward <- Dist_tipward
     }
-    V_Tilde[i] <- v
+    # if(!is.null(mserr) & i %in% TIPS){
+    #   Dist_rootward <- NodeAge_i 
+    #   Dist_tipward <- Dist_rootward + mserr[phy$edge[i,2]]
+    #   ErrEdge[i] <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/ 2 / Alpha_j
+    #   # ErrEdge[i] <- mserr[phy$edge[i,2]]*exp(-2 * Alpha_j * Dist_tipward)
+    # }
+    V_Tilde[i] <- v 
     D[i] <- w
   }
-  
-  # calculates the diagonal matrix for each tip i
-  DiagWt <- numeric(nTip)
-  names(DiagWt) <- phy$tip.label
-  if(is.null(tip.paths)){
-    for(i in 1:nTip){
-      DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
-    }
+  if(!any(abs(diff(pars[,3])) > 0)){
+    V_Tilde <- V_Tilde * exp(-2 * pars[,3][1] * RootAge)
+    ModMap <- lapply(ModMap, function(x) x * exp(-2 * pars[,3][1] * RootAge))
+    phy$edge.length <- V_Tilde
+    phy$maps <- ModMap
   }else{
-    for(i in 1:nTip){
-      DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+    DiagWt <- numeric(nTip)
+    if(is.null(tip.paths)){
+      for(i in 1:nTip){
+        # DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+        DiagWt[i] <- (sum(D[getPathToRoot(phy, i)]))
+      }
+    }else{
+      for(i in 1:nTip){
+        DiagWt[i] <- (sum(D[tip.paths[[i]]]))
+      }
     }
+    species.total.variances <- matrix(0, length(DiagWt), length(DiagWt))
+    for(i in 1:length(DiagWt)) {
+      for(j in 1:length(DiagWt)){
+        species.total.variances[i,j] <- exp(-(DiagWt[i] + DiagWt[j]))
+      }
+    }
+    phy$edge.length <- V_Tilde
+    V <- vcv.phylo(phy)
+    V <-V * species.total.variances
+    phy <- vcv2phylo(V)
   }
-  phy$edge.length <- V_Tilde
-  phy$maps <- ModMap
-  obj <- list(tree = phy, diag = DiagWt)
+  # calculates the diagonal matrix for each tip i
+  # DiagWt <- numeric(nTip)
+  # names(DiagWt) <- phy$tip.label
+  # if(is.null(tip.paths)){
+  #   for(i in 1:nTip){
+  #     DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+  #   }
+  # }else{
+  #   for(i in 1:nTip){
+  #     DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+  #   }
+  # }
+  # obj <- list(tree = phy, diag = DiagWt)
   
-  return(obj)
+  return(phy)
 }
 
 

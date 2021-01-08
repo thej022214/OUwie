@@ -368,8 +368,12 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                     names(expected.vals) <- phy$tip.label
                 }
                 transformed.tree <- transformPhy(phy, map, pars)
+                if(mserr=="known"){
+                  TIPS <- transformed.tree$edge[,2] <= length(transformed.tree$tip.label)
+                  transformed.tree$edge.length[TIPS] <- transformed.tree$edge.length[TIPS] + data[,3]^2
+                }
                 comp <- NA
-                try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE)
+                try(comp <- phylolm::three.point.compute(transformed.tree, x, expected.vals), silent=TRUE)
                 if(is.na(comp[1])){
                     return(10000000)
                 }else{

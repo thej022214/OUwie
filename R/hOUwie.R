@@ -1,8 +1,8 @@
 # set of functions for the hidden rates OU model
 
 # exported function with all the bells and whistles
-hOUwie <- function(phy, data, 
-                   rate.cat, rate.mat=NULL, model.cor="ARD", root.p="yang", lb=1e-3, ub=10,
+hOUwie <- function(phy, data,
+                   rate.cat, rate.mat=NULL, model.cor="ARD", null.model=FALSE, root.p="yang", lb=1e-3, ub=10,
                    model.ou="BM1", root.station.ou=FALSE, get.root.theta=FALSE, shift.point=0.5, algorithm="three.point",
                    p=NULL, ip=NULL, nSim=1000, opts=NULL, nCores=1, weighted=FALSE){
   # check that tips and data match
@@ -49,7 +49,7 @@ hOUwie <- function(phy, data,
   }
   
   # get the appropriate OU model structure
-  index.ou <- getParamStructure(model.ou, "three.point", root.station.ou, get.root.theta, dim(model.set.final$Q)[1])
+  index.ou <- getParamStructure(model.ou, "three.point", root.station.ou, get.root.theta, dim(model.set.final$Q)[1], rate.mat = model.set.final$rate, null.model = null.model)
   # default MLE search options
   if(is.null(opts)){
     opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000000", "ftol_rel"=.Machine$double.eps^0.5)
@@ -77,9 +77,9 @@ hOUwie <- function(phy, data,
                   rep(1e-5, length(unique(na.omit(index.ou[2,])))), 
                   rep(1e-9, length(unique(na.omit(index.ou[3,]))))))
     upper = log(c(rep(ub, model.set.final$np), 
-                  rep(100, length(unique(na.omit(index.ou[1,])))), 
-                  rep(100, length(unique(na.omit(index.ou[2,])))), 
-                  rep(100, length(unique(na.omit(index.ou[3,]))))))
+                  rep(21, length(unique(na.omit(index.ou[1,])))), 
+                  rep(21, length(unique(na.omit(index.ou[2,])))), 
+                  rep(21, length(unique(na.omit(index.ou[3,]))))))
     cat("\nStarting a serch of parameters with", nSim, "simmaps...\n")
     out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data.cor=hOUwie.dat$data.cor , data.ou=hOUwie.dat$data.ou, liks=model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=nSim, nCores=nCores, algorithm=algorithm, tip.paths=tip.paths, weighted=weighted)
     cat("\nFinished.\n")
@@ -150,7 +150,7 @@ organizeHOUwieDat <- function(data){
 }
 
 # different OU models have different parameter structures. This will evaluate the appropriate one.
-getParamStructure <- function(model, algorithm, root.station, get.root.theta, k){
+getParamStructure <- function(model, algorithm, root.station, get.root.theta, k, rate.mat, null.model=FALSE){
   index.mat <- matrix(0, 2,k)
   if(algorithm == "three.point"){
     Rate.mat <- matrix(1, 3, k)
@@ -270,6 +270,9 @@ getParamStructure <- function(model, algorithm, root.station, get.root.theta, k)
     param.count <- np
     root.station=FALSE
     trendy=1
+  }
+  if(null.model == TRUE){
+    
   }
   return(index.mat)
 }
