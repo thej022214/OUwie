@@ -116,7 +116,7 @@ test_that("testing simmap", {
     }
     ouwiefit.nodes <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
     ouwiefit.simmap <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="invert", shift.point=0.5, quiet=TRUE)
-    comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
+        comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
     expect_true(comparison)
 })
 
@@ -314,7 +314,7 @@ test_that("testing OUMVA three-point likelihood", {
 })
 
 
-test_that("testing msserr vs three point", {
+test_that("testing mserr vs three-point", {
     skip_on_cran()
     
     data(tworegime)
