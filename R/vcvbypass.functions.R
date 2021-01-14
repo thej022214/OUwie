@@ -77,7 +77,8 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
       Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
       # calculate the descendent distance from the root based on a fixed root distribution
       tmp.w <- Alpha_j * (Dist_tipward - Dist_rootward)
-      tmp.v <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
+      # tmp.v <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
+      tmp.v <- Alpha_j * Map_i[j]
       v <- v + tmp.v
       w <- w + tmp.w
       ModMap[[i]][j] <- tmp.v
@@ -93,34 +94,44 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
     V_Tilde[i] <- v 
     D[i] <- w
   }
-  if(!any(abs(diff(pars[,3])) > 0)){
-    V_Tilde <- V_Tilde * exp(-2 * pars[,3][1] * RootAge)
-    ModMap <- lapply(ModMap, function(x) x * exp(-2 * pars[,3][1] * RootAge))
+  # if(!any(abs(diff(pars[,3])) > 0)){
+  #   V_Tilde <- V_Tilde * exp(-2 * pars[,3][1] * RootAge)
+  #   ModMap <- lapply(ModMap, function(x) x * exp(-2 * pars[,3][1] * RootAge))
+  #   phy$edge.length <- V_Tilde
+  #   phy$maps <- ModMap
+  # }else{
+  #   DiagWt <- numeric(nTip)
+  #   D2 <- numeric(length(D))
+  #   if(is.null(tip.paths)){
+  #     for(i in 1:nTip){
+  #       # DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+  #       DiagWt[i] <- (sum(D[getPathToRoot(phy, i)]))
+  #     }
+  #   }else{
+  #     for(i in 1:nTip){
+  #       DiagWt[i] <- (sum(D[tip.paths[[i]]]))
+  #     }
+  #   }
+  #   species.total.variances <- matrix(0, length(DiagWt), length(DiagWt))
+  #   for(i in 1:length(DiagWt)){
+  #     for(j in 1:length(DiagWt)){
+  #       species.total.variances[i,j] <- exp(-(DiagWt[i] + DiagWt[j]))
+  #     }
+  #   }
     phy$edge.length <- V_Tilde
-    phy$maps <- ModMap
-  }else{
-    DiagWt <- numeric(nTip)
-    if(is.null(tip.paths)){
-      for(i in 1:nTip){
-        # DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
-        DiagWt[i] <- (sum(D[getPathToRoot(phy, i)]))
-      }
-    }else{
-      for(i in 1:nTip){
-        DiagWt[i] <- (sum(D[tip.paths[[i]]]))
-      }
-    }
-    species.total.variances <- matrix(0, length(DiagWt), length(DiagWt))
-    for(i in 1:length(DiagWt)) {
-      for(j in 1:length(DiagWt)){
-        species.total.variances[i,j] <- exp(-(DiagWt[i] + DiagWt[j]))
-      }
-    }
-    phy$edge.length <- V_Tilde
-    V <- vcv.phylo(phy)
-    V <-V * species.total.variances
-    phy <- vcv2phylo(V)
-  }
+    # phy2 <- phy
+    # index <- reorder(phy, "pruningwise", index.only = TRUE)
+    # phy2 <- reorder(phy2, "pruningwise")
+  #   V <- vcv.phylo(phy)
+  #   V <- V * species.total.variances
+  #   phy <- vcv2phylo(V)
+  #   for(i in 1:dim(phy$edge)[1]){
+  #     edge_i <- phy2$edge[i,]
+  #     Diag_i <- DiagWt[edge_i[2]]
+  #     D_i <- D[index][i]
+  #     Scale_i <- exp(-Diag_i * D_i)
+  #   }
+  # }
   # calculates the diagonal matrix for each tip i
   # DiagWt <- numeric(nTip)
   # names(DiagWt) <- phy$tip.label

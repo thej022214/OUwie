@@ -265,7 +265,7 @@ test_that("testing OU1 three-point likelihood", {
     data(tworegime)
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="OU1", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
-    comparison <- identical(round(ouwiefit$loglik,5), round(-21.74538,5))
+    comparison <- identical(round(ouwiefit$loglik,4), round(-21.74538,4))
     expect_true(comparison)
 })
 

@@ -16,6 +16,11 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         get.root.theta = FALSE
     }
     
+    if(algorithm=="three.point" & !is.null(root.age)){
+        warning("Specific root ages are currently only available for the invert algorithm.", call.=FALSE, immediate.=TRUE)
+        algorithm = "invert"
+    }
+    
     if(is.factor(data[,3])==TRUE){
         stop("Check the format of the data column. It's reading as a factor.", .call=FALSE)
     }
@@ -91,8 +96,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         phy$node.label[pp] <- 2
     }
     if (is.character(model)) {
-        if (model == "BM1"| model == "OU1"){
-            simmap.tree <- FALSE
+        if (algorithm == "invert"){
+            if (model == "BM1"| model == "OU1"){
+                simmap.tree <- FALSE
+            }
         }
     }
     if(simmap.tree==TRUE){
