@@ -322,8 +322,8 @@ test_that("testing mserr vs three-point", {
     alpha=c(5, 10)
     sigma.sq=c(1, 2)
     theta=c(5, 10)
-    INV <- c(OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "invert", quiet=TRUE)$loglik)
-    TPT <- OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=FALSE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "three.point", quiet=TRUE)$loglik
+    INV <- c(OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=TRUE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "invert", quiet=TRUE)$loglik)
+    TPT <- OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=TRUE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "three.point", quiet=TRUE)$loglik
     
     comparison <- identical(round(INV, 5), round(TPT, 5))
     expect_true(comparison)

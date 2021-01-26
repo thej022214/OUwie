@@ -353,35 +353,35 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sig2, theta0, theta, nMap=1){
 # undebug(OUwie:::hOUwie.dev)
 
 #
-require(corHMM)
-require(OUwie)
-require(parallel)
-require(geiger)
-require(proftools)
-
-phy <- sim.bdtree(b = 1, d = 0.5, stop = "taxa", n = 250)
-phy <- drop.extinct(phy)
-root.p = c(0.5, 0.5)
-p.mk <- c(0.1, 0.1)
-alpha = c(1, 2)
-sig2= c(0.1, 0.1)
-theta = c(3, 8)
-Q = matrix(c(-p.mk[1],p.mk[2],p.mk[1],-p.mk[2]), 2, 2)
-theta0 = 5
-rate.cat = 1
-model.cor = "ER"
-model.ou = "OUMA"
-
-data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[1]]
-p = c(0.1, 0.01, 0.1, 1, 3, 8)
-hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
-nObs <- length(hOUwie.dat$ObservedTraits)
-model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model.cor)
-phy <- reorder(phy, "pruningwise")
-index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, dim(model.set.final$Q)[2])
-# phy$edge.length <- phy$edge.length/max(branching.times(phy))
-
-OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=1, nCores=1, algorithm = "three.point")
+# require(corHMM)
+# require(OUwie)
+# require(parallel)
+# require(geiger)
+# require(proftools)
+# 
+# phy <- sim.bdtree(b = 1, d = 0.5, stop = "taxa", n = 250)
+# phy <- drop.extinct(phy)
+# root.p = c(0.5, 0.5)
+# p.mk <- c(0.1, 0.1)
+# alpha = c(1, 2)
+# sig2= c(0.1, 0.1)
+# theta = c(3, 8)
+# Q = matrix(c(-p.mk[1],p.mk[2],p.mk[1],-p.mk[2]), 2, 2)
+# theta0 = 5
+# rate.cat = 1
+# model.cor = "ER"
+# model.ou = "OUMA"
+# 
+# data <- OUwie:::hOUwie.sim(phy, Q, root.p, alpha, sig2, theta0, theta)[[1]]
+# p = c(0.1, 0.01, 0.1, 1, 3, 8)
+# hOUwie.dat <- OUwie:::organizeHOUwieDat(data)
+# nObs <- length(hOUwie.dat$ObservedTraits)
+# model.set.final <- corHMM:::rate.cat.set.corHMM.JDB(phy=phy,data=hOUwie.dat$data.cor,rate.cat=rate.cat, ntraits = nObs, model = model.cor)
+# phy <- reorder(phy, "pruningwise")
+# index.ou <- OUwie:::getParamStructure(model.ou, "three.point", FALSE, FALSE, dim(model.set.final$Q)[2])
+# # phy$edge.length <- phy$edge.length/max(branching.times(phy))
+# 
+# OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=10, nCores=1, algorithm = "three.point")
 
 # # # weigthed <- sapply(1:100, function(x) OUwie:::hOUwie.dev(p = log(p), phy = phy, data.cor = OUwie:::organizeHOUwieDat(data)$data.cor, data.ou = OUwie:::organizeHOUwieDat(data)$data.ou, liks = model.set.final$liks, Q=model.set.final$Q, rate=model.set.final$rate, root.p=root.p, rate.cat=rate.cat, index.ou=index.ou, model.ou=model.ou, nSim=10, nCores=1, weighted = TRUE))
 # # 

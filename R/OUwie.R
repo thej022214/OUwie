@@ -71,6 +71,10 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             }
 		}
 	}
+  
+  if(algorithm == "three.point" & scaleHeight == FALSE){
+    warning("It is recommended that you set scaleHeight to TRUE if using the three.poiint algorithm.", call. = FALSE, immediate.=TRUE)
+  }
 
     #Values to be used throughout
 	n <- max(phy$edge[,1])
@@ -183,12 +187,13 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	trendy <- 0
 	
     #Data:
-    if(algorithm == "three.point"){
-        x <- data[,2]
-        names(x) <- rownames(data)
-    }else{
-        x <- as.matrix(data[,2])
-    }
+  if(algorithm == "three.point"){
+      x <- data[,2]
+      names(x) <- rownames(data)
+      tip.paths <- lapply(1:length(data[,2]), function(x) getPathToRoot(phy, x))
+  }else{
+      x <- as.matrix(data[,2])
+  }
 
     #Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
@@ -367,13 +372,13 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                     expected.vals <- colSums(t(W) * pars[,1])
                     names(expected.vals) <- phy$tip.label
                 }
-                transformed.tree <- transformPhy(phy, map, pars)
+                transformed.tree <- transformPhy(phy, map, pars, tip.paths)
                 if(mserr=="known"){
-                  TIPS <- transformed.tree$edge[,2] <= length(transformed.tree$tip.label)
-                  transformed.tree$edge.length[TIPS] <- transformed.tree$edge.length[TIPS] + data[,3]^2
+                  TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
+                  transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
                 }
                 comp <- NA
-                try(comp <- phylolm::three.point.compute(transformed.tree, x, expected.vals), silent=TRUE)
+                try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE)
                 if(is.na(comp[1])){
                     return(10000000)
                 }else{
