@@ -9,7 +9,7 @@
 #global OU (OU1), multiple regime OU (OUM), multiple sigmas (OUMV), multiple alphas (OUMA),
 #and the multiple alphas and sigmas (OUMVA).
 
-OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"), diagn=FALSE, quiet=FALSE, warn=TRUE, lb = 1e-9, ub = 100, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, mserr="none", starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"), diagn=FALSE, quiet=FALSE, warn=TRUE, lb = NULL, ub = NULL, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
 
     if(length(algorithm) == 2){
         algorithm = "invert"
@@ -420,25 +420,37 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	if(quiet==FALSE){
 		cat("Initializing...", "\n")
 	}
-
+  
+	if(is.null(lb)){
+	  lb <- 1e-9
+	}
+	if(is.null(ub)){
+	  ub <- 100
+	}
 	lower = rep(log(lb), np)
 	upper = rep(log(ub), np)
-
-    if(scaleHeight==TRUE){
-        phy$edge.length <- phy$edge.length/Tmax
-        Tmax <- 1
-    }else{
-        Tmax <- max(branching.times(phy))
-    }
 
     if(algorithm == "three.point"){
         if(simmap.tree == FALSE){
             map <- getMapFromNode(phy, tip.states, int.states, shift.point)
+            if(scaleHeight==TRUE){
+              map <- lapply(map, function(x) x/Tmax)
+            }
         }else{
             map <- phy$maps
+            if(scaleHeight==TRUE){
+              map <- lapply(map, function(x) x/Tmax)
+            }
         }
     }
 
+	if(scaleHeight==TRUE){
+	  phy$edge.length <- phy$edge.length/Tmax
+	  Tmax <- 1
+	}else{
+	  Tmax <- max(branching.times(phy))
+	}
+	
 	if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
         #Initial value for alpha is just the half life based on the entire length of the tree:
         if(is.null(starting.vals)){
