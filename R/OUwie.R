@@ -73,7 +73,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	}
   
   if(algorithm == "three.point" & scaleHeight == FALSE){
-    warning("It is recommended that you set scaleHeight to TRUE if using the three.poiint algorithm.", call. = FALSE, immediate.=TRUE)
+    warning("It is recommended that you set scaleHeight to TRUE if using the three.point algorithm.", call. = FALSE, immediate.=TRUE)
   }
 
     #Values to be used throughout

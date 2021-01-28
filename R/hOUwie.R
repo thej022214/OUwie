@@ -68,6 +68,7 @@ hOUwie <- function(phy, data,
     cat("This feature is not yet finzalized\n")
     out<-NULL
     start.cor <- rep(10/sum(phy$edge.length), model.set.final$np)
+    # consider what this means for a BM or BMS model
     start.ou <- c(rep(var(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[1,])))), 
                   rep(var(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[2,])))), 
                   rep(mean(hOUwie.dat$data.ou[,3]), length(unique(na.omit(index.ou[3,])))))
