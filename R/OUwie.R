@@ -318,8 +318,16 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		}
 	}
 
-    index.mat[is.na(index.mat)] <- param.count+1
-
+	if(model == "BM1" | model == "BMS"){
+	  if(algorithm == "three.point"){
+	    index.mat[is.na(index.mat)] <- param.count + 1
+	  }else{
+	    index.mat[is.na(index.mat)] <- param.count
+	  }
+	}else{
+	  index.mat[is.na(index.mat)] <- param.count + 1
+	}	
+	
 	if(warn==TRUE){
 		if(param.count > (ntips/10)){
 			warning("You might not have enough data to fit this model well", call.=FALSE, immediate.=TRUE)
@@ -495,24 +503,28 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             sig <- starting.vals
         }
 		#####################
-		if(model=="BMS"){
-			ip <- rep(sig, k)
-            if(get.root.theta == TRUE){
-                ip <- c(ip, mean(x))
-                lower <- c(lower, log(lb))
-                upper <- c(upper, log(ub))
-            }
-		}
-		else{
-			if(model=="BM1"){
-				ip <- sig
-                if(get.root.theta == TRUE){
-                    ip <- c(ip, mean(x))
-                    lower <- c(lower, log(lb))
-                    upper <- c(upper, log(ub))
-                }
-			}
-			if(model=="TrendyM"){
+	  if(model=="BMS"){
+	    ip <- rep(sig, k)
+	    if(get.root.theta == TRUE){
+	      if(algorithm == "three.point"){
+	        ip <- c(ip, mean(x))
+	        lower <- c(lower, log(lb))
+	        upper <- c(upper, log(ub))
+	      }
+	    }
+	  }
+	  else{
+	    if(model=="BM1"){
+	      ip <- sig
+	      if(get.root.theta == TRUE){
+	        if(algorithm == "three.point"){
+	          ip <- c(ip, mean(x))
+	          lower <- c(lower, log(lb))
+	          upper <- c(upper, log(ub))
+	        }
+	      }
+	    }
+	    if(model=="TrendyM"){
 				#We assume that the starting trend values are zero:
 				ip <- c(sig, rep(exp(-20), param.count-2), mean(x))
 				lower <- c(lb,rep(log(lb), param.count-2), log(lb))
