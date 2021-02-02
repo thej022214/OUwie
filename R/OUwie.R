@@ -45,6 +45,11 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
         }
     }
 
+    if(diagn == TRUE & algorithm == "three.point"){
+        diagn=FALSE
+        warning("Turning off internal diagnostic, not implemented for the three-point algorithm.", call. = FALSE, immediate.=TRUE)
+    }
+    
     if(check.identify == TRUE){
             identifiable <- check.identify(phy=phy, data=data, simmap.tree=simmap.tree, quiet=TRUE)
             if(identifiable == 0){
@@ -73,7 +78,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	}
   
   if(algorithm == "three.point" & scaleHeight == FALSE){
-    warning("It is recommended that you set scaleHeight to TRUE if using the three.point algorithm.", call. = FALSE, immediate.=TRUE)
+    warning("It is recommended that you set scaleHeight to TRUE if using the three-point algorithm.", call. = FALSE, immediate.=TRUE)
   }
 
     #Values to be used throughout
@@ -187,13 +192,13 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	trendy <- 0
 	
     #Data:
-  if(algorithm == "three.point"){
-      x <- data[,2]
-      names(x) <- rownames(data)
-      tip.paths <- lapply(1:length(data[,2]), function(x) getPathToRoot(phy, x))
-  }else{
-      x <- as.matrix(data[,2])
-  }
+    if(algorithm == "three.point"){
+        x <- data[,2]
+        names(x) <- rownames(data)
+        tip.paths <- lapply(1:length(data[,2]), function(x) getPathToRoot(phy, x))
+    }else{
+        x <- as.matrix(data[,2])
+    }
 
     #Matches the model with the appropriate parameter matrix structure
 	if (is.character(model)) {
@@ -584,6 +589,11 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	}else{
         if(algorithm == "invert"){
             theta <- dev.theta(out$solution, index.mat, edges, mserr)
+        }else{
+            if(model == "BM1" | model == "BMS"){
+                max.pars <- max(index.mat)
+                index.mat[3,] <- max.pars - 1
+            }
         }
 	}
 
@@ -655,6 +665,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		obj = list(loglik = loglik, AIC = -2*loglik+2*param.count, AICc=-2*loglik+(2*param.count*(ntips/(ntips-param.count-1))), BIC = -2*loglik + log(ntips) * param.count, model=model, param.count=param.count, solution=solution, theta=theta, solution.se=solution.se, tot.states=tot.states, index.mat=index.mat, simmap.tree=simmap.tree, root.age=root.age, shift.point=shift.point, opts=opts, data=data, phy=phy, root.station=root.station, scaleHeight=scaleHeight, starting.vals=starting.vals, lb=lower, ub=upper, iterations=out$iterations, get.root.theta=get.root.theta, regime.weights=regime.weights, eigval=eigval, eigvect=eigvect, new.start=out$new.start, algorithm=algorithm)
 
 	}
+    
 	if(diagn==FALSE){
 		solution <- matrix(out$solution[index.mat], dim(index.mat))
 		if(model=="TrendyM" | model=="TrendyMS"){
@@ -739,10 +750,10 @@ print.OUwie<-function(x, ...){
 
 	if (is.character(x$model)) {
 		if (x$model == "BM1" | x$model == "BMS" | x$model == "TrendyM" | x$model == "TrendyMS"){
-			param.est <- x$solution
-			if(x$root.station==FALSE){
-			theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
-			}
+            param.est<- x$solution[1:2,]
+            if(x$root.station==FALSE){
+                theta.mat <- matrix(t(x$theta[1,]), 2, length(levels(x$tot.states)))
+            }
 			else{
 				theta.mat<-matrix(t(x$theta), 2, length(levels(x$tot.states)))
 			}
@@ -754,7 +765,7 @@ print.OUwie<-function(x, ...){
 				colnames(theta.mat) <- c(colnames(x$phy$mapped.edge))
 			}
 			cat("Rates\n")
-			print(param.est)
+            print(param.est)
 			cat("\n")
 			cat("Optima\n")
 			print(theta.mat)
