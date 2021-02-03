@@ -187,7 +187,9 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 		if(scaleHeight==TRUE){
 			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
-            root.age = 1
+			root.age <- max(MakeAgeTable(phy, root.age=root.age))
+			phy$maps <- lapply(phy$maps, function(x) x/root.age)
+      root.age = 1
 		}
 		edges=edges[sort.list(edges[,3]),]
 
@@ -210,13 +212,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		x[ROOT,] <- theta0
 
 		for(i in 1:length(edges[,1])){
-
-			if(scaleHeight==TRUE){
-				currentmap<-phy$maps[[i]]/max(MakeAgeTable(phy, root.age=root.age))
-			}
-			else{
-				currentmap<-phy$maps[[i]]
-			}
+			currentmap<-phy$maps[[i]]
 			oldtime=edges[i,4]
 
 			if(length(phy$maps[[i]])==1){
@@ -248,8 +244,8 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		sim.dat[,1]<-phy$tip.label
 		sim.dat[,2]<-x[TIPS,]
         if(mserr == "known"){
-            for(i in 1:TIPS){
-                sim.dat[i,2] <- rnorm(1,sim.dat[i,2],data[i,2])
+            for(i in TIPS){
+                sim.dat[i,2] <- rnorm(1,sim.dat[i,2],data[i,3])
             }
         }
 		colnames(sim.dat)<-c("Genus_species","X")
