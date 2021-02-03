@@ -1,6 +1,6 @@
 
 ---
-title: "OUwie 2.1"
+title: "New additions as of OUwie 2.1"
 author: "Jeremy M. Beaulieu and Brian C. O'Meara"
 output:
   pdf_document:
