@@ -484,7 +484,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             if(model == "OU1"){
                 ip <- c(ip, mean(x))
             }else{
-                means.by.regime <- with(data, tapply(data[,2], tot.states, mean))
+                means.by.regime <- with(data, tapply(data[,2], data[,1], mean))
                 names(means.by.regime) <- NULL
                 ip <- c(ip, means.by.regime)
             }
