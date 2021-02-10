@@ -453,6 +453,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             map <- phy$maps
             if(scaleHeight==TRUE){
               map <- lapply(map, function(x) x/Tmax)
+              phy$maps <- map
             }
         }
     }
