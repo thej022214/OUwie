@@ -77,9 +77,9 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		}
 	}
   
-  if(algorithm == "three.point" & scaleHeight == FALSE){
-    warning("It is recommended that you set scaleHeight to TRUE if using the three-point algorithm.", call. = FALSE, immediate.=TRUE)
-  }
+  # if(algorithm == "three.point" & scaleHeight == FALSE){
+  #   warning("It is recommended that you set scaleHeight to TRUE if using the three-point algorithm.", call. = FALSE, immediate.=TRUE)
+  # }
 
     #Values to be used throughout
 	n <- max(phy$edge[,1])
@@ -486,6 +486,9 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                 ip <- c(ip, mean(x))
             }else{
                 means.by.regime <- with(data, tapply(data[,2], data[,1], mean))
+                if(length(means.by.regime) < length(levels(tot.states))){
+                  means.by.regime <- rep(mean(data[,2]), length(levels(tot.states)))
+                }
                 names(means.by.regime) <- NULL
                 ip <- c(ip, means.by.regime)
             }
