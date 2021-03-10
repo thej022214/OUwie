@@ -196,7 +196,7 @@ A long time complaint about `OUwie` is that it does not scale well when trees ex
 
 ```{r, eval=TRUE, echo=TRUE}
 data(tworegime)
-three.point <- OUwie(tree, trait, model="OUMV", root.station=FALSE, scaleHeight=TRUE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
+three.point <- OUwie(tree, trait, model="OUMV", root.station=FALSE, scaleHeight=TRUE, shift.point=0.5, algorithm="three.point", quiet=TRUE, check.identify=FALSE)
 three.point
 ```
 

@@ -28,8 +28,8 @@ diagn=FALSE, quiet=FALSE, warn=TRUE, lb = NULL, ub = NULL, opts = list(algorithm
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{FALSE}.}
 \item{warn}{a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is \code{TRUE}.}
-\item{lb}{sets the lower bound for the parameter search, when set to NULL it will be a default value of 1e-9. Note that this value is log transformed internally.}
-\item{ub}{sets the upper bound for the parameter search, when set to NULL it will be a default value of 100. Note that this value is log transformed internally.}
+\item{lb}{a vector of length 2 which sets the lower bound for the parameter search. the first position of the vector is alpha's lower bound, the second position of the vector is sigma.sq's lower bound. when set to NULL it will be a default value of 1e-9. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
+\item{ub}{a vector of length 2 which sets the upper bound for the parameter search. the first position of the vector is alpha's upper bound, the second position of the vector is sigma.sq's upper bound. when set to NULL it will be a default value of 100. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }
 \details{

@@ -62,6 +62,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
     if(mserr == "none"){
 		data <- data.frame(data[,2], data[,3], row.names=data[,1])
 		data <- data[phy$tip.label,]
+		tip.states.cp <- factor(data[,1]) # fixes a cosmetic bug when internal states don't match external
 	}
 	if(mserr=="known"){
 		if(!dim(data)[2]==4){
@@ -73,6 +74,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             }else{
                 data <- data.frame(data[,2], data[,3], data[,4], row.names=data[,1])
                 data <- data[phy$tip.label,]
+                tip.states.cp <- factor(data[,1])
             }
 		}
 	}
@@ -434,15 +436,39 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		cat("Initializing...", "\n")
 	}
   
+	# we're in a BM type model
+	if(max(index.mat[1,]) > max(index.mat[2,])){
+	  k.alpha <- 0
+	  k.sigma <- length(unique(index.mat[2,]))
+	}else{
+	  k.alpha <- length(unique(index.mat[1,]))
+	  k.sigma <- length(unique(index.mat[2,]))
+	}
 	if(is.null(lb)){
-	  lb <- 1e-9
+	  lb.alpha <- 1e-9
+	  lb.sigma <- 1e-9
+	  lower = c(rep(log(lb.alpha), k.alpha), rep(log(lb.sigma), k.sigma))
+	}else{
+	  lower = c(rep(log(lb[1]), k.alpha), rep(log(lb[2]), k.sigma))
 	}
 	if(is.null(ub)){
-	  ub <- 100
+	  ub.alpha <- 100
+	  ub.sigma <- 100
+	  upper = c(rep(log(ub.alpha), k.alpha), rep(log(ub.sigma), k.sigma))
+	}else{
+	  upper = c(rep(log(ub[1]), k.alpha), rep(log(ub[2]), k.sigma))
 	}
-	lower = rep(log(lb), np)
-	upper = rep(log(ub), np)
-
+	if(k.sigma + k.alpha != np){
+	  cat("The number of bound parameters input did not match the number needed, using default settings...\n")
+	  lb <- 1e-9
+	  ub <- 100
+	  lower = rep(log(lb), np)
+	  upper = rep(log(ub), np)
+	}
+	# for any downstream usage, we default to the old treatment of lb and ub
+	lb <- 1e-9
+	ub <- 100
+	
     if(algorithm == "three.point"){
         if(simmap.tree == FALSE){
             map <- getMapFromNode(phy, tip.states, int.states, shift.point)
@@ -603,6 +629,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 
 	#Calculates the Hessian for use in calculating standard errors and whether the maximum likelihood solution was found
 	if(diagn==TRUE){
+	  data[,1] <- tip.states.cp # fixes a cosmetic bug in cases where internal states don't match tip states
 		h <- hessian(x=log(out$solution), func=dev, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy, get.root.theta=get.root.theta)
 		#Using the corpcor package here to overcome possible NAs with calculating the SE
 		solution <- matrix(out$solution[index.mat], dim(index.mat))
@@ -624,7 +651,6 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		#If eigenvect is TRUE then the eigenvector and index matrix will appear in the list of objects
 		eigval<-signif(hess.eig$values,2)
 		eigvect<-round(hess.eig$vectors, 2)
-        
         if(get.root.theta == TRUE){
             if(model == "BM1" | model == "BMS"){
                 W <- matrix(0, Ntip(phy), k + 1)
@@ -671,6 +697,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	}
     
 	if(diagn==FALSE){
+	  data[,1] <- tip.states.cp # fixes a cosmetic bug in cases where internal states don't match tip states
 		solution <- matrix(out$solution[index.mat], dim(index.mat))
 		if(model=="TrendyM" | model=="TrendyMS"){
 			rownames(solution) <- rownames(index.mat) <- c("alpha","sigma.sq","trend")

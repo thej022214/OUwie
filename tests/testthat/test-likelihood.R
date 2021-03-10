@@ -116,6 +116,8 @@ test_that("testing simmap", {
     }
     ouwiefit.nodes <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
     ouwiefit.simmap <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="invert", shift.point=0.5, quiet=TRUE)
+    # ouwiefit.3pta <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="three.point", shift.point=0.5, quiet=TRUE)
+    # ouwiefit.3ptb <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
         comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
     expect_true(comparison)
 })
