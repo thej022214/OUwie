@@ -436,38 +436,45 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		cat("Initializing...", "\n")
 	}
   
-	# we're in a BM type model
-	if(max(index.mat[1,]) > max(index.mat[2,])){
-	  k.alpha <- 0
-	  k.sigma <- length(unique(index.mat[2,]))
+	# upper and lower bounds
+	if(algorithm == "three.point"){
+	  if(max(index.mat[1,]) > max(index.mat[2,])){
+	    k.alpha <- 0
+	    k.sigma <- length(unique(index.mat[2,]))
+	  }else{
+	    k.alpha <- length(unique(index.mat[1,]))
+	    k.sigma <- length(unique(index.mat[2,]))
+	  }
+	  if(is.null(lb)){
+	    lb.alpha <- 1e-9
+	    lb.sigma <- 1e-9
+	    lower = c(rep(log(lb.alpha), k.alpha), rep(log(lb.sigma), k.sigma))
+	    lb <- 1e-9
+	  }else{
+	    lower = c(rep(log(lb[1]), k.alpha), rep(log(lb[2]), k.sigma))
+	    ub <- ub[3] # theta's are added later
+	  }
+	  if(is.null(ub)){
+	    ub.alpha <- 100
+	    ub.sigma <- 100
+	    upper = c(rep(log(ub.alpha), k.alpha), rep(log(ub.sigma), k.sigma))
+	    ub <- 100
+	  }else{
+	    upper = c(rep(log(ub[1]), k.alpha), rep(log(ub[2]), k.sigma))
+	    ub <- ub[3] # theta's are added later
+	  }
 	}else{
-	  k.alpha <- length(unique(index.mat[1,]))
-	  k.sigma <- length(unique(index.mat[2,]))
-	}
-	if(is.null(lb)){
-	  lb.alpha <- 1e-9
-	  lb.sigma <- 1e-9
-	  lower = c(rep(log(lb.alpha), k.alpha), rep(log(lb.sigma), k.sigma))
-	}else{
-	  lower = c(rep(log(lb[1]), k.alpha), rep(log(lb[2]), k.sigma))
-	}
-	if(is.null(ub)){
-	  ub.alpha <- 100
-	  ub.sigma <- 100
-	  upper = c(rep(log(ub.alpha), k.alpha), rep(log(ub.sigma), k.sigma))
-	}else{
-	  upper = c(rep(log(ub[1]), k.alpha), rep(log(ub[2]), k.sigma))
-	}
-	if(k.sigma + k.alpha != np){
-	  cat("The number of bound parameters input did not match the number needed, using default settings...\n")
-	  lb <- 1e-9
-	  ub <- 100
+	  if(is.null(lb)){
+	    lb <- 1e-9
+	  }
+	  if(is.null(ub)){
+	    ub <- 100
+	  }
 	  lower = rep(log(lb), np)
-	  upper = rep(log(ub), np)
+	  upper = rep(log(ub), np)	
 	}
+
 	# for any downstream usage, we default to the old treatment of lb and ub
-	lb <- 1e-9
-	ub <- 100
 	
     if(algorithm == "three.point"){
         if(simmap.tree == FALSE){
