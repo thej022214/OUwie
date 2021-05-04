@@ -181,8 +181,9 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		branch.lengths[(ntips+1):(n-1)]=branching.times(phy)[-1]/max(branching.times(phy))
 
 		#Obtain root state and internal node labels
-		root.state<-which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
-
+		root.edge.index <- which(phy$edge[,1] == ntips+1)
+		root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
+		
 		#New tree matrix to be used for subsetting regimes
 		edges=cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 		if(scaleHeight==TRUE){

@@ -110,7 +110,8 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		data[,1] <- as.numeric(tip.states)
 
 		#Obtains the state at the root
-		root.state=which(colnames(phy$mapped.edge)==names(phy$maps[[1]][1]))
+		root.edge.index <- which(phy$edge[,1] == ntips+1)
+		root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
 		##Begins the construction of the edges matrix -- similar to the ouch format##
 		edges=cbind(c(1:(n-1)),phy$edge, MakeAgeTable(phy, root.age=root.age))
 
