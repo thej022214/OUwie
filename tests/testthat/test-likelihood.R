@@ -105,20 +105,29 @@ test_that("testing simmap", {
     data(tworegime)
     set.seed(8)
     library(phytools)
+    library(corHMM)
     regs <- setNames(trait[,2], trait[,1])
     test <- make.simmap(tree, regs, model="ER")
+    tree.corm <- reorder(tree, "pruningwise")
+    corm <- makeSimmap(tree.corm, trait[c(1,2)], test$Q, 1)[[1]]
     for(i in 1:dim(test$mapped.edge)[1]){
         entries <- test$mapped.edge[i,which(test$mapped.edge[i,] > 0)]
         test$mapped.edge[i,which(test$mapped.edge[i,] > 0)] <- sum(entries)/length(entries)
         maps <- test$maps[[i]]
         test$maps[[i]] <- rep(sum(maps)/length(maps), length(maps))
         names(test$maps[[i]]) <- names(maps)
+        entries <- corm$mapped.edge[i,which(corm$mapped.edge[i,] > 0)]
+        corm$mapped.edge[i,which(corm$mapped.edge[i,] > 0)] <- sum(entries)/length(entries)
+        maps <- corm$maps[[i]]
+        corm$maps[[i]] <- rep(sum(maps)/length(maps), length(maps))
+        names(corm$maps[[i]]) <- names(maps)
     }
     ouwiefit.nodes <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, algorithm="invert", quiet=TRUE)
     ouwiefit.simmap <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="invert", shift.point=0.5, quiet=TRUE)
+    ouwiefit.corm <- OUwie(corm, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="invert", shift.point=0.5, quiet=TRUE)
     # ouwiefit.3pta <- OUwie(test, trait, model="OUM", simmap.tree=TRUE, root.station=FALSE, algorithm="three.point", shift.point=0.5, quiet=TRUE)
     # ouwiefit.3ptb <- OUwie(tree, trait, model="OUM", root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE)
-        comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5))
+        comparison <- identical(round(ouwiefit.nodes$loglik,5), round(ouwiefit.simmap$loglik,5), round(ouwiefit.corm$loglik,5))
     expect_true(comparison)
 })
 
