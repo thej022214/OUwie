@@ -17,7 +17,7 @@
 #multiple alphas (OUSMA): alpha=c(0.5,0.1); sigma.sq=c(0.9,0.9); theta0=0; theta=c(1,2)
 #multiple alphas and sigmas (OUSMVA): alpha=c(0.5,0.1); sigma.sq=c(0.45,0.9); theta0=0; theta=c(1,2)
 
-OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, fitted.object=NULL){
+OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, fitted.object=NULL, get.all=FALSE){
     if(!is.null(fitted.object)) {
         if(grepl("BM", fitted.object$model) | grepl("OU1", fitted.object$model)) {
             stop(paste("not implemented yet for ", fitted.object$model))
@@ -153,20 +153,35 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 			}
 		}
 
-		sim.dat <- matrix(,ntips,3)
-		sim.dat <- data.frame(sim.dat)
+        if(get.all == TRUE){
+            sim.dat <- matrix(,length(x),3)
+            sim.dat <- data.frame(sim.dat)
 
-        sim.dat[,1] <- phy$tip.label
-		sim.dat[,2] <- data[,1]
-		sim.dat[,3] <- x[TIPS]
+            sim.dat[,1] <- NA
+            sim.dat[TIPS,1] <- phy$tip.label
+            sim.dat[,2] <- c(data[,1], phy$node.label)
+            sim.dat[,3] <- x
+            
+            if(mserr == "known"){
+                for(i in TIPS){
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3]*sqrt(ntips))
+                }
+            }
+        }else{
+            sim.dat <- matrix(,ntips,3)
+            sim.dat <- data.frame(sim.dat)
 
-        if(mserr == "known"){
-            for(i in TIPS){
-                sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
+            sim.dat[,1] <- phy$tip.label
+            sim.dat[,2] <- data[,1]
+            sim.dat[,3] <- x[TIPS]
+            
+            if(mserr == "known"){
+                for(i in TIPS){
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3]*sqrt(ntips))
+                }
             }
         }
 		colnames(sim.dat)<-c("Genus_species","Reg","X")
-
 	}
 	if(simmap.tree==TRUE){
 		n=max(phy$edge[,1])
@@ -190,7 +205,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 			edges[,4:5]<-edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
 			root.age <- max(MakeAgeTable(phy, root.age=root.age))
 			phy$maps <- lapply(phy$maps, function(x) x/root.age)
-      root.age = 1
+            root.age = 1
 		}
 		edges=edges[sort.list(edges[,3]),]
 
@@ -233,23 +248,39 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 					newtime<-oldtime+regimeduration
 					regimenumber<-which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
 					x[edges[i,3],]=x[edges[i,3],]*exp(-alpha[regimenumber]*(newtime-oldtime))+(theta[regimenumber])*(1-exp(-alpha[regimenumber]*(newtime-oldtime)))+sigma[regimenumber]*rnorm(1,0,1)*sqrt((1-exp(-2*alpha[regimenumber]*(newtime-oldtime)))/(2*alpha[regimenumber]))
-					oldtime<-newtime
-					newregime<-regimenumber
-				}
-			}
-		}
-
-		sim.dat<-matrix(,ntips,2)
-		sim.dat<-data.frame(sim.dat)
-
-		sim.dat[,1]<-phy$tip.label
-		sim.dat[,2]<-x[TIPS,]
-        if(mserr == "known"){
-            for(i in TIPS){
-                sim.dat[i,2] <- rnorm(1,sim.dat[i,2],data[i,3])
+                    oldtime<-newtime
+                    newregime<-regimenumber
+                }
             }
         }
-		colnames(sim.dat)<-c("Genus_species","X")
-	}
-	sim.dat
+        
+        if(get.all == TRUE) {
+            sim.dat <- matrix(,length(x),3)
+            sim.dat <- data.frame(sim.dat)
+            
+            sim.dat[,1] <- NA
+            sim.dat[TIPS,1] <- phy$tip.label
+            sim.dat[,2] <- x
+            
+            if(mserr == "known"){
+                for(i in TIPS){
+                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,3]*sqrt(ntips))
+                }
+            }
+        }else{
+            sim.dat<-matrix(,ntips,2)
+            sim.dat<-data.frame(sim.dat)
+            
+            sim.dat[,1]<-phy$tip.label
+            sim.dat[,2]<-x[TIPS,]
+            if(mserr == "known"){
+                for(i in TIPS){
+                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,3]*sqrt(ntips))
+                }
+            }
+        }
+        colnames(sim.dat)<-c("Genus_species","X")
+    }
+    sim.dat
 }
+

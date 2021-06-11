@@ -5,7 +5,7 @@
 \usage{
 OUwie.sim(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE,
 alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, 
-fitted.object=NULL)
+fitted.object=NULL, get.all=FALSE)
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
@@ -20,6 +20,7 @@ fitted.object=NULL)
 \item{mserr}{designates whether a third column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{fitted.object}{a model fit from OUwie to use for simulation.}
+\item{get.all}{a logical indicating whether or not the entire simulation history is to be returned. The default is \code{FALSE} meaning that only the tips are returned.}
 }
 \details{
 The input is a tree and a data file OR a fitted OUwie object. The tree must be of class \dQuote{phylo} and if \code{simmap=FALSE} must contain the ancestral selective regimes as internal node labels. The data file is a dataframe that must have column entries in the following order: [,1] species names and [,2] their current selective regime. If \code{mserr="known"} then a third column can be added which contains the measurement error for each species. Note that if \code{simmap=TRUE} no data file is needed. The user specifies the simulated parameter values (i.e. \eqn{\alpha}{alpha}, \eqn{\sigma^2}{sigma^2}, \eqn{\theta_0}{theta_0}, \eqn{\theta}{theta}). Assuming two selective regimes, possible models can be specified as follows (Note that this assumes a stationary distribution at the root):
