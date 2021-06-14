@@ -54,8 +54,11 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
                     theta <- theta.all[2:length(theta.all)]
                     theta0 <- theta.all[1]
                 }else{
+                    int.states <- factor(phy$node.label)
+                    phy.tmp <- phy
+                    phy.tmp$node.label <- as.numeric(int.states)
                     theta <- matrix(t(fitted.object$theta), 2, length(levels(fitted.object$tot.states)))[1,]
-                    theta0 <- theta[phy$node.label[1]]
+                    theta0 <- theta[phy.tmp$node.label[1]]
                 }
             }
         }
