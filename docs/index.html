@@ -80,6 +80,24 @@
   <div class="contents col-md-9">
 
 
+<p>OUwie is an R package for using Brownian motion and Ornstein-Uhlenbeck models for trait evolution. Its friendly webpage is at <a href="http://thej022214.github.io/OUwie/" class="uri">http://thej022214.github.io/OUwie/</a>; its source code is at <a href="https://github.com/thej022214/OUwie/" class="uri">https://github.com/thej022214/OUwie/</a>.</p>
+<p>Some of the features:</p>
+<ul>
+<li>Brownian motion models that allow the rate (sigma-squared) to vary over the tree</li>
+<li>Ornstein-Uhlenbeck models that allow the rate, optima (theta), and/or strength of pull (alpha) to vary over the tree</li>
+<li>Uncertainty estimation using contour plots to find potential ridges</li>
+<li>Simulation functions</li>
+<li>Automatic testing of some identifiability issues using methods from Ho and Ané (2014)</li>
+<li>Ancestral state estimation under all these models (though use substantial caution)</li>
+<li>Use of measurement error at the tips</li>
+</ul>
+<p>Some of its caveats:</p>
+<ul>
+<li>It is univariate (a single trait) only</li>
+<li>For multiple rate models, it requires some mapping of regimes (stochastic character mapping of a discrete state, using node labels for regimes on trees, etc.).</li>
+<li>It warns you about models that are very complex for what your data may allow, but it will let you run them</li>
+<li>Optimization can be a difficult problem – it tries its best, and will announce failures when it notices them, but still be careful</li>
+</ul>
 <p>This is the bleeding edge version: you can install it with <code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("thej022214/OUwie")</a></code> [install the remotes package from CRAN first]</p>
 
   </div>
