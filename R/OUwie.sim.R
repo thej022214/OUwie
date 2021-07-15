@@ -180,7 +180,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3])
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
                 }
             }
         }else{
@@ -193,7 +193,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3])
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
                 }
             }
         }
@@ -284,7 +284,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,3])
+                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,2])
                 }
             }
         }else{
@@ -295,7 +295,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             sim.dat[,2]<-x[TIPS,]
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,3])
+                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,2])
                 }
             }
         }
