@@ -18,6 +18,7 @@
 #multiple alphas and sigmas (OUSMVA): alpha=c(0.5,0.1); sigma.sq=c(0.45,0.9); theta0=0; theta=c(1,2)
 
 OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, alpha=NULL, sigma.sq=NULL, theta0=NULL, theta=NULL, mserr="none", shift.point=0.5, fitted.object=NULL, get.all=FALSE){
+	mserr_vector <- NA
     if(!is.null(fitted.object)) {
         if(grepl("BM", fitted.object$model) | grepl("OU1", fitted.object$model)) {
             stop(paste("not implemented yet for ", fitted.object$model))
@@ -78,7 +79,19 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
         }
         if(mserr == "known"){
             data <- data.frame(data[,2], data[,3], row.names=data[,1])
+			mserr_vector <- data[,2] #because we've shifted things over
         }
+		if(class(mserr)=="numeric"){
+			if(length(mserr) == length(phy$tip.label)){
+				data <- data.frame(data[,2], mserr, row.names=data[,1])
+				mserr_vector <- mserr
+			}	
+			if(length(mserr)==1){
+				data <- data.frame(data[,2], rep(mserr, length(phy$tip.label)), row.names=data[,1])
+				mserr_vector <- rep(mserr, length(phy$tip.label))
+			}
+			mserr <- "known"
+		}
 
 		data <- data[phy$tip.label,]
 
@@ -167,7 +180,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3]*sqrt(ntips))
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3])
                 }
             }
         }else{
@@ -180,11 +193,15 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3]*sqrt(ntips))
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,3])
                 }
             }
         }
+
 		colnames(sim.dat)<-c("Genus_species","Reg","X")
+		if(mserr=="known"){
+			sim.dat$mserr <- mserr_vector	
+		}
 	}
 	if(simmap.tree==TRUE){
 		n=max(phy$edge[,1])
@@ -267,7 +284,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,3]*sqrt(ntips))
+                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,3])
                 }
             }
         }else{
@@ -278,11 +295,14 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             sim.dat[,2]<-x[TIPS,]
             if(mserr == "known"){
                 for(i in TIPS){
-                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,3]*sqrt(ntips))
+                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,3])
                 }
             }
         }
         colnames(sim.dat)<-c("Genus_species","X")
+		if(mserr=="known"){
+			sim.dat$mserr <- mserr_vector	
+		}		
     }
     sim.dat
 }
