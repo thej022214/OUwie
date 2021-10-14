@@ -378,7 +378,8 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                 }
             }
             if(algorithm == "three.point"){
-                pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, dimnames = list(levels(tot.states), c("opt", "sig", "alp")))
+                pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, 
+                               dimnames = list(levels(factor(as.numeric(tot.states))), c("opt", "sig", "alp")))
                 if(get.root.theta == TRUE){
                     root.par.index <- length(p)
                     theta0 <- p[root.par.index]
