@@ -875,8 +875,9 @@ print.OUwie<-function(x, ...){
 		if (any(x$eigval<0)) {
 			cat("The objective function may be at a saddle point -- check eigenvectors or try a simpler model", "\n")
 		}
-	}
-	else{
+	} else if (abs(x$loglik)==10000000) {
+		cat("Error in calculating likeliood so an inaccurate placeholder value was returned: search likely never went beyond its starting value and the likelihood and AICc values are incorrect", "\n")
+	} else {
 		cat("Arrived at a reliable solution","\n")
 	}
 }
