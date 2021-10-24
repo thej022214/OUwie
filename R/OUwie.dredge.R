@@ -375,7 +375,7 @@ OptimizeDredgeLikelihood <- function(curmodel, phy, data, criterion=c("AIC", "AI
             if(criterion == "AIC"){
                 score <- (2*loglik) + (2*(shifts+param.count))
             }
-            if(criterion == "sAICc"){
+            if(criterion == "AICc"){
                 #What surface does
                 score <- (2*loglik) + (2*(2 * shifts + param.count))
             }
