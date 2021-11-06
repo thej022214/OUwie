@@ -584,7 +584,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		if(quiet==FALSE){
 			cat("Finished. Begin thorough search...", "\n")
 		}
-		out = nloptr(x0=log(ip), eval_f=dev, lb=lower, ub=upper, opts=opts, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy, get.root.theta=get.root.theta)
+		out = nloptr(x0=log(ip), eval_f=dev, lb=fix_lower(lower, log(ip)), ub=fix_upper(upper, log(ip)), opts=opts, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy, get.root.theta=get.root.theta)
 	}
 	
     loglik <- -out$objective
