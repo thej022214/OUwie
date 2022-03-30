@@ -9,6 +9,14 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
         algorithm = "invert"
         warning("An algorithm was not specified. Defaulting to computing the determinant and inversion of the vcv.", call.=FALSE, immediate.=TRUE)
     }
+	
+	if(algorithm == "fast") {
+		algorithm = "three.point"	
+	}
+	
+	if(algorithm == "slow") {
+		algorithm = "invert"	
+	}	
     
     #Coerce the data so that it will run in OUwie -- using values of OU1 as the starting points:
     cat("Initializing...","\n")

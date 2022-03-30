@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.9</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -61,7 +57,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/thej022214/OUwie/">
+  <a href="https://github.com/thej022214/OUwie/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -76,14 +72,14 @@
 
       
 
-      </header><script src="OUwie_2.1_adds_files/header-attrs-2.11.3/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>New additions as of OUwie 2.1</h1>
-                        <h4 class="author">Jeremy M. Beaulieu and Brian C. O’Meara</h4>
+                        <h4 data-toc-skip class="author">Jeremy M. Beaulieu and Brian C. O’Meara</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/thej022214/OUwie/blob/master/vignettes/OUwie_2.1_adds.Rmd"><code>vignettes/OUwie_2.1_adds.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/thej022214/OUwie/blob/HEAD/vignettes/OUwie_2.1_adds.Rmd" class="external-link"><code>vignettes/OUwie_2.1_adds.Rmd</code></a></small>
       <div class="hidden name"><code>OUwie_2.1_adds.Rmd</code></div>
 
     </div>
@@ -91,82 +87,82 @@
     
     
 <p>It’s been quite a while since we’ve done any active development of <code>OUwie</code>. It was recently brought to our attention that the likelihoods between <code>OUwie</code> and <code>ouch</code> are not the same when the model assumes different OU means (what we refer to here as “OUM”). We would like to thank and credit Clay Cressler for working through our code to identify the specific causes. In doing so, we have taken this opportunity to release a new version of <code>OUwie</code> that provides cleaner output and a number of new capabilities. Some of these new functions were implemented at the request of users, for our own research, and as part of tutorials for various workshops.</p>
-<div id="bug-fixes-and-deprecated-functions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#bug-fixes-and-deprecated-functions" class="anchor"></a>Bug fixes and deprecated functions</h2>
+<div class="section level3">
+<h3 id="bug-fixes-and-deprecated-functions">Bug fixes and deprecated functions<a class="anchor" aria-label="anchor" href="#bug-fixes-and-deprecated-functions"></a>
+</h3>
 <p>The differences between <code>OUwie</code> and <code>ouch</code> were traced to two issues. There first being a bug in the most recent version of the weight matrix generation code. For some reason, while looping over the different regimes, the function was not resetting the regime to the regime at the root, and the calculation for the weights for the root regime was missing a <span class="math inline">\(W_{0,i}+e^{(-\alpha_{0,i})}\)</span> term. These are now fixed, and fortunately does not cause any detectable effect on the likelihood, though it does have a slight impact on the estimates of the regime optima.</p>
 <p>The second issue is significant and has to do with the way <code>OUwie</code> and <code>ouch</code> construct the variance-covariance matrix when assuming stationarity at the root. In Beaulieu et al. (2012), we expanded upon equation A5 in Butler and King (2004), which assumed that the root optima was estimated. We found that the root regime was hard, if not impossible, to estimate with even moderate values of <span class="math inline">\(\alpha\)</span> (the pull parameter). Because of this, by default we drop the root optima and absorb the weight into whatever regime the root was painted. We incorrectly referred to this as “stationarity”. Ho and Ane (2013) showed that in order to assume true stationarity in an OU model, the covariance requires an additional variance term to account for the fact that, up until <span class="math inline">\(T=0\)</span>, the time at which the clade of interest came into existence, the lineage is assumed to have been evolving in the ancestral regime. For an intuitive example, consider two tips that diverged at the root. Under the original formulation of Butler and King (2004) and Beaulieu et al. (2012) the covariance between the two tips is zero because <span class="math inline">\(s_{ij}=0\)</span>, so <span class="math inline">\(1-e^{-2\alpha s_{ij}}=0\)</span>). However, with the Ho and Ane (2013) method, an additional <span class="math inline">\(V_{ij} = \frac{\sigma^2}{2\alpha}e^{-2\alpha}\)</span> is added to the variance-covariance matrix.</p>
 <p>It is worth pointing out, however, that Ho and Ane (2014a) cautioned that when there are several regimes the stationary distribution does not have a clear definition. This is because it is a weighted average of the regimes the lineage switched between starting from the origin of life to the most recent common ancestor of the focal clade under study. In other words, it’s not as straightforward as integrating over some distribution. For now, <code>OUwie</code> assumes a fixed root, where the <span class="math inline">\(\theta_0\)</span> is equal to whatever regime the root is painted (see below on behavior). In order to make OU1 and OUM models <em>only</em> consistent with <code>ouch</code> we have added the stationarity assumption of Ho and Ane (2014a):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model <span class="op">=</span> <span class="st">"OUM"</span>, root.station <span class="op">=</span> <span class="cn">TRUE</span>, scaleHeight <span class="op">=</span> <span class="cn">TRUE</span>,
     shift.point <span class="op">=</span> <span class="fl">0</span>, algorithm <span class="op">=</span> <span class="st">"invert"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning: The supplied regime painting may be unidentifiable for the regime
-## painting. All regimes form connected subtrees.</code></pre>
+<pre><code><span class="co">## Warning: The supplied regime painting may be unidentifiable for the regime</span>
+<span class="co">## painting. All regimes form connected subtrees.</span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span></code></pre></div>
-<pre><code>## 
-## Fit
-##        lnL      AIC     AICc      BIC model ntax
-##  -19.75473 47.50945 48.18742 56.14498   OUM   64
-## 
-## 
-## Rates
-##                  1         2
-## alpha    1.5935448 1.5935448
-## sigma.sq 0.6912515 0.6912515
-## 
-## Optima
-##                  1         2
-## estimate 1.6762664 0.3936621
-## se       0.1921354 0.3322554
-## 
-## 
-## Half life (another way of reporting alpha)
-##         1         2 
-## 0.4349719 0.4349719 
-## 
-## Arrived at a reliable solution</code></pre>
+<pre><code><span class="co">## </span>
+<span class="co">## Fit</span>
+<span class="co">##        lnL      AIC     AICc      BIC model ntax</span>
+<span class="co">##  -19.75473 47.50945 48.18742 56.14498   OUM   64</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Rates</span>
+<span class="co">##                  1         2</span>
+<span class="co">## alpha    1.5935448 1.5935448</span>
+<span class="co">## sigma.sq 0.6912515 0.6912515</span>
+<span class="co">## </span>
+<span class="co">## Optima</span>
+<span class="co">##                  1         2</span>
+<span class="co">## estimate 1.6762664 0.3936621</span>
+<span class="co">## se       0.1921354 0.3322554</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Half life (another way of reporting alpha)</span>
+<span class="co">##         1         2 </span>
+<span class="co">## 0.4349719 0.4349719 </span>
+<span class="co">## </span>
+<span class="co">## Arrived at a reliable solution</span></code></pre>
 <p>compare this to the new default:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model <span class="op">=</span> <span class="st">"OUM"</span>, root.station <span class="op">=</span> <span class="cn">FALSE</span>, scaleHeight <span class="op">=</span> <span class="cn">TRUE</span>,
     shift.point <span class="op">=</span> <span class="fl">0</span>, algorithm <span class="op">=</span> <span class="st">"invert"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning: The supplied regime painting may be unidentifiable for the regime
-## painting. All regimes form connected subtrees.</code></pre>
+<pre><code><span class="co">## Warning: The supplied regime painting may be unidentifiable for the regime</span>
+<span class="co">## painting. All regimes form connected subtrees.</span></code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span></code></pre></div>
-<pre><code>## 
-## Fit
-##        lnL      AIC     AICc      BIC model ntax
-##  -19.51361 47.02721 47.70518 55.66274   OUM   64
-## 
-## 
-## Rates
-##                  1         2
-## alpha    1.3916589 1.3916589
-## sigma.sq 0.6545502 0.6545502
-## 
-## Optima
-##                  1         2
-## estimate 1.6751330 0.2935858
-## se       0.1822091 0.3797622
-## 
-## 
-## Half life (another way of reporting alpha)
-##         1         2 
-## 0.4980726 0.4980726 
-## 
-## Arrived at a reliable solution</code></pre>
+<pre><code><span class="co">## </span>
+<span class="co">## Fit</span>
+<span class="co">##        lnL      AIC     AICc      BIC model ntax</span>
+<span class="co">##  -19.51361 47.02721 47.70518 55.66274   OUM   64</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Rates</span>
+<span class="co">##                  1         2</span>
+<span class="co">## alpha    1.3916589 1.3916589</span>
+<span class="co">## sigma.sq 0.6545502 0.6545502</span>
+<span class="co">## </span>
+<span class="co">## Optima</span>
+<span class="co">##                  1         2</span>
+<span class="co">## estimate 1.6751330 0.2935858</span>
+<span class="co">## se       0.1822091 0.3797622</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Half life (another way of reporting alpha)</span>
+<span class="co">##         1         2 </span>
+<span class="co">## 0.4980726 0.4980726 </span>
+<span class="co">## </span>
+<span class="co">## Arrived at a reliable solution</span></code></pre>
 <p>Note that we have also added the new option <code>shift.point</code> into the function call. This allows users to alter the assumption of where the regime shifts occur. By default <code><a href="../reference/OUwie.html">OUwie()</a></code> assumes any regime shift occurs halfway down a branch (i.e., <code>shift.point=0.5</code>), whereas <code>ouch</code> assumes a regime shift occurs at the end of the branch (i.e, <code>shift.point=0</code>). Generally speaking, this will have a slight effect on estimates of <span class="math inline">\(\theta_i\)</span> because the position of regime shift point will alter the time spent in each regime.</p>
 <p>Finally, we note that we have removed two functions previously available: <code>OUwie.joint()</code> and <code>OUwie.slice()</code>. The <code>OUwie.joint()</code> function was developed for a particular study question (e.g., Leslie et al. 2014), otherwise it is not particularly useful. The function <code>OUwie.slice()</code> was developed and moderately tested, but it does not seem to work particularly well. Both functions are still available by request, and future work will focus on improving and understanding the behavior of <code>OUwie.slice()</code>.</p>
 </div>
-<div id="new-features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>New Features</h2>
-<div id="idenfiability-tests" class="section level3">
-<h3 class="hasAnchor">
-<a href="#idenfiability-tests" class="anchor"></a>Idenfiability tests</h3>
+<div class="section level3">
+<h3 id="new-features">New Features<a class="anchor" aria-label="anchor" href="#new-features"></a>
+</h3>
+<div class="section level4">
+<h4 id="idenfiability-tests">Idenfiability tests<a class="anchor" aria-label="anchor" href="#idenfiability-tests"></a>
+</h4>
 <p>Ho and Ane (2014a) demonstrated that certain regime paintings can produce a ridge in the likelihood surface, which will lead to convergence issues. Specifically, when each regime forms a connected subtree this produces a <span class="math inline">\(m-1\)</span> regime shifts, which is the minimal number. In these situations, the selective optima may not be separately identifiable. In this version of <code>OUwie</code> we have implemented a “identifiability of the regime paintings” check, as both part of the <code><a href="../reference/OUwie.html">OUwie()</a></code> function and as a standalone function. With <code><a href="../reference/OUwie.html">OUwie()</a></code> by default <code>check.identify=TRUE</code>, and if the check fails, the function will spit out a warning for now. However, this check can be turned off by simply changing <code>check.identify=FALSE</code>. The standalone function simply requires the tree with the regimes painted (either as a simmap object or with node labels) and the data set. Figure 1 depicts a similar example as the one shown in Figure 2 of Ho and Ane (2014a).</p>
 <div class="figure">
 <img src="OUwie_2.1_adds_files/figure-html/unnamed-chunk-4-1.png" alt="The edges are painted by regime, assuming an optimum $\theta_i$ for each color. As shown in Ho and Ane (2014a) the left shows an case of unidentifiability case because every regime forms a connected component. The tree on the right shows a case of identifiability because the black regime covers two completely disconnected parts in the tree." width="624"><p class="caption">
@@ -175,34 +171,34 @@ The edges are painted by regime, assuming an optimum <span class="math inline">\
 </div>
 <p>Using the trees in Figure 1, we can conduct a formal test of identifiability of the <span class="math inline">\(\theta_i\)</span> parameters in the model. Let’s try the unidentifiable case:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"simUnidentifiable.Rsave"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"simUnidentifiable.Rsave"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/check.identify.html">check.identify</a></span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span><span class="op">)</span></code></pre></div>
-<pre><code>## The regime optima are unidentifiable.</code></pre>
-<pre><code>## [1] 0</code></pre>
+<pre><code><span class="co">## The regime optima are unidentifiable.</span></code></pre>
+<pre><code><span class="co">## [1] 0</span></code></pre>
 <p>Now, the identifiable case:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"simIdentifiable.Rsave"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"simIdentifiable.Rsave"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/check.identify.html">check.identify</a></span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span><span class="op">)</span></code></pre></div>
-<pre><code>## The regime optima are identifiable.</code></pre>
-<pre><code>## [1] 1</code></pre>
+<pre><code><span class="co">## The regime optima are identifiable.</span></code></pre>
+<pre><code><span class="co">## [1] 1</span></code></pre>
 <p>Another way to diagnose identifiability is to look at the <code>$regime.weights</code> now provided as part of the model fit output. If the weights for every taxon in a given regime are identical, then the expected values of any two taxa in this regime are also identical. This was shown in the mathematical proof of Ho and Ane (2014a, see Appendix 1). It is important to note that we have seen in simulation that even the unidentifiable cases perform well. However, this may be illusory, and we recommend this test always be used as a guide, especially in instances where the resulting model fit is unstable or seems off.</p>
 </div>
 </div>
-<div id="contour-plots" class="section level2">
-<h2 class="hasAnchor">
-<a href="#contour-plots" class="anchor"></a>Contour plots</h2>
+<div class="section level3">
+<h3 id="contour-plots">Contour plots<a class="anchor" aria-label="anchor" href="#contour-plots"></a>
+</h3>
 <p>Confidence intervals are typically estimated for each parameter individually. However, the confidence intervals calculated for <em>pairs</em> of correlated parameters can be much wider than their respective univariate confidence intervals. For example, for OU models a decrease in <span class="math inline">\(\sigma^2\)</span> has a similar effect as an increase in <span class="math inline">\(\alpha\)</span>: less variation at the tips. There are differences, of course, so the parameters are identifiable (greater <span class="math inline">\(\alpha\)</span> tends to erase phylogenetic signal, whereas lower <span class="math inline">\(\sigma^2\)</span> does not). For practical problems, it is possible to have a ridge of nearly equal likelihood where if you change just one parameter, this is enough to move it off the ridge, but if you were to change both this would result in simply sliding along the ridge. This “ridge” behavior is precisely what happens when the <span class="math inline">\(\theta_{root}\)</span> is included in the model.</p>
 <p>We now allow users to create contour maps of the likelihood surface for any pair of parameters in a given <code>OUwie</code> model. Specifically, we sample a large set of points using a latin hypercube design, and one by one we use these as fixed values for our focal parameters, and we then search for the maximum likelihood estimates for the remaining parameters in the model. This step is done using the new <code><a href="../reference/OUwie.contour.html">OUwie.contour()</a></code> function. We will use the trees from above, to show what a “ridge” looks likes.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"simsOUidentify_8"</span><span class="op">)</span>
-<span class="va">surfaceDatThetaR_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.contour.html">OUwie.contour</a></span><span class="op">(</span><span class="va">oum.root</span>, focal.params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"theta_Root"</span>,
-    <span class="st">"theta_2"</span><span class="op">)</span>, focal.params.upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nreps <span class="op">=</span> <span class="fl">1000</span>, n.cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
-<span class="va">surfaceDatTheta1_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.contour.html">OUwie.contour</a></span><span class="op">(</span><span class="va">oum.root</span>, focal.params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"theta_1"</span>, <span class="st">"theta_2"</span><span class="op">)</span>,
-    focal.params.upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nreps <span class="op">=</span> <span class="fl">1000</span>, n.cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"simsOUidentify_8"</span><span class="op">)</span>
+<span class="va">surfaceDatThetaR_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.contour.html">OUwie.contour</a></span><span class="op">(</span><span class="va">oum.root</span>, focal.params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"theta_Root"</span>,
+    <span class="st">"theta_2"</span><span class="op">)</span>, focal.params.upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nreps <span class="op">=</span> <span class="fl">1000</span>, n.cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
+<span class="va">surfaceDatTheta1_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.contour.html">OUwie.contour</a></span><span class="op">(</span><span class="va">oum.root</span>, focal.params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"theta_1"</span>, <span class="st">"theta_2"</span><span class="op">)</span>,
+    focal.params.upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nreps <span class="op">=</span> <span class="fl">1000</span>, n.cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
 <p>We want to look at the likelihood surface for <span class="math inline">\(\theta_{root}\)</span> vs. <span class="math inline">\(\theta_2\)</span> and for <span class="math inline">\(\theta_1\)</span> vs. <span class="math inline">\(\theta_2\)</span>, for an OUM model with the <span class="math inline">\(\theta_{root}\)</span> included in the model. The pair of parameters to examine is passed by <code>focal.param</code>, and the parameters need to be either “theta”, “alpha”, or “sigma.sq”. For example, to look at sigma.sq from the first regime and alpha from the second regime, one would pass <code>focal.param = c( "sigma.sq_1", "alpha_2")</code>. If the regimes are input as characters like, say, flower color, the focal parameter would be <code>focal.param = c( "sigma.sq_Red", "sigma.sq_Blue")</code>. Note that the <code>OUwie.contour</code> function can also be used across multiple processors (<code>n.cores!=NULL</code>). Once the set of points have been evaluated, the plot of the likelihood surface can be generated by inputting <code>OUwie.contour</code> into a plotting function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">surfaceDatThetaR_2</span>, mle.point <span class="op">=</span> <span class="st">"red"</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span> <span class="op">*</span> <span class="fl">0.1</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="va">root</span><span class="op">]</span><span class="op">)</span>,
-    ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html">grey.colors</a></span><span class="op">(</span><span class="fl">21</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">surfaceDatThetaR_2</span>, mle.point <span class="op">=</span> <span class="st">"red"</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span> <span class="op">*</span> <span class="fl">0.1</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="va">root</span><span class="op">]</span><span class="op">)</span>,
+    ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html" class="external-link">grey.colors</a></span><span class="op">(</span><span class="fl">21</span>,
         start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>A few notes about the inputs for the plotting function. First, it requires an object of class <code>OUwie.contour</code>. Second, by default <code>mle.point=NULL</code>, which means the MLE point on the surface will not be plotted, unlesss a color is specified. The axis labels can be customized, or left as NULL, in which case the focal.param input from the <code>OUwie.contour</code> function will be used. The limits to both the x and y axes (the first two values), as well as the spacing (the third value) can be also specified. Finally, the levels and the color vector must be of the same length. In the example above, the levels correspond to the space within 2 log-likelihood from the MLE, with colors increasingly becoming lighter as the distance from the MLE increases.</p>
 <p>Using a simulated data set, Figure 2 shows the impact of including the <span class="math inline">\(\theta_{root}\)</span> into the model – that is, the likelihood surface forms a ridge where linear combinations of parameter values produce identical likelihoods. In such situations the MLE is undefined and the parameters are generally unidentifiable. When the <span class="math inline">\(\theta_{root}\)</span> is dropped from the model, as shown in Figure 3, MLE estimates of <span class="math inline">\(\theta_{1}\)</span>, <span class="math inline">\(\theta_{2}\)</span>, <span class="math inline">\(\theta_{3}\)</span> are sufficiently peaked and are clearly separately identifiable.</p>
@@ -216,9 +212,9 @@ A contour plot of a OUM model, with the <span class="math inline">\(\theta_{root
 A contour plot of a OUM model, with the <span class="math inline">\(\theta_{root}\)</span> removed from the model. (A) The contour for when <span class="math inline">\(\theta_{1}\)</span> and <span class="math inline">\(\theta_{2}\)</span> are specified as the focal parameters, and (B) for when <span class="math inline">\(\theta_{1}\)</span> and <span class="math inline">\(\theta_{3}\)</span> are specified, the likelihood surface is sufficiently peaked. In other words, the likelihood surface no longer appears as a ridge and regimes are separately identifiable.
 </p>
 </div>
-<div id="ancestral-trait-reconstruction" class="section level3">
-<h3 class="hasAnchor">
-<a href="#ancestral-trait-reconstruction" class="anchor"></a>Ancestral trait reconstruction</h3>
+<div class="section level4">
+<h4 id="ancestral-trait-reconstruction">Ancestral trait reconstruction<a class="anchor" aria-label="anchor" href="#ancestral-trait-reconstruction"></a>
+</h4>
 <p>Since <code>OUwie</code> was first released we’ve received a deluge of requests to allow for ancestral trait reconstruction. One such request made its way onto the public R-SIG-PHYLO discussion forum, which stimulated an important conversation about not whether or not you <em>could</em> estimate ancestral states, but, rather, <em>should</em> you. The answer is “it’s complicated” and we honestly don’t recommend it. In our view, the intended use case is just to visualize what the model is saying about evolution to help intuition. For example, is the model something you can believe in? But, if you don’t want to listen to us regarding the merits of ancestral trait reconstructions, here is a sample of comments from other experts in the field:</p>
 <blockquote>
 <p><em>So in short, yes, you can do it, with any number of methods. But why? If you can answer your biological question with methods that do not involve estimation of a parameter that is inherently fraught with error, it might be better to go another way. Bottom line - use caution and be thoughtful!</em> – Marguerite Butler</p>
@@ -241,8 +237,8 @@ A contour plot of a OUM model, with the <span class="math inline">\(\theta_{root
 <p>These people probably know better than anyone about the power and limitations of the OU model in phylogenetics. So, don’t listen to us, listen to them!</p>
 <p>Still determined? Ok, fair enough. It is straightforward to run the ancestral trait reconstruction in <code>OUwie</code>. All you need is an object of class <code>OUwie</code>, which is plugged directly into the new <code><a href="../reference/OUwie.anc.html">OUwie.anc()</a></code> function:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 <span class="va">ouwiefit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model <span class="op">=</span> <span class="st">"OUM"</span>, scaleHeight <span class="op">=</span> <span class="cn">TRUE</span>, root.station <span class="op">=</span> <span class="cn">FALSE</span>,
     shift.point <span class="op">=</span> <span class="fl">0.5</span>, algorithm <span class="op">=</span> <span class="st">"invert"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span>, check.identify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -257,74 +253,74 @@ A plot of the ancestral state reconstruction under an OUwie model.
 </p>
 </div>
 </div>
-<div id="generalized-three-point-structured-algorithm" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generalized-three-point-structured-algorithm" class="anchor"></a>Generalized three-point structured algorithm</h3>
+<div class="section level4">
+<h4 id="generalized-three-point-structured-algorithm">Generalized three-point structured algorithm<a class="anchor" aria-label="anchor" href="#generalized-three-point-structured-algorithm"></a>
+</h4>
 <p>A long time complaint about <code>OUwie</code> is that it does not scale well when trees exceed 1000 species. This was largely due to the fact that we relied completely on linear algebra functions, in particular, computing the determinant of the variance-covariance matrix, <span class="math inline">\(V\)</span>, as well as inverting it to obtain the log-likelihood and calculate <span class="math inline">\(\theta_i\)</span>. Starting with <code>OUwie</code> version 2.5, we include the generalize three-point algorithm of Ho and Ane (2014b) that bypasses the need for these inefficient calculations. The details of this algorithm are beyond the scope of this vignette and readers should consult Ho and Ane (2014b). The generalized three-point structured algorithm can now be specified in the <code><a href="../reference/OUwie.html">OUwie()</a></code> function call:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
 <span class="va">three.point</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model <span class="op">=</span> <span class="st">"OUMV"</span>, root.station <span class="op">=</span> <span class="cn">FALSE</span>, scaleHeight <span class="op">=</span> <span class="cn">TRUE</span>,
     shift.point <span class="op">=</span> <span class="fl">0.5</span>, algorithm <span class="op">=</span> <span class="st">"three.point"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span>, check.identify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">three.point</span></code></pre></div>
-<pre><code>## 
-## Fit
-##        lnL      AIC     AICc      BIC model ntax
-##  -14.79505 39.59011 40.62459 50.38453  OUMV   64
-## 
-## 
-## Rates
-##                  1        2
-## alpha    1.7124628 1.712463
-## sigma.sq 0.3518159 1.076873
-## 
-## Optima
-##                 1         2
-## estimate 1.676914 0.5567907
-## se             NA        NA
-## 
-## 
-## Half life (another way of reporting alpha)
-##         1         2 
-## 0.4047663 0.4047663 
-## 
-## Arrived at a reliable solution</code></pre>
+<pre><code><span class="co">## </span>
+<span class="co">## Fit</span>
+<span class="co">##        lnL      AIC     AICc      BIC model ntax</span>
+<span class="co">##  -14.79505 39.59011 40.62459 50.38453  OUMV   64</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Rates</span>
+<span class="co">##                  1        2</span>
+<span class="co">## alpha    1.7124628 1.712463</span>
+<span class="co">## sigma.sq 0.3518159 1.076873</span>
+<span class="co">## </span>
+<span class="co">## Optima</span>
+<span class="co">##                 1         2</span>
+<span class="co">## estimate 1.676914 0.5567907</span>
+<span class="co">## se             NA        NA</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Half life (another way of reporting alpha)</span>
+<span class="co">##         1         2 </span>
+<span class="co">## 0.4047663 0.4047663 </span>
+<span class="co">## </span>
+<span class="co">## Arrived at a reliable solution</span></code></pre>
 <p>We can compare this to the using the standard matrix determinant and matrix inversion:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span>
 <span class="va">invert</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model <span class="op">=</span> <span class="st">"OUMV"</span>, root.station <span class="op">=</span> <span class="cn">FALSE</span>, scaleHeight <span class="op">=</span> <span class="cn">TRUE</span>,
     shift.point <span class="op">=</span> <span class="fl">0.5</span>, algorithm <span class="op">=</span> <span class="st">"invert"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning: The supplied regime painting may be unidentifiable for the regime
-## painting. All regimes form connected subtrees.</code></pre>
+<pre><code><span class="co">## Warning: The supplied regime painting may be unidentifiable for the regime</span>
+<span class="co">## painting. All regimes form connected subtrees.</span></code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">invert</span></code></pre></div>
-<pre><code>## 
-## Fit
-##        lnL      AIC    AICc      BIC model ntax
-##  -14.79506 39.59011 40.6246 50.38453  OUMV   64
-## 
-## 
-## Rates
-##                  1        2
-## alpha    1.7110818 1.711082
-## sigma.sq 0.3517019 1.076479
-## 
-## Optima
-##                 1         2
-## estimate 1.676894 0.5563541
-## se       0.112031 0.3020699
-## 
-## 
-## Half life (another way of reporting alpha)
-##        1        2 
-## 0.405093 0.405093 
-## 
-## Arrived at a reliable solution</code></pre>
+<pre><code><span class="co">## </span>
+<span class="co">## Fit</span>
+<span class="co">##        lnL      AIC    AICc      BIC model ntax</span>
+<span class="co">##  -14.79506 39.59011 40.6246 50.38453  OUMV   64</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Rates</span>
+<span class="co">##                  1        2</span>
+<span class="co">## alpha    1.7110818 1.711082</span>
+<span class="co">## sigma.sq 0.3517019 1.076479</span>
+<span class="co">## </span>
+<span class="co">## Optima</span>
+<span class="co">##                 1         2</span>
+<span class="co">## estimate 1.676894 0.5563541</span>
+<span class="co">## se       0.112031 0.3020699</span>
+<span class="co">## </span>
+<span class="co">## </span>
+<span class="co">## Half life (another way of reporting alpha)</span>
+<span class="co">##        1        2 </span>
+<span class="co">## 0.405093 0.405093 </span>
+<span class="co">## </span>
+<span class="co">## Arrived at a reliable solution</span></code></pre>
 <p>In this particular example, the log-likelihoods are identical. However, users are cautioned that some slight differences between the <code>algorithm="invert"</code> and <code>algorithm="three.point"</code> will likely be common. The use of the three-point structured algorithm requires that <span class="math inline">\(\theta_i\)</span> be optimized like any other parameter in the model, whereas with the matrix inversion approach <span class="math inline">\(\theta_i\)</span> are solved numerically. This means that when there are differences in the log-likelihood it is likely because one or more of <span class="math inline">\(\theta_i\)</span> is not at the MLE after using the three-point algorithm. Users are encouraged then to examine the contours of pairs of <span class="math inline">\(\theta_i\)</span>. Also note, that the speed-ups afforded by the three-point algorithm is most observable when the tree size exceeds 500 taxa.</p>
 </div>
 </div>
-<div id="references" class="section level1">
-<h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <p>Beaulieu J.M., D.C. Jhwueng, C. Boettiger, and B.C. O’Meara. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution, 66:2369-2383.</p>
 <p>Butler M.A., A.A. King A.A. 2004. Phylogenetic comparative analysis: A modeling approach for adaptive evolution. American Naturalist, 164:683-695.</p>
 <p>Ho, L.S.T., and C. Ane. 2013. Asymptotic theory with hierarchical autocorrelation: Orstein-Uhlenbeck tree models. The Annals of Statistics, 41:957-981.</p>
@@ -344,11 +340,13 @@ A plot of the ancestral state reconstruction under an OUwie model.
 
 
       <footer><div class="copyright">
-  <p>Developed by Jeremy Beaulieu.</p>
+  <p></p>
+<p>Developed by Jeremy Beaulieu.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -356,6 +354,8 @@ A plot of the ancestral state reconstruction under an OUwie model.
 
   
 
+
+  
 
   </body>
 </html>

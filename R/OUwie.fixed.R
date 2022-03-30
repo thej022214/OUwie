@@ -10,6 +10,14 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         algorithm = "invert"
         warning("An algorithm was not specified. Defaulting to computing the determinant and inversion of the vcv.", call.=FALSE, immediate.=TRUE)
     }
+	
+	if(algorithm == "fast") {
+		algorithm = "three.point"	
+	}
+	
+	if(algorithm == "slow") {
+		algorithm = "invert"	
+	}	
     
     if(model=="BMS" & root.station==TRUE){
         warning("By setting root.station=TRUE, you have specified the group means model of Thomas et al. 2006", call.=FALSE, immediate.=TRUE)

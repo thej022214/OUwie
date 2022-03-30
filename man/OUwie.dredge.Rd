@@ -20,7 +20,7 @@ opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000",
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1. The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated.}
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
-\item{algorithm}{designates whether the standard matrix inversion (slow) or the three-point algorithm (fast) of Ho and Ane (2013) should be used.}
+\item{algorithm}{designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
 }

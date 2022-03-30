@@ -25,7 +25,7 @@ tip.paths=NULL, quiet=FALSE)
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest.}
 \item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
 \item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
-\item{algorithm}{designates whether matrix inversion (slow) or the three-point algorithm (fast) of Ho and Ane (2013) should be used.}
+\item{algorithm}{designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.}
 \item{tip.paths}{an optional list that can be provided by the user where each element from 1:nTips is the path from tip to root by labeled node number. The default is NULL and this option is used for internal speedups.}
 \item{quiet}{a logical indicating whether or not to print progress to the screen. The default is "FALSE".}
 }
