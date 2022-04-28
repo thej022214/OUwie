@@ -214,7 +214,7 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   # calculte the discrete probabilities based on the given Q matrix (Pij already calculated)
   if(class(root.p)[1] == "character"){
     if(root.p == "yang"){
-      root_liks <- c(MASS:::Null(Q))
+      root_liks <- c(MASS::Null(Q))
       root_liks <- root_liks/sum(root_liks)
     }
     if(root.p == "flat"){
@@ -965,7 +965,7 @@ getRootLiks <- function(conditional_probs, Q, root.p){
   }
   if(class(root.p)[1] == "character"){
     if(root.p == "yang"){
-      root_liks <- c(MASS:::Null(Q))
+      root_liks <- c(MASS::Null(Q))
       root_liks <- root_liks/sum(root_liks)
     }
     if(root.p == "flat"){
