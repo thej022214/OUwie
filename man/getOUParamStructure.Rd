@@ -44,8 +44,8 @@ Returns a matrix which describes the continuous model structure for use in \code
 \donttest{
 \dontrun{
 # for the following example we will imagine we have a single discrete character with 3 states.
-# these matrices could be assigned to a variable and input into the continuous_model arguement in hOUwie
-# for later model comparison.
+# these matrices could be assigned to a variable and input into the continuous_model arguement
+# in hOUwie for later model comparison.
 
 # there are several model structures but they can be broken into:
 # Character dependent (CD) which 
@@ -55,25 +55,26 @@ getOUParamStructure("OUMA", 3, 2, TRUE)
 # Hybrid model (HYB) which has both character dependent and character independent rate heterogeneity
 getOUParamStructure("OUMA", 3, 2, FALSE)
 
-# from the different uses of the function above, notice how the parameters are associated with particular
-# regimes to create the different classes of model. CD has a separate parameter for each state, whereas CID
-# always has the different observed states associated with the same parameter value. Obviously, different
-# mixes of these are allowed and the hybrid model is the most general form which can then be further constrained.
+# from the different uses of the function above, notice how the parameters are associated 
+# with particular regimes to create the different classes of model. CD has a separate 
+# parameter for each state, whereas CID always has the different observed states associated 
+# with the same parameter value. Obviously, different mixes of these are allowed and the 
+# hybrid model is the most general form which can then be further constrained.
 }
 }
 }
 \references{
-Beaulieu J.M., Jhwueng D.-C., Boettiger C., O’Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein–Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369–2383.
+Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 
-Boyko J.D., O’Meara B.C., Beaulieu J.M. 2022. In prep.
+Boyko J.D., O'Meara B.C., Beaulieu J.M. 2022. In prep.
 
-Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683–695.
+Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683--695.
 
-Felsenstein J. 1985. Phylogenies and the Comparative Method. Am. Nat. 125:1–15.
+Felsenstein J. 1985. Phylogenies and the Comparative Method. Am. Nat. 125:1--15.
 
-Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341–1351.
+Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341--1351.
 
-O’Meara B.C., Ané C., Sanderson M.J., Wainwright P.C. 2006. Testing for Different Rates of Continuous Trait Evolution Using Likelihood. Evolution. 60:922–933.
+O'Meara B.C., Ane C., Sanderson M.J., Wainwright P.C. 2006. Testing for Different Rates of Continuous Trait Evolution Using Likelihood. Evolution. 60:922--933.
 }
 \author{James D. Boyko}
 \keyword{model structure}

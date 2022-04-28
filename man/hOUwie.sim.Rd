@@ -14,7 +14,7 @@ hOUwie.sim(phy,
 \arguments{
 \item{phy}{A phylogenetic tree, in \code{ape} \dQuote{phylo} format.}
 \item{Q}{A transition rate matrix with dimensions \code{nStates} by \code{nStates} describing rates of change between discrete states.}
-\item{root}{A vector \code{nStates} long with probabilities of the root being in a particular state. For example, for a binary discrete character a root prior of \code{c(1, 0)} would fix the root state in state 1.}
+\item{root.freqs}{A vector \code{nStates} long with probabilities of the root being in a particular state. For example, for a binary discrete character a root prior of \code{c(1, 0)} would fix the root state in state 1.}
 \item{alpha}{A vector \code{nStates} long which gives alpha parameter of the OU model. For a BM model set this to be near 0.}
 \item{sigma.sq}{A vector \code{nStates} long which gives the evolutionary rate parameter of the OU model.}
 \item{theta0}{A numeric value giving the starting value of the continuous character at the root.}

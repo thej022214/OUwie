@@ -551,9 +551,9 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
   root.edge.index <- which(phy$edge[,1] == ntips+1)
   root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
   ##Begins the construction of the edges matrix -- similar to the ouch format##
-  edges <- cbind(c(1:(n-1)),phy$edge,OUwie:::MakeAgeTable(phy, root.age=root.age))
+  edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
   if(scaleHeight == TRUE){
-    Tmax <- max(OUwie:::MakeAgeTable(phy, root.age=root.age))
+    Tmax <- max(MakeAgeTable(phy, root.age=root.age))
     edges[,4:5]<-edges[,4:5]/Tmax
     root.age <-  1
     phy$maps <- lapply(phy$maps, function(x) x/Tmax)
@@ -574,13 +574,7 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
     Tmax <- 1
   }
   
-  if(algorithm == "three.point"){
-    if(simmap.tree == FALSE){
-      map <- getMapFromNode(phy, tip.states, node.states, shift.point)
-    }else{
-      map <- phy$maps
-    }
-  }
+  map <- phy$maps
   
   Rate.mat <- rbind(alpha, sigma.sq, theta)
   pars <- matrix(c(theta, sigma.sq, alpha), length(theta), 3, dimnames = list(1:length(sigma.sq), c("opt", "sig", "alp")))
@@ -591,13 +585,15 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
   }
   
   if(get.root.theta == TRUE){
-    W <- OUwie:::weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
   }else{
-    W <- OUwie:::weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
   }
   
   #Likelihood function for estimating model parameters
   if(get.root.theta == TRUE){
+    root_index <- as.numeric(names(phy$maps[[which.min(phy$edge[,1])[1]]]))
+    theta0 <- theta[root_index]
     expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
     names(expected.vals) <- phy$tip.label
   }else{
@@ -607,7 +603,7 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
   if(return.expected.vals){
     return(expected.vals)
   }
-  transformed.tree <- OUwie:::transformPhy(phy, map, pars, tip.paths)
+  transformed.tree <- transformPhy(phy, map, pars, tip.paths)
   # generate a map from node based reconstructions
   if(mserr=="known"){
     TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
@@ -671,7 +667,7 @@ getAllJointProbs<- function(phy, data, rate.cat, time_slice, Q, alpha, sigma.sq,
   # prerequisites
   hOUwie.dat <- organizeHOUwieDat(data, "none", TRUE)
   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
-  tip.paths <- lapply(1:length(phy$tip.label), function(x) OUwie:::getPathToRoot(phy, x))
+  tip.paths <- lapply(1:length(phy$tip.label), function(x) getPathToRoot(phy, x))
   # generate the edge_liks_list
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
   # determine all the possible ways to fix the node states
@@ -768,7 +764,7 @@ getOUExpectations <- function(simmap, Rate.mat, tip.paths=NULL){
   # phy must be of class simmap
   nTip <- length(simmap$tip.label)
   if(is.null(tip.paths)){
-    tip.paths <- lapply(1:(nTip*2-1), function(x) OUwie:::getPathToRoot(simmap, x))
+    tip.paths <- lapply(1:(nTip*2-1), function(x) getPathToRoot(simmap, x))
   }
   # find the root state and its theta value
   root_state <- as.numeric(names(simmap$maps[[which.min(simmap$edge[,1])]])[1])
@@ -998,42 +994,42 @@ getDiscreteModel <- function(data, model, rate.cat, dual, collapse){
 }
 
 
-getAllContinuousModelStructures <- function(k, type = "OU"){
-  # index.mat <- matrix(0, 3, k, dimnames = list(c("alpha", "sigma.sq", "theta"), c(1:k)))
-  # we want all unique combinations of a parameter. then we can add a single all same
-  # how many combinations are there of 1:k numbers?
-  potential_combos <- apply(partitions:::setparts(k), 2, function(x) paste(x, collapse="_"))
-  # this technically isn't all the possible alpha combinations, but for sim purposes we're fine.
-  if(type == "BM"){
-    alpha.combos <- paste(rep(0, k), collapse="_")
-    theta.combos <- paste(rep(1, k), collapse="_")
-  }
-  if(type == "OU"){
-    alpha.combos <- potential_combos
-    theta.combos <- potential_combos
-  }
-  if(type == "BMOU"){
-    if(k > 2){
-      stop("BMOU must be manually created if k > 1 atm. Sorry.")
-    }
-    # needed_numerals <- 1:((2^k)-2)
-    needed_numerals <- 1
-    alpha.combos <- apply(sapply(needed_numerals, function(x) as.numeric(intToBits(x)[1:k])), 2, function(x) paste(x, collapse="_")) # currently doesn't allow for BM mixed with OUA
-    # theta.combos <- potential_combos
-    theta.combos <- paste(rep(1, k), collapse="_")
-  }
-  sigma.sq.combos <- potential_combos
-  all_combos <- expand.grid(list(alpha.combos, sigma.sq.combos, theta.combos))
-  index_mats <- array(NA, c(3, k, dim(all_combos)[1]), dimnames = list(c("alpha", "sigma.sq", "theta"), c(1:k)))
-  for(i in 1:dim(all_combos)[1]){
-    alpha_i <- as.numeric(unlist(strsplit(as.character(all_combos[i,1]), "_")))
-    alpha_i[alpha_i == 0] <- NA
-    sigma_i <- max(c(0, alpha_i), na.rm = TRUE) + as.numeric(unlist(strsplit(as.character(all_combos[i,2]), "_")))
-    theta_i <- max(sigma_i) + as.numeric(unlist(strsplit(as.character(all_combos[i,3]), "_")))
-    index_mats[,,i] <- rbind(alpha_i, sigma_i, theta_i)
-  }
-  return(index_mats)
-}
+# getAllContinuousModelStructures <- function(k, type = "OU"){
+#   # index.mat <- matrix(0, 3, k, dimnames = list(c("alpha", "sigma.sq", "theta"), c(1:k)))
+#   # we want all unique combinations of a parameter. then we can add a single all same
+#   # how many combinations are there of 1:k numbers?
+#   potential_combos <- apply(partitions:::setparts(k), 2, function(x) paste(x, collapse="_"))
+#   # this technically isn't all the possible alpha combinations, but for sim purposes we're fine.
+#   if(type == "BM"){
+#     alpha.combos <- paste(rep(0, k), collapse="_")
+#     theta.combos <- paste(rep(1, k), collapse="_")
+#   }
+#   if(type == "OU"){
+#     alpha.combos <- potential_combos
+#     theta.combos <- potential_combos
+#   }
+#   if(type == "BMOU"){
+#     if(k > 2){
+#       stop("BMOU must be manually created if k > 1 atm. Sorry.")
+#     }
+#     # needed_numerals <- 1:((2^k)-2)
+#     needed_numerals <- 1
+#     alpha.combos <- apply(sapply(needed_numerals, function(x) as.numeric(intToBits(x)[1:k])), 2, function(x) paste(x, collapse="_")) # currently doesn't allow for BM mixed with OUA
+#     # theta.combos <- potential_combos
+#     theta.combos <- paste(rep(1, k), collapse="_")
+#   }
+#   sigma.sq.combos <- potential_combos
+#   all_combos <- expand.grid(list(alpha.combos, sigma.sq.combos, theta.combos))
+#   index_mats <- array(NA, c(3, k, dim(all_combos)[1]), dimnames = list(c("alpha", "sigma.sq", "theta"), c(1:k)))
+#   for(i in 1:dim(all_combos)[1]){
+#     alpha_i <- as.numeric(unlist(strsplit(as.character(all_combos[i,1]), "_")))
+#     alpha_i[alpha_i == 0] <- NA
+#     sigma_i <- max(c(0, alpha_i), na.rm = TRUE) + as.numeric(unlist(strsplit(as.character(all_combos[i,2]), "_")))
+#     theta_i <- max(sigma_i) + as.numeric(unlist(strsplit(as.character(all_combos[i,3]), "_")))
+#     index_mats[,,i] <- rbind(alpha_i, sigma_i, theta_i)
+#   }
+#   return(index_mats)
+# }
 
 
 organizeHOUwieDat <- function(data, mserr, collapse = TRUE){
@@ -1280,188 +1276,188 @@ sum_lliks <- function(lliks){
   return(out)
 }
 
-hOUwie.twostep <- function(phy, data, rate.cat, discrete_model, continuous_model, nSim=1000, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, n_starts = 1, ncores = 1){
-  start_time <- Sys.time()
-  # if the data has negative values, shift it right - we will shift it back later
-  negative_values <- FALSE
-  if(mserr == "none"){
-    if(any(data[,dim(data)[2]] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
-      negative_values <- TRUE
-      data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
-    }
-  }else{
-    if(any(data[,dim(data)[2]-1] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
-      negative_values <- TRUE
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
-    }
-  }
-  # check that tips and data match
-  # check for invariance of tip states and not that non-invariance isn't just ambiguity
-  if(!is.null(phy$node.label)){
-    if(!quiet){
-      cat("Your phylogeny had node labels, these have been removed.\n")
-    }
-    phy$node.label <- NULL
-  }
-  
-  if(ncores > n_starts){
-    cat("You have specified more cores are to be used than the number of starts. Setting ncores to be equal to the number of optimizations.\n")
-    ncores <- n_starts
-  }
-  
-  # organize the data
-  phy <- reorder.phylo(phy, "pruningwise")
-  hOUwie.dat <- organizeHOUwieDat(data, mserr, collapse)
-  nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
-  nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
-  Tmax <- max(branching.times(phy))
-  tip.paths <- lapply(1:Ntip(phy), function(x) OUwie:::getPathToRoot(phy, x))
-  
-  if(class(discrete_model)[1] == "character"){
-    index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
-    index.disc[index.disc == 0] <- NA
-  }else{
-    index.disc <- discrete_model
-    index.disc[index.disc == 0] <- NA
-  }
-  if(class(continuous_model)[1] == "character"){
-    index.cont <- getOUParamStructure(continuous_model, "three.point", root.station, get.root.theta, nStates * rate.cat)
-  }else{
-    continuous_model[continuous_model == 0] <- NA
-    index.cont <- continuous_model
-  }
-  if(dim(index.disc)[2] > dim(index.cont)[2]){
-    stop("Not all of your discrete states have OU parameters associated with them. Please check that your discrete index matrix matches your continuous index matrix.")
-  }
-  if(dim(index.cont)[2] > dim(index.disc)[2]){
-    stop("You have specified more OU parameters than there are states in the discrete process. Please check that your discrete index matrix matches your continuous index matrix.")
-  }
-  if(class(root.p[1]) != "character"){
-    if(dim(index.disc)[2] != length(root.p)){
-      stop("You have entered a custom root prior whose length does not equal the number of states in your discrete model.")
-    }
-  }
-  
-  if(is.null(lb_continuous_model)){
-    # the lower limit of alpha is defined as a halflife of 10000% of the max tree height
-    # the lower limit of sigma is defined 10 times less than alpha
-    # the lower limit of optim is defined 10 times lower than the minimum observation
-    if(any(is.na(lb_continuous_model[1,]))){
-      lb.alpha = 1e-10
-    }else{
-      lb.alpha = 1e-10
-    }
-    lb.sigma = 1e-10
-    lb.optim = min(data[, 1+nCol+1])/10 
-    lb_continuous_model=c(lb.alpha,lb.sigma,lb.optim)
-  }
-  if(is.null(ub_continuous_model)){
-    # the upper limit of alpha is defined as a halflife of 1% of the max tree height
-    # the upper limit of sigma is defined 10 times more than alpha
-    # the upper limit of optim is defined 10 times more than the maximum observation
-    ub.alpha = log(2)/(0.01 * Tmax)
-    ub.sigma = ub.alpha
-    ub.optim = max(data[, 1+nCol+1])*10 
-    ub_continuous_model=c(ub.alpha,ub.sigma,ub.optim)
-  }
-  if(is.null(lb_discrete_model)){
-    # the minimum dwell time is defined as 100 times the max tree height
-    lb_discrete_model = 1/(Tmax*100)
-  }
-  if(is.null(ub_discrete_model)){
-    ub_discrete_model = 1/(Tmax*0.01)
-  }
-  #Ensures that weird root state probabilities that do not sum to 1 are input:
-  if(!is.null(root.p)){
-    if(!is.character(root.p)){
-      root.p <- root.p/sum(root.p)
-    }
-  }
-  time_slice <- Tmax+1
-  # the number of parameters for each process
-  n_p_trans <- max(index.disc, na.rm = TRUE)
-  n_p_alpha <- length(unique(na.omit(index.cont[1,])))
-  n_p_sigma <- length(unique(na.omit(index.cont[2,])))
-  n_p_theta <- length(unique(na.omit(index.cont[3,])))
-  n_p <- n_p_trans + n_p_alpha + n_p_sigma + n_p_theta
-  
-  # an internal data structure (internodes liks matrix) for the dev function
-  edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
-  
-  # default MLE search options
-  if(is.null(opts)){
-    if(optimizer == "nlopt_ln"){
-      opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
-    }
-    if(optimizer == "nlopt_gn"){
-      opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
-    }
-    if(optimizer == "sann"){
-      opts <- list(max.call=1000, smooth=FALSE)
-    }
-  }
-  # a global matrix to contain likelihoods so that identical parameters return identical likelihoods
-  if(is.null(opts$maxeval) | is.null(opts$max.call)){
-    max.its <- 1000
-  }else{
-    max.its <- as.numeric(opts$maxeval)
-  }
-  setDTthreads(threads=1)
-  tmp.df <- data.frame(matrix(c(0, rep(1e5, n_p)), byrow = TRUE, ncol = n_p+1, nrow = max.its))
-  global_liks_mat <- as.data.table(tmp.df)
-  
-  # p is organized into 2 groups with the first set being corHMM and the second set being OUwie
-  # organized as c(trans.rt, alpha, sigma.sq, theta)
-  # evaluate likelihood
-  if(!is.null(p)){
-    if(!quiet){
-      cat("Calculating likelihood from a set of fixed parameters.\n")
-      print(p)
-    }
-    if(max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE) != length(p)){
-      message <- paste0("The number of parameters does not match the number required by the model structure. You have supplied ", length(p), ", but the model structure requires ", max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE), ".")
-      stop(message, call. = FALSE)
-    }
-    out<-NULL
-    pars <- out$solution <- log(p)
-  }else{
-    out<-NULL
-    lower = log(c(rep(lb_discrete_model, n_p_trans), 
-                  rep(lb_continuous_model[1], length(unique(na.omit(index.cont[1,])))), 
-                  rep(lb_continuous_model[2], length(unique(na.omit(index.cont[2,])))), 
-                  rep(lb_continuous_model[3], length(unique(na.omit(index.cont[3,]))))))
-    upper = log(c(rep(ub_discrete_model, n_p_trans), 
-                  rep(ub_continuous_model[1], length(unique(na.omit(index.cont[1,])))), 
-                  rep(ub_continuous_model[2], length(unique(na.omit(index.cont[2,])))), 
-                  rep(ub_continuous_model[3], length(unique(na.omit(index.cont[3,]))))))
-    # cat(c("TotalLnLik", "DiscLnLik", "ContLnLik"), "\n")
-    # check for user input initial parameters 
-    if(is.character(ip)){
-      if(rate.cat > 1){
-        bin_index <- cut(hOUwie.dat$data.ou[,3], rate.cat, labels = FALSE)
-        combos <- expand.grid(1:max(hOUwie.dat$data.cor[,2]), 1:rate.cat)
-        disc_tips <- vector("numeric", length(phy$tip.label))
-        for(i in 1:dim(combos)[1]){
-          disc_tips[hOUwie.dat$data.cor[,2] == combos[i,1] & bin_index == combos[i,2]] <- i
-        }
-      }else{
-        disc_tips <- hOUwie.dat$data.cor[,2]
-      }
-      starts.alpha <- rep(log(2)/Tmax, n_p_alpha)
-      # starts.sigma <- rep(var(hOUwie.dat$data.ou[,3]), n_p_sigma)
-      starts.sigma <- rep(log(2)/Tmax, n_p_sigma)
-      start.theta <- getIP.theta(hOUwie.dat$data.ou[,3], disc_tips, index.cont[3,])
-      start.cor <- rep(10/sum(phy$edge.length), n_p_trans)
-      starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
-      cat("\nFitting the discrete model to discrete data...\n")
-      discrete_fit <- corHMM(phy=phy, data=hOUwie.dat$data.cor, rate.cat=rate.cat, rate.mat=index.disc, node.states="none", opts = opts)
-      cat("\nGenerating", nSim, "simmaps and optimizing the continuous model to each.")
-      simmap_list <- makeSimmap(tree=phy, data=hOUwie.dat$data.cor, model=discrete_fit$solution, rate.cat=1, nSim=nSim, nCores=1)
-      continuous_fit <- mclapply(simmap_list, function(x) nloptr(x0 = log(c(starts.alpha, starts.sigma, start.theta)), eval_f = OUwie.basic.dev, lb=lower[-seq(n_p_trans)], ub=upper[-seq(n_p_trans)], opts=opts, phy = x, data = hOUwie.dat$data.ou, mserr = mserr, index.cont = index.cont, tip.paths = tip.paths), mc.cores=ncores)
-    }
-  }
-  return(list(discrete_fit, continuous_fit))
-}
+# hOUwie.twostep <- function(phy, data, rate.cat, discrete_model, continuous_model, nSim=1000, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, n_starts = 1, ncores = 1){
+#   start_time <- Sys.time()
+#   # if the data has negative values, shift it right - we will shift it back later
+#   negative_values <- FALSE
+#   if(mserr == "none"){
+#     if(any(data[,dim(data)[2]] < 0)){
+#       cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+#       negative_values <- TRUE
+#       data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
+#     }
+#   }else{
+#     if(any(data[,dim(data)[2]-1] < 0)){
+#       cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+#       negative_values <- TRUE
+#       data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
+#     }
+#   }
+#   # check that tips and data match
+#   # check for invariance of tip states and not that non-invariance isn't just ambiguity
+#   if(!is.null(phy$node.label)){
+#     if(!quiet){
+#       cat("Your phylogeny had node labels, these have been removed.\n")
+#     }
+#     phy$node.label <- NULL
+#   }
+#   
+#   if(ncores > n_starts){
+#     cat("You have specified more cores are to be used than the number of starts. Setting ncores to be equal to the number of optimizations.\n")
+#     ncores <- n_starts
+#   }
+#   
+#   # organize the data
+#   phy <- reorder.phylo(phy, "pruningwise")
+#   hOUwie.dat <- organizeHOUwieDat(data, mserr, collapse)
+#   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
+#   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
+#   Tmax <- max(branching.times(phy))
+#   tip.paths <- lapply(1:Ntip(phy), function(x) OUwie:::getPathToRoot(phy, x))
+#   
+#   if(class(discrete_model)[1] == "character"){
+#     index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
+#     index.disc[index.disc == 0] <- NA
+#   }else{
+#     index.disc <- discrete_model
+#     index.disc[index.disc == 0] <- NA
+#   }
+#   if(class(continuous_model)[1] == "character"){
+#     index.cont <- getOUParamStructure(continuous_model, "three.point", root.station, get.root.theta, nStates * rate.cat)
+#   }else{
+#     continuous_model[continuous_model == 0] <- NA
+#     index.cont <- continuous_model
+#   }
+#   if(dim(index.disc)[2] > dim(index.cont)[2]){
+#     stop("Not all of your discrete states have OU parameters associated with them. Please check that your discrete index matrix matches your continuous index matrix.")
+#   }
+#   if(dim(index.cont)[2] > dim(index.disc)[2]){
+#     stop("You have specified more OU parameters than there are states in the discrete process. Please check that your discrete index matrix matches your continuous index matrix.")
+#   }
+#   if(class(root.p[1]) != "character"){
+#     if(dim(index.disc)[2] != length(root.p)){
+#       stop("You have entered a custom root prior whose length does not equal the number of states in your discrete model.")
+#     }
+#   }
+#   
+#   if(is.null(lb_continuous_model)){
+#     # the lower limit of alpha is defined as a halflife of 10000% of the max tree height
+#     # the lower limit of sigma is defined 10 times less than alpha
+#     # the lower limit of optim is defined 10 times lower than the minimum observation
+#     if(any(is.na(lb_continuous_model[1,]))){
+#       lb.alpha = 1e-10
+#     }else{
+#       lb.alpha = 1e-10
+#     }
+#     lb.sigma = 1e-10
+#     lb.optim = min(data[, 1+nCol+1])/10 
+#     lb_continuous_model=c(lb.alpha,lb.sigma,lb.optim)
+#   }
+#   if(is.null(ub_continuous_model)){
+#     # the upper limit of alpha is defined as a halflife of 1% of the max tree height
+#     # the upper limit of sigma is defined 10 times more than alpha
+#     # the upper limit of optim is defined 10 times more than the maximum observation
+#     ub.alpha = log(2)/(0.01 * Tmax)
+#     ub.sigma = ub.alpha
+#     ub.optim = max(data[, 1+nCol+1])*10 
+#     ub_continuous_model=c(ub.alpha,ub.sigma,ub.optim)
+#   }
+#   if(is.null(lb_discrete_model)){
+#     # the minimum dwell time is defined as 100 times the max tree height
+#     lb_discrete_model = 1/(Tmax*100)
+#   }
+#   if(is.null(ub_discrete_model)){
+#     ub_discrete_model = 1/(Tmax*0.01)
+#   }
+#   #Ensures that weird root state probabilities that do not sum to 1 are input:
+#   if(!is.null(root.p)){
+#     if(!is.character(root.p)){
+#       root.p <- root.p/sum(root.p)
+#     }
+#   }
+#   time_slice <- Tmax+1
+#   # the number of parameters for each process
+#   n_p_trans <- max(index.disc, na.rm = TRUE)
+#   n_p_alpha <- length(unique(na.omit(index.cont[1,])))
+#   n_p_sigma <- length(unique(na.omit(index.cont[2,])))
+#   n_p_theta <- length(unique(na.omit(index.cont[3,])))
+#   n_p <- n_p_trans + n_p_alpha + n_p_sigma + n_p_theta
+#   
+#   # an internal data structure (internodes liks matrix) for the dev function
+#   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
+#   
+#   # default MLE search options
+#   if(is.null(opts)){
+#     if(optimizer == "nlopt_ln"){
+#       opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+#     }
+#     if(optimizer == "nlopt_gn"){
+#       opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+#     }
+#     if(optimizer == "sann"){
+#       opts <- list(max.call=1000, smooth=FALSE)
+#     }
+#   }
+#   # a global matrix to contain likelihoods so that identical parameters return identical likelihoods
+#   if(is.null(opts$maxeval) | is.null(opts$max.call)){
+#     max.its <- 1000
+#   }else{
+#     max.its <- as.numeric(opts$maxeval)
+#   }
+#   setDTthreads(threads=1)
+#   tmp.df <- data.frame(matrix(c(0, rep(1e5, n_p)), byrow = TRUE, ncol = n_p+1, nrow = max.its))
+#   global_liks_mat <- as.data.table(tmp.df)
+#   
+#   # p is organized into 2 groups with the first set being corHMM and the second set being OUwie
+#   # organized as c(trans.rt, alpha, sigma.sq, theta)
+#   # evaluate likelihood
+#   if(!is.null(p)){
+#     if(!quiet){
+#       cat("Calculating likelihood from a set of fixed parameters.\n")
+#       print(p)
+#     }
+#     if(max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE) != length(p)){
+#       message <- paste0("The number of parameters does not match the number required by the model structure. You have supplied ", length(p), ", but the model structure requires ", max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE), ".")
+#       stop(message, call. = FALSE)
+#     }
+#     out<-NULL
+#     pars <- out$solution <- log(p)
+#   }else{
+#     out<-NULL
+#     lower = log(c(rep(lb_discrete_model, n_p_trans), 
+#                   rep(lb_continuous_model[1], length(unique(na.omit(index.cont[1,])))), 
+#                   rep(lb_continuous_model[2], length(unique(na.omit(index.cont[2,])))), 
+#                   rep(lb_continuous_model[3], length(unique(na.omit(index.cont[3,]))))))
+#     upper = log(c(rep(ub_discrete_model, n_p_trans), 
+#                   rep(ub_continuous_model[1], length(unique(na.omit(index.cont[1,])))), 
+#                   rep(ub_continuous_model[2], length(unique(na.omit(index.cont[2,])))), 
+#                   rep(ub_continuous_model[3], length(unique(na.omit(index.cont[3,]))))))
+#     # cat(c("TotalLnLik", "DiscLnLik", "ContLnLik"), "\n")
+#     # check for user input initial parameters 
+#     if(is.character(ip)){
+#       if(rate.cat > 1){
+#         bin_index <- cut(hOUwie.dat$data.ou[,3], rate.cat, labels = FALSE)
+#         combos <- expand.grid(1:max(hOUwie.dat$data.cor[,2]), 1:rate.cat)
+#         disc_tips <- vector("numeric", length(phy$tip.label))
+#         for(i in 1:dim(combos)[1]){
+#           disc_tips[hOUwie.dat$data.cor[,2] == combos[i,1] & bin_index == combos[i,2]] <- i
+#         }
+#       }else{
+#         disc_tips <- hOUwie.dat$data.cor[,2]
+#       }
+#       starts.alpha <- rep(log(2)/Tmax, n_p_alpha)
+#       # starts.sigma <- rep(var(hOUwie.dat$data.ou[,3]), n_p_sigma)
+#       starts.sigma <- rep(log(2)/Tmax, n_p_sigma)
+#       start.theta <- getIP.theta(hOUwie.dat$data.ou[,3], disc_tips, index.cont[3,])
+#       start.cor <- rep(10/sum(phy$edge.length), n_p_trans)
+#       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
+#       cat("\nFitting the discrete model to discrete data...\n")
+#       discrete_fit <- corHMM(phy=phy, data=hOUwie.dat$data.cor, rate.cat=rate.cat, rate.mat=index.disc, node.states="none", opts = opts)
+#       cat("\nGenerating", nSim, "simmaps and optimizing the continuous model to each.")
+#       simmap_list <- makeSimmap(tree=phy, data=hOUwie.dat$data.cor, model=discrete_fit$solution, rate.cat=1, nSim=nSim, nCores=1)
+#       continuous_fit <- mclapply(simmap_list, function(x) nloptr(x0 = log(c(starts.alpha, starts.sigma, start.theta)), eval_f = OUwie.basic.dev, lb=lower[-seq(n_p_trans)], ub=upper[-seq(n_p_trans)], opts=opts, phy = x, data = hOUwie.dat$data.ou, mserr = mserr, index.cont = index.cont, tip.paths = tip.paths), mc.cores=ncores)
+#     }
+#   }
+#   return(list(discrete_fit, continuous_fit))
+# }
 

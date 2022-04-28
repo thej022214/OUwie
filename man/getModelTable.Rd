@@ -21,11 +21,14 @@ Models are named based either on the names of the list or the order in which the
 \dontrun{
 # fit several possible models (we're using fixed parameters here)
 p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093) # MLE
-Model_X <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", continuous_model = "OUM", nSim = 25, p = p)
+Model_X <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", 
+                  continuous_model = "OUM", nSim = 25, p = p)
 p <- c(0.01664314, 0.39631218, 0.18684476, 0.25, 2.25121568, 0.82495093) # not MLE
-Model_Y <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", continuous_model = "OUMV", nSim = 25, p = p)
+Model_Y <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", 
+                  continuous_model = "OUMV", nSim = 25, p = p)
 p <- c(0.01664314, 0.39631218, 0.09631218, 0.18684476, 2.25121568, 0.82495093) # not MLE
-Model_Z <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", continuous_model = "OUMA", nSim = 25, p = p)
+Model_Z <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", 
+                  continuous_model = "OUMA", nSim = 25, p = p)
 
 # put the model results into a list
 model_list <- list(Model_X = Model_X, Model_Y = Model_Y, Model_Z = Model_Z)

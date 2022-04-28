@@ -2,7 +2,7 @@
 \alias{hOUwie}
 \title{Fit a joint model of discrete and continuous characters via maximum-likelihood.}
 \description{
-The hOUwie model jointly estimates the likelihood of a discrete and continuous character by combining the probability of the continuous character given a particular regime and the probability of that discrete regime painting, integrated over many regime paintings. Specifically, we combine hidden Markov models of discrete character evolution (Beaulieu et al. 2013; Boyko and Beaulieu 2021) with generalized Ornstein-Uhlenbeck models (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ané 2014a). 
+The hOUwie model jointly estimates the likelihood of a discrete and continuous character by combining the probability of the continuous character given a particular regime and the probability of that discrete regime painting, integrated over many regime paintings. Specifically, we combine hidden Markov models of discrete character evolution (Beaulieu et al. 2013; Boyko and Beaulieu 2021) with generalized Ornstein-Uhlenbeck models (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ane 2014a). 
 
 This function takes as main input a phylogenetic tree and a data.frame containing species, character values, and potentially measurement error. The rate category is a way to specify the number of hidden states to be incldued, with one meaning no hidden states present. The structure of the model and association between discrete and continuous characters is specified via discrete_model and continuous model (see Details).}
 \usage{
@@ -70,7 +70,7 @@ hOUwie(phy,
 \item{ncores}{An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.}
 }
 \details{
-Our model is composed of two processes: one that describes the evolution of a discrete character and the other describes the evolution of a continuous character. To model the evolution of a single continuous character we use an Ornstein-Uhlenbeck (OU) model (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ané 2014a). This model combines the stochastic evolution of a trait through time with a deterministic component which models the tendency for a trait to evolve towards an optimum. In this model, the value of a trait, \code{X_t}, is pulled towards an optimum, \code{theta}, at a rate scaled by the parameter \code{alpha}. The optimum, \code{theta}, is a piecewise constant on intervals and takes values in a finite set \code{theta}. This can represent the set of “selective regimes”, “regimes”, or Simpson’s “adaptive zones” (Cressler et al. 2015), though it is consistent with a variety of true underlying microevolutionary models (Hansen 2014). Additionally, random deviations are introduced by Gaussian white noise dB(t), which is distributed as a normal random variable with mean zero and variance equal to \code{sigma^2}. Thus, \code{sigma^2} is a constant describing the rate of stochastic evolution around the optimum. We use the set of extensions introduced by Beaulieu et al. (2012). This allows for multiple primary optima \code{theta} in which both the pull strength (\code{alpha}) and the rate of stochastic evolution (\code{sigma^2}) can vary across the phylogeny. 
+Our model is composed of two processes: one that describes the evolution of a discrete character and the other describes the evolution of a continuous character. To model the evolution of a single continuous character we use an Ornstein-Uhlenbeck (OU) model (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ane 2014a). This model combines the stochastic evolution of a trait through time with a deterministic component which models the tendency for a trait to evolve towards an optimum. In this model, the value of a trait, \code{X_t}, is pulled towards an optimum, \code{theta}, at a rate scaled by the parameter \code{alpha}. The optimum, \code{theta}, is a piecewise constant on intervals and takes values in a finite set \code{theta}. This can represent the set of "selective regimes", "regimes", or Simpson's "adaptive zones" (Cressler et al. 2015), though it is consistent with a variety of true underlying microevolutionary models (Hansen 2014). Additionally, random deviations are introduced by Gaussian white noise dB(t), which is distributed as a normal random variable with mean zero and variance equal to \code{sigma^2}. Thus, \code{sigma^2} is a constant describing the rate of stochastic evolution around the optimum. We use the set of extensions introduced by Beaulieu et al. (2012). This allows for multiple primary optima \code{theta} in which both the pull strength (\code{alpha}) and the rate of stochastic evolution (\code{sigma^2}) can vary across the phylogeny. 
 
 Our model allows for multiple rate categories (specified by the rate.cat argument). The default is one rate class in which only observed discrete states evolve. However, there are two main reasons one may be interested in increasing the number of rate categories. First, rate heterogeneity throughout the tree of life is more of a rule than a possibility. Not all things will evolve in the same way at the same time. For example, woody and herbaceous plants may evolve one way on the mainland and a completely different way on island. The challenge then is to allow for heterogeneity in the evolutionary process when we do not know what the 'mainland' or 'island' variables are. This is what hidden Markov models allow us to do (Boyko and Beaulieu 2021). The second reason to include hidden rate categories is to reduce the error rates of finding a false correlation. This has been discussed elsewhere in depth (see Maddison and FitzJohn 2015, Uyeda et al. 2018, Boyko and Beaulieu 2022). The problem lies in if we compare models with rate heterogeneity to models without it. Most character dependent models (correlation models) allow for different ways for the characters to evolve. In fact, their reliable inference depends on being able to define the differences between, for example, body size evolution on islands and mainlands. However, most character-independent models have no way to allow for variable ways for body size to evolve. So, whether or not the evolution of body size is connected to island systems, we may be biased towards selecting correlation models simply because they allow body size to have different rates of evolution. 
 
@@ -84,7 +84,7 @@ One way that hOUwie differs from other implementations of automatic regime detec
 
 For each set of parameters evaluated during the maximum likelihood search, a set of stochastic mappings are generated to evaluate the discrete and continuous likelihoods. To do this efficiently, we first approximate of the conditional state probabilities at nodes. This is what happens if \code{sample_nodes=TRUE}. The conditional state probability, unlike the more common marginal reconstruction or joint state reconstruction, calculates the probability that a node has a particular state value conditioned only on the observations of its descendants. For a particular focal node, we calculate the probability of the observing all pairwise descendant values given the OU model parameters, integrated over all possible rootward node states, and observed tipward discrete states. This process is repeated for each iteration of parameters if \code{adaptive_sample=TRUE}, in which case it is repeated until the joint likelihood for a given set of mappings does not improve.
 
-The algorithm used to calculate the likelihood described in Beaulieu et al. (2012) involves matrix inversion -- a computationally costly procedure. Therefore, we implement a linear-time computation of the likelihood of Gaussian trait models following (Ho and Ané 2014). 
+The algorithm used to calculate the likelihood described in Beaulieu et al. (2012) involves matrix inversion -- a computationally costly procedure. Therefore, we implement a linear-time computation of the likelihood of Gaussian trait models following (Ho and Ane 2014). 
 
 }
 \value{
@@ -154,11 +154,14 @@ OUM_CID <- getOUParamStructure(model = "OUM", nObsState = 2, rate.cat = 2, null.
 
 ##Third step is to fit our model (here we are using fixed params from a previous ML search):
 p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093) # MLE
-pp_cd <- hOUwie(tree, trait, rate.cat = 1, discrete_model = ER_1, continuous_model = OUM_CD, nSim = 25, p = p)
+pp_cd <- hOUwie(tree, trait, rate.cat = 1, discrete_model = ER_1, 
+                continuous_model = OUM_CD, nSim = 25, p = p)
 p <- c(0.008956173, 0.013314238, 0.142922735, 43.563960366, 1.308719702) # MLE
-pp_cid <- hOUwie(tree, trait, rate.cat = 2, discrete_model = ER_2, continuous_model = OUM_CID, nSim = 25, p = p)
+pp_cid <- hOUwie(tree, trait, rate.cat = 2, discrete_model = ER_2, 
+                 continuous_model = OUM_CID, nSim = 25, p = p)
 
-## We can compare this to the result from OUwie on a fixed map to see a difference in estimates of theta
+## We can compare this to the result from OUwie on a fixed map to see a difference 
+# in estimates of theta
 pp2 <- OUwie(tree,trait,model=c("OUM"),root.station=FALSE, algorithm="three.point")
 
 pp_cd$solution.cont
@@ -166,25 +169,25 @@ pp2$solution
 }
 }
 \references{
-Beaulieu J.M., Jhwueng D.-C., Boettiger C., O’Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein–Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369–2383.
+Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 
-Beaulieu J.M., O’Meara B.C., Donoghue M.J. 2013. Identifying Hidden Rate Changes in the Evolution of a Binary Morphological Character: The Evolution of Plant Habit in Campanulid Angiosperms. Syst Biol. 62:725–737.
+Beaulieu J.M., O'Meara B.C., Donoghue M.J. 2013. Identifying Hidden Rate Changes in the Evolution of a Binary Morphological Character: The Evolution of Plant Habit in Campanulid Angiosperms. Syst Biol. 62:725--737.
 
-Boyko J.D., Beaulieu J.M. 2021. Generalized hidden Markov models for phylogenetic comparative datasets. Methods Ecol Evol. 12:468–478.
+Boyko J.D., Beaulieu J.M. 2021. Generalized hidden Markov models for phylogenetic comparative datasets. Methods Ecol Evol. 12:468--478.
 
-Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683–695.
+Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683--695.
 
-Cressler C.E., Butler M.A., King A.A. 2015. Detecting Adaptive Evolution in Phylogenetic Comparative Analysis Using the Ornstein–Uhlenbeck Model. Systematic Biology. 64:953–968.
+Cressler C.E., Butler M.A., King A.A. 2015. Detecting Adaptive Evolution in Phylogenetic Comparative Analysis Using the Ornstein--Uhlenbeck Model. Systematic Biology. 64:953--968.
 
 Felsenstein J. 2004. Inferring phylogenies. Sunderland MA: Sinauer Associates.
 
-Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341–1351.
+Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341--1351.
 
-Hansen T.F., Pienaar J., Orzack S.H. 2008. A Comparative Method for Studying Adaptation to a Randomly Evolving Environment. Evolution. 62:1965–1977.
+Hansen T.F., Pienaar J., Orzack S.H. 2008. A Comparative Method for Studying Adaptation to a Randomly Evolving Environment. Evolution. 62:1965--1977.
 
-Hansen T.F. 2014. Use and Misuse of Comparative Methods in the Study of Adaptation. In: Garamszegi L.Z., editor. Modern Phylogenetic Comparative Methods and Their Application in Evolutionary Biology. Berlin, Heidelberg: Springer Berlin Heidelberg. p. 351–379.
+Hansen T.F. 2014. Use and Misuse of Comparative Methods in the Study of Adaptation. In: Garamszegi L.Z., editor. Modern Phylogenetic Comparative Methods and Their Application in Evolutionary Biology. Berlin, Heidelberg: Springer Berlin Heidelberg. p. 351--379.
 
-Ho L. si, Ané C. 2014. A Linear-Time Algorithm for Gaussian and Non-Gaussian Trait Evolution Models. Syst Biol. 63:397–408.
+Ho L. si, Ane C. 2014. A Linear-Time Algorithm for Gaussian and Non-Gaussian Trait Evolution Models. Syst Biol. 63:397--408.
 }
 \author{James D. Boyko}
 \keyword{hOUwie}

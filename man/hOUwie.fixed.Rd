@@ -1,9 +1,10 @@
 \name{hOUwie.fixed}
 \alias{hOUwie.fixed}
 \title{Fit a joint model of discrete and continuous characters via maximum-likelihood with fixed regimes.}
-\description{The hOUwie model jointly estimates the likelihood of a discrete and continuous character by combining the probability of the continuous character given a particular regime and the probability of that discrete regime painting, integrated over many regime paintings. In the standard \code{hOUwie} function, regimes are generated for each iteration of parameters and then evaluated. However, \code{hOUwie.fixed} allows users to provide a map or set of maps which will then be optimized based on their joint probability. Most other inputs and outputs remain the same.
+\description{
+The hOUwie model jointly estimates the likelihood of a discrete and continuous character by combining the probability of the continuous character given a particular regime and the probability of that discrete regime painting, integrated over many regime paintings. In the standard \code{hOUwie} function, regimes are generated for each iteration of parameters and then evaluated. However, \code{hOUwie.fixed} allows users to provide a map or set of maps which will then be optimized based on their joint probability. Most other inputs and outputs remain the same.
 
-This function takes as main input a list of stochastic maps and a data.frame containing species, character values, and potentially measurement error. The rate category is a way to specify the number of hidden states to be incldued, with one meaning no hidden states present. The structure of the model and association between discrete and continuous characters is specified via discrete_model and continuous model (see Details).}
+This function takes as main input a list of stochastic maps and a data.frame containing species, character values, and potentially measurement error. The rate category is a way to specify the number of hidden states to be incldued, with one meaning no hidden states present. The structure of the model and association between discrete and continuous characters is specified via discrete_model and continuous model (see Details).
 }
 \usage{
 hOUwie.fixed(simmaps, 
@@ -11,6 +12,7 @@ hOUwie.fixed(simmaps,
              rate.cat, 
              discrete_model, 
              continuous_model, 
+             null.model          = FALSE,
              root.p              = "yang", 
              dual                = FALSE, 
              collapse            = TRUE, 
@@ -30,7 +32,7 @@ hOUwie.fixed(simmaps,
              quiet               = FALSE, 
              sample_tips         = FALSE, 
              sample_nodes        = TRUE, 
-             adaptive_sampling   = TRUE, 
+             adaptive_sampling   = FALSE, 
              diagn_msg           = FALSE,
              n_starts            = 1, 
              ncores              = 1)
@@ -56,7 +58,7 @@ hOUwie.fixed(simmaps,
 \item{recon}{A boolean indicating whether marginal ancestral state reconstruction should take place following the ML search.}
 \item{nodes}{If \code{recon=TRUE}, a character or vector indicating which nodes should have their discrete ancestral state characters estimated. If a vector, nodes specified will be reconstructed with 1:Ntip representing tip reconstructions and Ntip+1 representing the root. A user can also indicate "all", "internal", or "external" to reconstruct all nodes, ancestral nodes, or extant nodes respectively. Reconstructing tip states ("external") is only useful if hidden states are included in the model.}
 \item{p}{A numeric vector of fixed parameters to be optimized. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}}
-\item{ip}{A numeric vector indicating initial parameters to start the ML search. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}}
+\item{ip}{A numeric vector indicating initial parameters to start the ML search. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}.}
 \item{optimizer}{One of "nlopt_ln", "nlopt_gn", or "sann" for a local search of parameter space, global search of paramater space, or simmulated annealing. The default is "nlopt_ln".}
 \item{opts}{A list of options to be passed to nloptr.}
 \item{quiet}{A boolean indicating whether or not to print messages.}
@@ -132,27 +134,30 @@ simmap <- makeSimmap(tree=tree, data=trait[,c(1,2)], model=model, rate.cat=1, nS
 ##First step is to define our discrete model:
 # we use corHMM functions to help create rate matricies
 discrete_model <- getStateMat4Dat(data = trait[,c(1,2)], model = "ARD")$rate.mat
-continuous_model <- getOUParamStructure(model = "OUM", nObsState = 2, rate.cat = 1, null.model = FALSE)
+continuous_model <- getOUParamStructure(model = "OUM", nObsState = 2, 
+                                        rate.cat = 1, null.model = FALSE)
 
 p <- c(0.01664314, 0.01664314, 0.39631218, 0.18684476, 2.2512157, 0.8249509)
-pp_cd <- hOUwie.fixed(simmap, trait, rate.cat = 1, discrete_model = discrete_model, continuous_model = continuous_model, p = p)
+pp_cd <- hOUwie.fixed(simmap, trait, rate.cat = 1, discrete_model = discrete_model,
+                      continuous_model = continuous_model, p = p)
+# done
 }
 }
 
 \references{
-Beaulieu J.M., Jhwueng D.-C., Boettiger C., O’Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein–Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369–2383.
+Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 
-Beaulieu J.M., O’Meara B.C., Donoghue M.J. 2013. Identifying Hidden Rate Changes in the Evolution of a Binary Morphological Character: The Evolution of Plant Habit in Campanulid Angiosperms. Syst Biol. 62:725–737.
+Beaulieu J.M., O'Meara B.C., Donoghue M.J. 2013. Identifying Hidden Rate Changes in the Evolution of a Binary Morphological Character: The Evolution of Plant Habit in Campanulid Angiosperms. Syst Biol. 62:725--737.
 
-Boyko J.D., Beaulieu J.M. 2021. Generalized hidden Markov models for phylogenetic comparative datasets. Methods Ecol Evol. 12:468–478.
+Boyko J.D., Beaulieu J.M. 2021. Generalized hidden Markov models for phylogenetic comparative datasets. Methods Ecol Evol. 12:468--478.
 
-Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683–695.
+Butler M.A., King A.A. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. The American Naturalist. 164:683--695.
 
-Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341–1351.
+Hansen T.F. 1997. Stabilizing Selection and the Comparative Analysis of Adaptation. Evolution. 51:1341--1351.
 
-Hansen T.F., Pienaar J., Orzack S.H. 2008. A Comparative Method for Studying Adaptation to a Randomly Evolving Environment. Evolution. 62:1965–1977.
+Hansen T.F., Pienaar J., Orzack S.H. 2008. A Comparative Method for Studying Adaptation to a Randomly Evolving Environment. Evolution. 62:1965--1977.
 
-Ho L. si, Ané C. 2014. A Linear-Time Algorithm for Gaussian and Non-Gaussian Trait Evolution Models. Syst Biol. 63:397–408.
+Ho L. si, Ane C. 2014. A Linear-Time Algorithm for Gaussian and Non-Gaussian Trait Evolution Models. Syst Biol. 63:397--408.
 }
 \author{James D. Boyko}
 \keyword{hOUwie}

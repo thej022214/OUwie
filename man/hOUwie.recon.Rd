@@ -22,7 +22,8 @@ require(OUwie)
 data(tworegime)
 
 p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093) # MLE
-pp_cd <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", continuous_model = "OUM", nSim = 25, p = p)
+pp_cd <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER", 
+                continuous_model = "OUM", nSim = 25, p = p)
 # reconstruct the three deepest ancestral nodes
 recon <- hOUwie.recon(pp_cd, nodes = c(65, 66, 97))
 }

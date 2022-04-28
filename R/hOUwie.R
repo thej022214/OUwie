@@ -37,7 +37,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
   Tmax <- max(branching.times(phy))
-  all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) OUwie:::getPathToRoot(phy, x))
+  all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   
   if(class(discrete_model)[1] == "character"){
     index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
@@ -234,7 +234,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   # }
   # conducting ancestra state resconstruction
   if(recon){
-    houwie_recon <- hOUwieRecon(houwie_obj, nodes)
+    houwie_recon <- hOUwie.recon(houwie_obj, nodes)
     houwie_obj$recon <- houwie_recon
   }
   if(negative_values){
@@ -256,7 +256,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   return(houwie_obj)
 }
 
-hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, n_starts = 1, ncores = 1){
+hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, diagn_msg=FALSE, n_starts = 1, ncores = 1){
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
@@ -288,7 +288,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
   Tmax <- max(branching.times(simmaps[[1]]))
-  all.paths <- lapply(1:(Nnode(simmaps[[1]]) + Ntip(simmaps[[1]])), function(x) OUwie:::getPathToRoot(simmaps[[1]], x))
+  all.paths <- lapply(1:(Nnode(simmaps[[1]]) + Ntip(simmaps[[1]])), function(x) getPathToRoot(simmaps[[1]], x))
   
   if(class(discrete_model)[1] == "character"){
     index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
@@ -413,11 +413,11 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
                   rep(ub_continuous_model[3], length(unique(na.omit(index.cont[3,]))))))
     # cat(c("TotalLnLik", "DiscLnLik", "ContLnLik"), "\n")
     # check for user input initial parameters 
-    if(is.character(ip)){
+    if(is.null(ip)){
       if(rate.cat > 1){
         bin_index <- cut(hOUwie.dat$data.ou[,3], rate.cat, labels = FALSE)
         combos <- expand.grid(1:max(hOUwie.dat$data.cor[,2]), 1:rate.cat)
-        disc_tips <- vector("numeric", length(phy$tip.label))
+        disc_tips <- vector("numeric", length(simmaps[[1]]$tip.label))
         for(i in 1:dim(combos)[1]){
           disc_tips[hOUwie.dat$data.cor[,2] == combos[i,1] & bin_index == combos[i,2]] <- i
         }
@@ -428,11 +428,9 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       # starts.sigma <- rep(var(hOUwie.dat$data.ou[,3]), n_p_sigma)
       starts.sigma <- rep(log(2)/Tmax, n_p_sigma)
       start.theta <- getIP.theta(hOUwie.dat$data.ou[,3], disc_tips, index.cont[3,])
-      start.cor <- rep(10/sum(phy$edge.length), n_p_trans)
+      start.cor <- rep(10/sum(simmaps[[1]]$edge.length), n_p_trans)
       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
-      if(ip == "fast"){
-        starts <- starts.basic
-      }
+      starts <- starts.basic
     }else{
       if(negative_values){
         ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + 50 
@@ -450,7 +448,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              index.disc=index.disc, index.cont=index.cont, root.p=root.p,
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths,
       #              sample_tips=sample_tips, split.liks=FALSE)
-      multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat), mc.cores = ncores)
+      multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x) x$objective))
       search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -log(mean(exp(multi_logliks))), sd_logliks = log(sd(exp(multi_logliks))))
       if(!quiet){
@@ -467,7 +465,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              index.disc=index.disc, index.cont=index.cont, root.p=root.p,
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, 
       #              sample_tips=sample_tips, split.liks=FALSE)
-      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE), global_liks_mat=global_liks_mat, mc.cores = ncores)
+      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, diagn_msg=diagn_msg), global_liks_mat=global_liks_mat, mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x) x$value))
       search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -mean(multi_logliks), sd_logliks = sd(multi_logliks))
       if(!quiet){
@@ -488,7 +486,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   # }
   # conducting ancestra state resconstruction
   if(recon){
-    houwie_recon <- hOUwieRecon(houwie_obj, nodes)
+    houwie_recon <- hOUwie.recon(houwie_obj, nodes)
     houwie_obj$recon <- houwie_recon
   }
   if(negative_values){
@@ -532,7 +530,7 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
   nTip <- length(phy$tip.label)
   Tmax <- max(branching.times(phy))
   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
-  all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) OUwie:::getPathToRoot(phy, x))
+  all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   # an internal data structure (internodes liks matrix) for the dev function
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
   if(is.character(nodes[1])){
@@ -594,7 +592,7 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sigma.sq, theta0, theta){
   while(!all(1:dim(Q)[1] %in% dat.cor$TipStates)){
     dat.cor <- simCharacterHistory(phy, Q, root.freqs)
   }
-  map <- OUwie:::getMapFromNode(phy, dat.cor$TipStates, dat.cor$NodeStates, 0.5)
+  map <- getMapFromNode(phy, dat.cor$TipStates, dat.cor$NodeStates, 0.5)
   simmap <- getMapFromSubstHistory(list(map), phy)[[1]]
   # dat.cor <- data.frame(sp=names(dat.cor), d=dat.cor)
   # simulate a stochastic map with true Q
