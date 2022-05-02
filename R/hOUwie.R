@@ -5,6 +5,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
   if(mserr == "none"){
+    cor_dat <- data[,c(1:(dim(data)[2]-1))]
     if(any(data[,dim(data)[2]] < 0)){
       if(!quiet){
         cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
@@ -13,6 +14,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
     }
   }else{
+    cor_dat <- data[,c(1:(dim(data)[2]-2))]
     if(any(data[,dim(data)[2]-1] < 0)){
       if(!quiet){
         cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
@@ -44,7 +46,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   
   if(class(discrete_model)[1] == "character"){
-    index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
+    index.disc <- getDiscreteModel(cor_dat, discrete_model, rate.cat, dual, collapse)
     index.disc[index.disc == 0] <- NA
   }else{
     index.disc <- discrete_model

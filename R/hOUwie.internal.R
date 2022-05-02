@@ -863,10 +863,12 @@ getCherryConditionals <- function(phy, data, Rate.mat, Q, edge_liks_list,tip.pat
       node_state_liks <- do.call(rbind, node_state_liks_list)
       node_mat[[j]] <- node_state_liks
     }
-    new_node_mat <- node_mat[[1]]
-    for(j in 2:length(node_mat)){
-      new_node_mat <- combineDesc(new_node_mat, node_mat[[j]])
-    }
+    node_mat <- lapply(node_mat, colMeans)
+    new_node_mat <- do.call(rbind, node_mat)
+    # new_node_mat <- node_mat[[1]]
+    # for(j in 2:length(node_mat)){
+    #   new_node_mat <- combineDesc(new_node_mat, node_mat[[j]])
+    # }
     # node_mat contains two (or more lists) of tip samples, what needs to happen now is the combination of the two edges as parent daughters and then the combination of those pairs
     # node_state_liks <- Reduce("*", node_state_liks_list)
     # node_state_liks <- apply(branch_matrix, 1, sum_lliks)
