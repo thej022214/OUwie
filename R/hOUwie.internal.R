@@ -1147,7 +1147,7 @@ simCharacterHistory <- function(phy, Q, root.freqs, Q2 = NA, NoI = NA){
   #return(CharacterHistory)
 }
 # organize the houwie output
-getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mserr, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet){
+getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mserr, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values){
   param.count <- max(index.disc, na.rm = TRUE) + max(index.cont, na.rm = TRUE)
   nb.tip <- length(phy$tip.label)
   solution <- organizeHOUwiePars(pars=pars, index.disc=index.disc, index.cont=index.cont)
@@ -1159,6 +1159,17 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mse
   rownames(solution$solution.cor) <- colnames(solution$solution.cor) <- StateNames
   colnames(solution$solution.ou) <- StateNames
   names(hOUwie.dat$ObservedTraits) <- 1:length(hOUwie.dat$ObservedTraits)
+  if(negative_values){
+    n_theta <- length(unique(index.cont[3,]))
+    pars[(length(pars) - n_theta + 1):length(pars)] <- pars[(length(pars) - n_theta + 1):length(pars)]- 50
+    if(mserr == "none"){
+      data[,dim(data)[2]] <- data[,dim(data)[2]] - 50
+      solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
+    }else{
+      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] - 50
+      solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
+    }
+  }
   obj <- list(
     loglik = liks_houwie$TotalLik,
     DiscLik = liks_houwie$DiscLik,

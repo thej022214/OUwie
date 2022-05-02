@@ -6,13 +6,17 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   negative_values <- FALSE
   if(mserr == "none"){
     if(any(data[,dim(data)[2]] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      if(!quiet){
+        cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      }
       negative_values <- TRUE
       data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
     }
   }else{
     if(any(data[,dim(data)[2]-1] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      if(!quiet){
+        cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      }
       negative_values <- TRUE
       data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
     }
@@ -226,7 +230,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   }
   # preparing output
   liks_houwie <- hOUwie.dev(p = pars, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values)
   # adding independent model if included
   # if(is.null(p)){
   #   liks_indep <- hOUwie.dev(p = log(starts), phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, sample_tips=sample_tips, split.liks=TRUE)
@@ -236,15 +240,6 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   if(recon){
     houwie_recon <- hOUwie.recon(houwie_obj, nodes)
     houwie_obj$recon <- houwie_recon
-  }
-  if(negative_values){
-    if(mserr == "none"){
-      data[,dim(data)[2]] <- data[,dim(data)[2]] - 50
-      houwie_obj$solution.cont[3,] <- houwie_obj$solution.cont[3,] - 50
-    }else{
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] - 50
-      houwie_obj$solution.cont[3,] <- houwie_obj$solution.cont[3,] - 50
-    }
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
@@ -478,7 +473,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   }
   # preparing output
   liks_houwie <- hOUwie.fixed.dev(p = pars, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values)
   # adding independent model if included
   # if(is.null(p)){
   #   liks_indep <- hOUwie.dev(p = log(starts), phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, sample_tips=sample_tips, split.liks=TRUE)
@@ -488,15 +483,6 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   if(recon){
     houwie_recon <- hOUwie.recon(houwie_obj, nodes)
     houwie_obj$recon <- houwie_recon
-  }
-  if(negative_values){
-    if(mserr == "none"){
-      data[,dim(data)[2]] <- data[,dim(data)[2]] - 50
-      houwie_obj$solution.cont[3,] <- houwie_obj$solution.cont[3,] - 50
-    }else{
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
-      houwie_obj$solution.cont[3,] <- houwie_obj$solution.cont[3,] - 50
-    }
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
@@ -608,8 +594,41 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sigma.sq, theta0, theta){
 }
 
 
-
 ##### Utility exported functions ##### 
+hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_bound=0, upper_bound=Inf, adjust_width_interval=100, badval=1e9, sd_vector=NULL, debug=FALSE, restart_after=50){
+  
+  phy <- houwie_obj$phy
+  root.p <- houwie_obj$root.p
+  mserr <- houwie_obj$mserr
+  rate.cat <- houwie_obj$rate.cat
+  index.cont <- houwie_obj$index.cont
+  index.disc <- houwie_obj$index.disc
+  time_slice <- houwie_obj$time_slice
+  state_names <- colnames(houwie_obj$solution.disc)
+  sample_tips <- houwie_obj$sample_tips
+  sample_nodes <- houwie_obj$sample_nodes
+  adaptive_sampling <- houwie_obj$adaptive_sampling
+  nSim <- houwie_obj$nSim
+  data <- houwie_obj$data
+  # set up dentist
+  best_par <- (houwie_obj$p)
+  n_p_trans <- max(index.disc, na.rm = TRUE)
+  n_p_alpha <- length(unique(na.omit(index.cont[1,])))
+  n_p_sigma <- length(unique(na.omit(index.cont[2,])))
+  n_p_theta <- length(unique(na.omit(index.cont[3,])))
+  names(best_par) <- c(paste0("rate", "_", 1:n_p_trans), paste0("alpha", "_", 1:n_p_alpha), paste0("sigma2", "_", 1:n_p_sigma), paste0("theta", "_", 1:n_p_theta))
+  best_neglnL <- -houwie_obj$loglik
+  
+  houwie_to_run <- function(par){
+    fixed_loglik <- hOUwie(p = par, phy=phy, data=houwie_obj$data, rate.cat=rate.cat, mserr=mserr, discrete_model = index.disc, continuous_model = index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, quiet = TRUE)$loglik
+    return(-fixed_loglik)
+  }
+  
+  dented_results <- dent_walk(par=best_par, fn=houwie_to_run, best_neglnL=best_neglnL, delta=delta, nsteps=nsteps, print_freq=print_freq, lower_bound=lower_bound, upper_bound=upper_bound, adjust_width_interval=adjust_width_interval, badval=badval, sd_vector=sd_vector, debug=debug, restart_after=restart_after)
+  
+  return(dented_results)
+}
+
 getModelTable <- function(model.list, type="AIC"){
   # checks
   if(class(model.list) != "list"){

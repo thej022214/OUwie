@@ -126,20 +126,14 @@ A named list with the following elements:
 data(tworegime)
 
 trait[,c(2)] <- c("A", "B")[trait[,c(2)]]
-MK <- corHMM(tree, trait[,c(1,2)], 1)
+MK <- corHMM:::corHMM(tree, trait[,c(1,2)], 1)
 model <- MK$solution
-simmap <- makeSimmap(tree=tree, data=trait[,c(1,2)], model=model, rate.cat=1, nSim=10, nCores=1)
-
-
-##First step is to define our discrete model:
-# we use corHMM functions to help create rate matricies
-discrete_model <- getStateMat4Dat(data = trait[,c(1,2)], model = "ARD")$rate.mat
-continuous_model <- getOUParamStructure(model = "OUM", nObsState = 2, 
-                                        rate.cat = 1, null.model = FALSE)
+simmap <- corHMM:::makeSimmap(tree=tree, data=trait[,c(1,2)], model=model, 
+                              rate.cat=1, nSim=10, nCores=1)
 
 p <- c(0.01664314, 0.01664314, 0.39631218, 0.18684476, 2.2512157, 0.8249509)
-pp_cd <- hOUwie.fixed(simmap, trait, rate.cat = 1, discrete_model = discrete_model,
-                      continuous_model = continuous_model, p = p)
+pp_cd <- hOUwie.fixed(simmap, trait, rate.cat = 1, discrete_model = "ARD",
+                      continuous_model = "OUM", p = p)
 # done
 }
 }

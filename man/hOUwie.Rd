@@ -139,11 +139,12 @@ data(tworegime)
 
 ##First step is to define our discrete model:
 # we use corHMM functions to help create rate matricies
-ER_1 <- getStateMat4Dat(data = trait[,c(1,2)], model = "ER")$rate.mat
+ER_1 <- corHMM:::getStateMat4Dat(data = trait[,c(1,2)], model = "ER")$rate.mat
 # if we wanted to make an independent model we could use more corHMM functions
-rate_class_matrix <- getRateCatMat(2)
+rate_class_matrix <- corHMM:::getRateCatMat(2)
 # this gives us a two rate class matrix
-ER_2 <- equateStateMatPars(getFullMat(list(ER_1, ER_1), rate_class_matrix), c(1:4))
+ER_2 <- corHMM:::equateStateMatPars(corHMM:::getFullMat(list(ER_1, ER_1), 
+                                                        rate_class_matrix), c(1:4))
 
 ##Second step is to define our continuous model:
 # character dependent
