@@ -213,9 +213,9 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       #              sample_tips=sample_tips, split.liks=FALSE)
       multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, mserr=mserr,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x) x$objective))
-      if(any(-multi_logliks > 1e10)){
+      if(any(-multi_logliks > 1e10) | any(is.null(multi_logliks))){
         cat("\nIt appears that an optimization failed. Removing failed optimizations from final output.\n")
-        failed_optimizations <- which(-multi_logliks > 1e10)
+        failed_optimizations <- which(-multi_logliks > 1e10 | is.null(multi_logliks))
         multi_logliks <- multi_logliks[-failed_optimizations]
         multi_out <- multi_out[-failed_optimizations]
         if(length(multi_out) == 0){
