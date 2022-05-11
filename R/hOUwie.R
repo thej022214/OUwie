@@ -4,10 +4,10 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
-  if(phy$edge.length < 0){
+  if(any(phy$edge.length < 0)){
     stop("Your phylogeny has negative edge lengths. I don't know what can cause this, but I know it's not good.")
   }
-  if(phy$edge.length == 0){
+  if(any(phy$edge.length == 0)){
     phy$edge.length[phy$edge.length == 0] <- 1e-5
     warning("Your phylogeny edge lengths of 0. Adding 1e-5")
   }
