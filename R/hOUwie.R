@@ -644,14 +644,15 @@ getModelTable <- function(model.list, type="AIC"){
   if(class(model.list) != "list"){
     stop("Input object must be of class list with each element as a separet fit model to the same dataset.", call. = FALSE)
   }
-  if(length(model.list) == 1){
-    stop("Two or models are needed to conduct model averaging.", call. = FALSE)
-  }
   if(!all(unlist(lapply(model.list, function(x) class(x))) == "houwie")){
-    stop("Not all models are of class houwie.", call.=FALSE)
+    warning("Not all models are of class houwie. These have been removed.")
+    model.list <- model.list[unlist(lapply(model.list, function(x) class(x)) == "houwie")]
   }
   if(var(unlist(lapply(model.list, function(x) dim(x$data)[1]))) != 0){
-    stop("The number of rows in your data are not the same for all models. Models cannot be averaged if they are not evaluating the same dataset", call.=FALSE)
+    stop("The number of rows in your data are not the same for all models. Models should not be compared if they are not evaluating the same dataset.", call.=FALSE)
+  }
+  if(length(model.list) == 1){
+    stop("Two or models are needed to conduct model averaging.", call. = FALSE)
   }
   
   ParCount <- unlist(lapply(model.list, function(x) x$param.count))
@@ -674,7 +675,7 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   rate_cats <- simplify2array(lapply(model.list, "[[", "rate.cat"))
   n_states <- simplify2array(lapply(model.list, function(x) dim(x$index.disc)[1]))
   if(any(rate_cats > 1)){
-    stop("Model averaging in this way only works for models with a single rate category. Try getModelAvgTipParams or see details.", call. = FALSE)
+    stop("Model averaging in this way only works for models with a single rate category.", call. = FALSE)
   }
   n_obs <- unique(n_states/rate_cats)
   
