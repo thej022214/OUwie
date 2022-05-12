@@ -34,6 +34,7 @@ hOUwie.fixed(simmaps,
              sample_nodes        = TRUE, 
              adaptive_sampling   = FALSE, 
              diagn_msg           = FALSE,
+             make_numeric        = TRUE,
              n_starts            = 1, 
              ncores              = 1)
 }
@@ -66,6 +67,7 @@ hOUwie.fixed(simmaps,
 \item{sample_nodes}{A boolean indicating whether or not to sample node probabilities when generating underlying regimes (see Deatils, but recommended to be set to TRUE).}
 \item{adaptive_sampling}{A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve (recommended TRUE).}
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
+\item{make_numeric}{A boolean indicating whether the given simmap needs to be converted to numeric map edges matching observed character data. Setting this to FALSE can be useful if you are interested in looking at hidden states since you will can have more mapped states than observed states.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
 \item{ncores}{An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.}
 }

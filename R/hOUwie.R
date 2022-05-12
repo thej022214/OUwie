@@ -261,7 +261,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   return(houwie_obj)
 }
 
-hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, diagn_msg=FALSE, n_starts = 1, ncores = 1){
+hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, diagn_msg=FALSE, make_numeric = TRUE, n_starts = 1, ncores = 1){
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
@@ -289,7 +289,9 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   names(observed_traits) <- 1:length(observed_traits)
   cat("\nUsing the following legend:\n")
   print(observed_traits)
-  simmaps <- lapply(simmaps, function(x) makeMapEdgesNumeric(x, observed_traits))
+  if(make_numeric){
+    simmaps <- lapply(simmaps, function(x) makeMapEdgesNumeric(x, observed_traits))
+  }
   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
   Tmax <- max(branching.times(simmaps[[1]]))
