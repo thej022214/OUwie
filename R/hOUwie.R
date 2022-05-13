@@ -127,10 +127,10 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   # default MLE search options
   if(is.null(opts)){
     if(optimizer == "nlopt_ln"){
-      opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+      opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.25)
     }
     if(optimizer == "nlopt_gn"){
-      opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+      opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.25)
     }
     if(optimizer == "sann"){
       opts <- list(max.call=1000, smooth=FALSE)
@@ -371,10 +371,10 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   # default MLE search options
   if(is.null(opts)){
     if(optimizer == "nlopt_ln"){
-      opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+      opts <- list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.25)
     }
     if(optimizer == "nlopt_gn"){
-      opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)
+      opts <- list("algorithm"="NLOPT_GN_DIRECT_L", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.25)
     }
     if(optimizer == "sann"){
       opts <- list(max.call=1000, smooth=FALSE)
