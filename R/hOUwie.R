@@ -254,6 +254,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
   houwie_obj$simmaps <- liks_houwie$simmaps
+  houwie_obj$global_liks_mat <- global_liks_mat
   end_time <- Sys.time()
   run_time <- end_time - start_time
   houwie_obj$run_time <- run_time
