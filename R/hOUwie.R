@@ -678,8 +678,8 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   }
   rate_cats <- simplify2array(lapply(model.list, "[[", "rate.cat"))
   n_states <- simplify2array(lapply(model.list, function(x) dim(x$index.disc)[1]))
-  if(any(rate_cats > 1)){
-    stop("Model averaging in this way only works for models with a single rate category.", call. = FALSE)
+  if(length(unique(rate_cats))){
+    stop("Model averaging works best for models with the same number of rate categories. Try tip-averaging instead.", call. = FALSE)
   }
   n_obs <- unique(n_states/rate_cats)
   
