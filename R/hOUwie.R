@@ -253,7 +253,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
-  houwie_obj$simmaps <- liks_houwie$simmaps
+  houwie_obj$simmaps <- lapply(liks_houwie$simmaps, correct_map_edges)
   houwie_obj$global_liks_mat <- global_liks_mat
   end_time <- Sys.time()
   run_time <- end_time - start_time
@@ -499,7 +499,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
-  houwie_obj$simmaps <- liks_houwie$simmaps
+  houwie_obj$simmaps <- lapply(liks_houwie$simmaps, correct_map_edges)   
   houwie_obj$global_liks_mat <- global_liks_mat
   end_time <- Sys.time()
   run_time <- end_time - start_time
@@ -607,6 +607,37 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sigma.sq, theta0, theta){
   return(list(data = data, simmap = simmap))
 }
 
+# rerun a set of completed models with the best current maps
+hOUwie.thorough <- function(model.list, ncores=1){
+  # seprate models by their rate class
+  rate_cat_vector <- unlist(lapply(model.list, "[[", "rate.cat"))
+  nSim_vector <- unlist(lapply(model.list, "[[", "nSim"))
+  if(length(unique(nSim_vector)) > 1){
+    stop("You have different amounts of simmaps for each model estimation. These should all be the same.")
+  }else{
+    nSim <- unique(nSim_vector)
+  }
+  all_rate_cats <- unique(rate_cat_vector)
+  model_set_separated <- sapply(all_rate_cats, function(x) model.list[x == rate_cat_vector])
+  # for each rate class run hOUwie summarize the maps
+  model_avg_pars <- lapply(model_set_separated, getModelAvgParams)
+  new_res <- list()
+  for(i in 1:length(model_set_separated)){
+    cat("Preparing rate category", i, "for hOUwie thorough...\n")
+    all_maps <- do.call(c, lapply(model_set_separated[[i]], "[[", "simmaps"))
+    map_id_list <- unlist(lapply(all_maps, function(x) paste0(names(unlist(x$maps)), collapse = "")))
+    map_lik_list <- unlist(lapply(model_set_separated[[i]], function(x) x$all_cont_liks + x$all_disc_liks))
+    unique_map_index <- !duplicated(map_id_list)
+    unique_map_lik_list <- map_lik_list[unique_map_index]
+    uniqie_all_maps <- all_maps[unique_map_index]
+    sorted_index <- sort(unique_map_lik_list, decreasing = TRUE, index.return = TRUE)$ix
+    new_maps <- uniqie_all_maps[sorted_index[1:nSim]]
+    new_res[[i]] <- mclapply(model_set_separated[[i]], function(x) runSingleThorough(x, new_maps, model_avg_pars[[i]]), mc.cores = ncores)
+  }
+  out <- do.call(c, new_res)
+  names(out) <- names(model.list)
+  return(out)
+}
 
 ##### Utility exported functions ##### 
 hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_bound=0, upper_bound=Inf, adjust_width_interval=100, badval=1e9, sd_vector=NULL, debug=FALSE, restart_after=50){
@@ -678,7 +709,7 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   }
   rate_cats <- simplify2array(lapply(model.list, "[[", "rate.cat"))
   n_states <- simplify2array(lapply(model.list, function(x) dim(x$index.disc)[1]))
-  if(length(unique(rate_cats))){
+  if(length(unique(rate_cats)) > 1){
     stop("Model averaging works best for models with the same number of rate categories. Try tip-averaging instead.", call. = FALSE)
   }
   n_obs <- unique(n_states/rate_cats)

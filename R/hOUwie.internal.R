@@ -266,6 +266,26 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   return(-llik_houwie)
 }
 
+# internal for houwie.thorough
+runSingleThorough <- function(houwie_obj, new_maps, init_pars){
+  hOUwie.dat <- houwie_obj$hOUwie.dat
+  root.p <- houwie_obj$root.p
+  mserr <- houwie_obj$mserr
+  rate.cat <- houwie_obj$rate.cat
+  index.disc <- houwie_obj$index.disc
+  n_p_trans <- max(index.disc, na.rm = TRUE)
+  p_disc <- na.omit(c(init_pars$mod_avg_disc))[1:n_p_trans]
+  index.cont <- houwie_obj$index.cont
+  n_p_alpha <- length(unique(na.omit(index.cont[1,])))
+  n_p_sigma <- length(unique(na.omit(index.cont[2,])))
+  n_p_theta <- length(unique(na.omit(index.cont[3,])))
+  p_cont <- c(init_pars$mod_avg_cont[1,seq_len(n_p_alpha)],
+              init_pars$mod_avg_cont[2,seq_len(n_p_sigma)],
+              init_pars$mod_avg_cont[3,seq_len(n_p_theta)])
+  ip <- c(p_disc, p_cont)
+  res <- hOUwie.fixed(simmaps = new_maps, data = hOUwie.dat$data.ou, rate.cat = rate.cat, discrete_model = index.disc, continuous_model = index.cont, adaptive_sampling = FALSE, make_numeric = FALSE, ip = ip)
+  return(res)
+}
 
 makeMapEdgesNumeric <- function(simmap, observed_traits){
   simmap$maps <- lapply(simmap$maps, function(x) replaceName(x, observed_traits))
