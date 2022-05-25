@@ -101,9 +101,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
     adaptive_criteria <- FALSE
-    adaptive_count <- 1
+    adaptive_count <- 0
     best_mapping <- simmaps[[which.max(llik_houwies)]]
     while(!adaptive_criteria){
+      adaptive_count <- adaptive_count + 1
       # while we wait to meet some criteria
       # generate a set of expectations based on the best mapping
       current_ou_expectations <- getOUExpectations(best_mapping, Rate.mat, all.paths)
