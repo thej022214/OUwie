@@ -708,18 +708,19 @@ getModelTable <- function(model.list, type="AIC"){
 }
 
 getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE){
+  if(any(unlist(lapply(model.list, class))!="houwie")){
+    warning("Some of the input models are not of class houwie, these have been removed.")
+    model.list <- model.list[which(unlist(lapply(model.list, class))=="houwie")]
+  }
   if(class(model.list) != "list" | length(model.list) < 2){
     stop("getModelAvgParams requires multiple houwie model objects to be input as a list.", call. = FALSE)
   }
   rate_cats <- simplify2array(lapply(model.list, "[[", "rate.cat"))
   n_states <- simplify2array(lapply(model.list, function(x) dim(x$index.disc)[1]))
-  if(length(unique(rate_cats)) > 1){
-    stop("Model averaging works best for models with the same number of rate categories. Try tip-averaging instead.", call. = FALSE)
-  }
   n_obs <- unique(n_states/rate_cats)
   
   # name the models
-  if(!is.null(names(model.list))){
+  if(is.null(names(model.list))){
     mod_names <- paste0("M", 1:length(model.list))
     names(model.list) <- mod_names
   }else{
@@ -728,10 +729,10 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   
   # pull the aic weights
   mods_table <- getModelTable(model.list)
-  if(diff(range(mods_table$AIC)) > 1e10){
+  if(diff(range(mods_table$AIC)) > 1e5){
     if(!force){
       max_aic <- max(mods_table$AIC)
-      model.list <- model.list[abs(mods_table$AIC - max_aic)  < 1e10]
+      model.list <- model.list[abs(mods_table$AIC - max_aic)  < 1e5]
       mods_table <- getModelTable(model.list)
       mod_names <- names(model.list)
     }else{
@@ -739,40 +740,16 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
     }
   }
   AICwts <- mods_table$AICwt
-  
-  # pull out the solutions from each model
-  solution_disc <- lapply(model.list, "[[", "solution.disc")
-  dim_disc <- dim(solution_disc[[1]])
-  dim_names_disc <- colnames(solution_disc[[1]])
-  names(solution_disc) <- mod_names
-  
-  solution_cont <- lapply(model.list, "[[", "solution.cont")
-  dim_cont <- dim(solution_cont[[1]])
-  dim_names_cont <- list(rownames(solution_cont[[1]]), colnames(solution_cont[[1]]))
-  names(solution_cont) <- mod_names
-  
-  solution_expc <- lapply(model.list, "[[", "expected_vals")
-  names_expc <- names(solution_expc[[1]])
-  names(solution_expc) <- mod_names
-  
-  # conduct the model averaging
-  solution_disc_table <- do.call(rbind, lapply(solution_disc, c))
-  mod_avg_disc_vector <- colSums(solution_disc_table * AICwts)
-  
-  solution_cont_table <- do.call(rbind, lapply(solution_cont, c))
-  if(BM_alpha_treatment == "zero"){
-    solution_cont_table[is.na(solution_cont_table)] <- 0
-    mod_avg_cont_vector <- colSums(solution_cont_table * AICwts)
+  tip_values_by_model <- lapply(model.list, get_tip_values)
+  for(i in 1:length(tip_values_by_model)){
+    tip_values_by_model[[i]] <- tip_values_by_model[[i]] * AICwts[i]
   }
-  
-  solution_expc_table <- do.call(rbind, solution_expc)
-  mod_avg_expc <- colSums(solution_expc_table * AICwts)
-  
-  # organize the parameter vectors back into matrix form
-  mod_avg_disc <- matrix(mod_avg_disc_vector, dim_disc[1], dim_disc[2], dimnames = list(dim_names_disc, dim_names_disc))
-  mod_avg_cont <- matrix(mod_avg_cont_vector, dim_cont[1], dim_cont[2], dimnames = list(dim_names_cont[[1]], dim_names_cont[[2]]))
-  
-  return(list(mod_avg_disc=mod_avg_disc, mod_avg_cont=mod_avg_cont, mod_avg_expc=mod_avg_expc))
+  weighted_tip_values <- Reduce("+", tip_values_by_model)
+  observed_tip_states <- model.list[[1]]$hOUwie.dat$PossibleTraits[as.numeric(model.list[[1]]$hOUwie.dat$data.cor[,2])]
+  names(observed_tip_states) <- model.list[[1]]$hOUwie.dat$data.cor[,1]
+  weighted_tip_values <- weighted_tip_values[match(names(observed_tip_states), rownames(weighted_tip_values)),]
+  weighted_tip_values$tip_state <- observed_tip_states
+  return(weighted_tip_values)
 }
 
 # different OU models have different parameter structures. This will evaluate the appropriate one.

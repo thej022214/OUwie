@@ -9,17 +9,15 @@ getModelAvgParams(model.list,
 }
 \arguments{
 \item{model.list}{A list of model results from several fits of the \code{hOUwie} model. All elements of the list must be of class "houwie".}
-\item{BM_alpha_treatment}{A boolean indicating whether alpha from BM models should be treated as zero or those models should be removed when averaging alpha values.}
+\item{BM_alpha_treatment}{A boolean indicating whether alpha from BM models should be treated as zero or those models should be removed when averaging alpha values. Currently zero is the only allowed value.}
 \item{force}{A boolean indicating whether to force potentially failed model fits to be included in the model averaging.}
 }
 \details{
-The AIC weight of each model is first evaluated and used as the weighting for each models' contribution to the overall parameter value (Burnham and Anderson 2002). At the moment, hidden state models are not included in model averaging and must be discussed independently of the multi-model framework. This is because we cannot know whether state 1A in Model_X is the same 1A in Model_Y. There are some naive ways to try and match hidden states with one another, but so far as I am aware there is no truly consistent way to match hidden states across nested models. If you know of such a method plesae contact me.
+The AIC weight of each model is first evaluated and used as the weighting for each models' contribution to the overall parameter value (Burnham and Anderson 2002). Tip values are estimated based on the weighted average of the joint probability of the fitted stochastic maps.
 }
 \value{
 Returns a named list with the following elements:
-\item{mod_avg_disc}{Model averaged transition rate matrix.}
-\item{mod_avg_cont}{Model averaged continuous trait parameters (alpha, sigma.sq, and theta).}
-\item{mod_avg_expc}{Model averaged expected values (Hansen 1997, Butler and King 2004, Beaulieu et al. 2012).}
+\item{weighted_tip_values}{Model averaged parameter estimate for each tip.}
 }
 \examples{
 \donttest{

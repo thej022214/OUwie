@@ -1310,6 +1310,38 @@ sum_lliks <- function(lliks){
   return(out)
 }
 
+# get weighted tip values from a stochastic map reults
+get_tip_values <- function(model){
+  all_tip_states <- lapply(model$simmaps, get_tip_states)
+  all_joint_liks <- model$all_disc_liks + model$all_cont_liks
+  weights <- exp(all_joint_liks - max(all_joint_liks))/sum(exp(all_joint_liks - max(all_joint_liks)))
+  waiting_times <- rowSums(model$solution.disc, na.rm = TRUE)
+  continuous_solution <- model$solution.cont
+  continuous_solution[is.na(continuous_solution)] <- 0
+  parameter_table_list <- lapply(all_tip_states, function(x) index_paramers_from_tip_states(x, waiting_times, continuous_solution))
+  for(i in 1:length(parameter_table_list)){
+    parameter_table_list[[i]] <- parameter_table_list[[i]] * weights[i]
+  }
+  tip_value_table <- Reduce("+", parameter_table_list)
+  return(tip_value_table)
+}
+
+get_tip_states <- function(simmap){
+  nTip <- length(simmap$tip.label)
+  tip_states <- as.numeric(unlist(lapply(simmap$maps[simmap$edge[,2] <= nTip], function(x) names(x)[length(x)])))
+  names(tip_states) <- simmap$tip.label[simmap$edge[,2][simmap$edge[,2] <= nTip]]
+  return(tip_states)
+}
+
+index_paramers_from_tip_states <- function(tip_states, waiting_times, continuous_solution){
+  parameter_df <- data.frame(waiting_times = waiting_times[tip_states],
+                             alpha = continuous_solution[1,tip_states],
+                             sigma.sq = continuous_solution[2,tip_states],
+                             theta = continuous_solution[3,tip_states],
+                             row.names = names(tip_states))
+  return(parameter_df)
+}
+
 # hOUwie.twostep <- function(phy, data, rate.cat, discrete_model, continuous_model, nSim=1000, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, n_starts = 1, ncores = 1){
 #   start_time <- Sys.time()
 #   # if the data has negative values, shift it right - we will shift it back later
