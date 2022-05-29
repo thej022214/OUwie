@@ -39,7 +39,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   edge_liks_list_init <- edge_liks_list
   # altering the conditional probabilities based on jointly sampled decendent species
   if(sample_nodes){
-    edge_liks_list <- getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths)
+    edge_liks_list <- try(getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths))
+    if(class(edge_liks_list) == "try-error"){
+      return(1e10)
+    }
   }
   # a way to alter the conditional values of the tips based on current parameeter values (only meaningful if there are multiple rate cats)
   if(rate.cat > 1 & sample_tips){
@@ -109,12 +112,18 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
       # generate a set of expectations based on the best mapping
       current_ou_expectations <- getOUExpectations(best_mapping, Rate.mat, all.paths)
       # generate a new conditional probability based on the new expected values
-      edge_liks_list <- getAdaptiveConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths, current_ou_expectations)
+      edge_liks_list <- try(getAdaptiveConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths, current_ou_expectations))
+      if(class(edge_liks_list) == "try-error"){
+        next
+      }
       for(recon_index in 1:length(edge_liks_list)){
         edge_liks_list[[recon_index]] <- edge_liks_list[[recon_index]] * edge_liks_list_init[[recon_index]]
       }
       conditional_probs <- getConditionalInternodeLik(phy, Q, edge_liks_list)
       root_liks <- getRootLiks(conditional_probs, Q, root.p)
+      if(is.null(root_liks)){
+        next
+      }
       # generate a new set of unique mappings based on the new conditional probabilities
       internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*2)
       if(length(internode_maps_and_discrete_probs$maps) == 0){
@@ -157,12 +166,12 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
   if(split.liks){
-    expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
-    expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
+    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
+    # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
     if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
       llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
     }
-    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, expected_vals = expected_vals, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
+    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
   }
   if(!is.null(global_liks_mat)){
     new_row <- which(global_liks_mat$X1 == 0)[1]
@@ -249,12 +258,12 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   # find the best nSim mappings after adaptive sampling
   if(split.liks){
-    expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
-    expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
+    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
+    # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
     if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
       llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
     }
-    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, expected_vals = expected_vals, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
+    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
   }
   if(!is.null(global_liks_mat)){
     new_row <- which(global_liks_mat$X1 == 0)[1]
@@ -1208,7 +1217,6 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mse
     index.cont = index.cont,
     phy = phy,
     legend = hOUwie.dat$ObservedTraits,
-    expected_vals = liks_houwie$expected_vals,
     data = data, 
     hOUwie.dat = hOUwie.dat,
     rate.cat = rate.cat, 
