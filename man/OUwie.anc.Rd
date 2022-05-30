@@ -38,7 +38,7 @@ To ensure that you've read this before use, please pass knowledge=TRUE as an arg
 \donttest{
 data(tworegime)
 fitted <- OUwie(tree,trait,model=c("OUMV"),root.station=FALSE, algorithm="three.point")
-recon <- OUwie.anc(fitted, knowledge=FALSE) # read the description above to make this work.
+recon <- OUwie.anc(fitted, knowledge=TRUE) # read the description above to make this work.
 plot(recon)
 }
 }
