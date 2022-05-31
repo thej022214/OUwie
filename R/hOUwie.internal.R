@@ -108,6 +108,9 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
     best_mapping <- simmaps[[which.max(llik_houwies)]]
     while(!adaptive_criteria){
       adaptive_count <- adaptive_count + 1
+      if(adaptive_count > 5){
+        adaptive_criteria <- TRUE
+      }
       # while we wait to meet some criteria
       # generate a set of expectations based on the best mapping
       current_ou_expectations <- getOUExpectations(best_mapping, Rate.mat, all.paths)
@@ -150,9 +153,6 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
         adaptive_criteria <- TRUE
       }
       # return to the initial step if some criteria has not been met, else done.
-      if(adaptive_count > 5){
-        adaptive_criteria <- TRUE
-      }
     }
   }
   # find the best nSim mappings after adaptive sampling
