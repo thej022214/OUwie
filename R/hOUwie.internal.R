@@ -101,6 +101,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
+  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+    return(1e10)
+  }
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
     adaptive_criteria <- FALSE
@@ -165,6 +169,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
+  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+    return(1e10)
+  }
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
