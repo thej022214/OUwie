@@ -105,6 +105,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
     # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
     return(1e10)
   }
+  if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
+    # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
+    return(1e10)
+  }
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
     adaptive_criteria <- FALSE
