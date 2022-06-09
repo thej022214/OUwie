@@ -749,6 +749,7 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   names(observed_tip_states) <- model.list[[1]]$hOUwie.dat$data.cor[,1]
   weighted_tip_values <- weighted_tip_values[match(names(observed_tip_states), rownames(weighted_tip_values)),]
   weighted_tip_values$tip_state <- observed_tip_states
+  weighted_tip_values$waiting_times <- 1/weighted_tip_values$waiting_times
   return(weighted_tip_values)
 }
 
