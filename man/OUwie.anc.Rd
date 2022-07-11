@@ -33,13 +33,4 @@ To ensure that you've read this before use, please pass knowledge=TRUE as an arg
 \value{
 \code{OUwie.anc} returns an object of class \code{OUwie.anc}. This is an OUwie object but with terminal species added at each node representing the ancestral states at each node (which are also included in the data object). There is also a \code{NodeRecon} element in the list that has the optimal ancestral states. There is not currently an estimate of uncertainty, but it is substantial.
 }
-
-\examples{
-\donttest{
-data(tworegime)
-fitted <- OUwie(tree,trait,model=c("OUMV"),root.station=FALSE, algorithm="three.point")
-recon <- OUwie.anc(fitted, knowledge=TRUE) # read the description above to make this work.
-plot(recon)
-}
-}
 \author{Brian C. O'Meara}

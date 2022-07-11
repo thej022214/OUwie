@@ -81,7 +81,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             data <- data.frame(data[,2], data[,3], row.names=data[,1])
 			mserr_vector <- data[,2] #because we've shifted things over
         }
-		if(class(mserr)=="numeric"){
+		if(is.numeric(mserr)){
 			if(length(mserr) == length(phy$tip.label)){
 				data <- data.frame(data[,2], mserr, row.names=data[,1])
 				mserr_vector <- mserr
