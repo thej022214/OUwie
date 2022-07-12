@@ -131,44 +131,6 @@ A named list with the following elements:
 \item{simmaps}{\code{nSim} stochastic maps from the best fitting hOUwie parameters (to be removed).}
 \item{run_time}{Time to complete the model fit.}
 }
-
-\examples{
-\donttest{
-require(OUwie)
-data(tworegime)
-
-##First step is to define our discrete model:
-# we use corHMM functions to help create rate matricies
-ER_1 <- corHMM:::getStateMat4Dat(data = trait[,c(1,2)], model = "ER")$rate.mat
-# if we wanted to make an independent model we could use more corHMM functions
-rate_class_matrix <- corHMM:::getRateCatMat(2)
-# this gives us a two rate class matrix
-ER_2 <- corHMM:::equateStateMatPars(corHMM:::getFullMat(list(ER_1, ER_1), 
-                                                        rate_class_matrix), c(1:4))
-
-##Second step is to define our continuous model:
-# character dependent
-OUM_CD <- getOUParamStructure(model = "OUM", nObsState = 2, rate.cat = 1, null.model = FALSE)
-# character independent
-OUM_CID <- getOUParamStructure(model = "OUM", nObsState = 2, rate.cat = 2, null.model = TRUE)
-
-
-##Third step is to fit our model (here we are using fixed params from a previous ML search):
-p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093) # MLE
-pp_cd <- hOUwie(tree, trait, rate.cat = 1, discrete_model = ER_1, 
-                continuous_model = OUM_CD, nSim = 25, p = p)
-p <- c(0.008956173, 0.013314238, 0.142922735, 43.563960366, 1.308719702) # MLE
-pp_cid <- hOUwie(tree, trait, rate.cat = 2, discrete_model = ER_2, 
-                 continuous_model = OUM_CID, nSim = 25, p = p)
-
-## We can compare this to the result from OUwie on a fixed map to see a difference 
-# in estimates of theta
-pp2 <- OUwie(tree,trait,model=c("OUM"),root.station=FALSE, algorithm="three.point")
-
-pp_cd$solution.cont
-pp2$solution
-}
-}
 \references{
 Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 

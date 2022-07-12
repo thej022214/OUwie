@@ -3,8 +3,7 @@
 \title{Rerun a set of hOUwie models with the best mappings of the set.}
 \description{This function takes as input a list of hOUwie fits and will automatically model rerun the model set using the best mappings. Given the complexity of a hOUwie model, it is often beneificial to run this to ensure the MLE has been found.}
 \usage{
-getModelAvgParams(model.list, 
-                  ncores = 1)
+hOUwie.thorough(model.list, ncores = 1)
 }
 \arguments{
 \item{model.list}{A list of model results from several fits of the \code{hOUwie} model. All elements of the list must be of class "houwie".}

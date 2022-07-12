@@ -3,9 +3,7 @@
 \title{Model average the parameter estimates over severl hOUwie fits.}
 \description{This function takes as input a list of hOUwie fits and will automatically model average the parameter estimates. It returns model averaged parameter values.}
 \usage{
-getModelAvgParams(model.list, 
-                  BM_alpha_treatment = "zero", 
-                  force              = TRUE)
+getModelAvgParams(model.list, BM_alpha_treatment="zero", force=TRUE)
 }
 \arguments{
 \item{model.list}{A list of model results from several fits of the \code{hOUwie} model. All elements of the list must be of class "houwie".}

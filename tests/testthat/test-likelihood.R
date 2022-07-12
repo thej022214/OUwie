@@ -320,7 +320,7 @@ test_that("testing OUMVA three-point likelihood", {
     data(tworegime)
     set.seed(42)
     ouwiefit <- OUwie(tree, trait, model="OUMVA", scaleHeight=TRUE, root.station=FALSE, shift.point=0.5, algorithm="three.point", quiet=TRUE, check.identify=FALSE)
-    comparison <- identical(round(ouwiefit$loglik,3), round(-14.03592,3))
+    comparison <- identical(round(ouwiefit$loglik,3), round(-14.059,3))
     expect_true(comparison)
 })
 
