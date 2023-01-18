@@ -122,24 +122,6 @@ A named list with the following elements:
 \item{simmaps}{\code{nSim} stochastic maps from the best fitting hOUwie parameters (to be removed).}
 \item{run_time}{Time to complete the model fit.}
 }
-
-\examples{
-\donttest{
-data(tworegime)
-
-trait[,c(2)] <- c("A", "B")[trait[,c(2)]]
-MK <- corHMM:::corHMM(tree, trait[,c(1,2)], 1)
-model <- MK$solution
-simmap <- corHMM:::makeSimmap(tree=tree, data=trait[,c(1,2)], model=model, 
-                              rate.cat=1, nSim=10, nCores=1)
-
-p <- c(0.01664314, 0.01664314, 0.39631218, 0.18684476, 2.2512157, 0.8249509)
-pp_cd <- hOUwie.fixed(simmap, trait, rate.cat = 1, discrete_model = "ARD",
-                      continuous_model = "OUM", p = p)
-# done
-}
-}
-
 \references{
 Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 
