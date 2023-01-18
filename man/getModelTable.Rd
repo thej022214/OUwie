@@ -4,11 +4,11 @@
 \description{This function takes as input a list of hOUwie models and outputs their relative fit to a dataset.}
 \usage{
 getModelTable(model.list, 
-              type = "AIC")
+              type = "BIC")
 }
 \arguments{
 \item{model.list}{A list of model results from several fits of the \code{hOUwie} model. All elements of the list must be of class "houwie".}
-\item{type}{One of AIC, BIC, or AICc for use during evaluation of relative model fit. AICc is the best option for datasets with a few number of species.}
+\item{type}{One of AIC, BIC, or AICc for use during evaluation of relative model fit. AICc or BIC is the best option for datasets with a few number of species.}
 }
 \details{
 Models are named based either on the names of the list or the order in which they are provided. If names are given, the rownames will reflect the input. If no names are given, model are assigned names M1 to Mn for the 1 to n models.

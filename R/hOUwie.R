@@ -1,6 +1,6 @@
 # set of functions for the hidden rates OU model
 ##### Main exported functions ##### 
-hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, nSim=100, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, diagn_msg=FALSE, n_starts = 1, ncores = 1){
+hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, nSim=100, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=FALSE, adaptive_sampling=FALSE, diagn_msg=FALSE, n_starts = 1, ncores = 1){
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
@@ -52,7 +52,15 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   # organize the data
   phy <- reorder.phylo(phy, "pruningwise")
   hOUwie.dat <- organizeHOUwieDat(data, mserr, collapse)
-  nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
+  
+  if(length(grep("&", hOUwie.dat$data.cor[,2])) > 0){
+    non_and_chars <- as.numeric(hOUwie.dat$data.cor[,2][-grep("&", hOUwie.dat$data.cor[,2])])
+    and_chars <- as.numeric(unlist(strsplit(hOUwie.dat$data.cor[,2][grep("&", hOUwie.dat$data.cor[,2])], "&")))
+    nStates <- max(c(non_and_chars, and_chars))
+  }else{
+    nStates <- max(as.numeric(hOUwie.dat$data.cor[,2]))
+  }
+  
   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
   Tmax <- max(branching.times(phy))
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
@@ -259,6 +267,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
   houwie_obj$simmaps <- lapply(liks_houwie$simmaps, correct_map_edges)
   houwie_obj$global_liks_mat <- global_liks_mat
+  houwie_obj$unsorted_lliks_df <- liks_houwie$unsorted_lliks_df
   end_time <- Sys.time()
   run_time <- end_time - start_time
   houwie_obj$run_time <- run_time
@@ -678,7 +687,7 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
   return(dented_results)
 }
 
-getModelTable <- function(model.list, type="AIC"){
+getModelTable <- function(model.list, type="BIC"){
   # checks
   if(class(model.list) != "list"){
     stop("Input object must be of class list with each element as a separet fit model to the same dataset.", call. = FALSE)
@@ -707,7 +716,7 @@ getModelTable <- function(model.list, type="AIC"){
   return(model_table)
 }
 
-getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE){
+getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC", force=TRUE){
   if(any(unlist(lapply(model.list, class))!="houwie")){
     warning("Some of the input models are not of class houwie, these have been removed.")
     model.list <- model.list[which(unlist(lapply(model.list, class))=="houwie")]
@@ -728,18 +737,18 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   }
   
   # pull the aic weights
-  mods_table <- getModelTable(model.list)
-  if(diff(range(mods_table$AIC)) > 1e5){
+  mods_table <- getModelTable(model.list, type=type)
+  if(diff(range(mods_table[,5])) > 1e5){
     if(!force){
-      max_aic <- max(mods_table$AIC)
-      model.list <- model.list[abs(mods_table$AIC - max_aic)  < 1e5]
-      mods_table <- getModelTable(model.list)
+      max_aic <- max(mods_table[,5])
+      model.list <- model.list[abs(mods_table[,5] - max_aic)  < 1e5]
+      mods_table <- getModelTable(model.list, type=type)
       mod_names <- names(model.list)
     }else{
       warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e10. Set force=FALSE to automatically remove potentially failed runs.")
     }
   }
-  AICwts <- mods_table$AICwt
+  AICwts <- mods_table[,7]
   tip_values_by_model <- lapply(model.list, get_tip_values)
   for(i in 1:length(tip_values_by_model)){
     tip_values_by_model[[i]] <- tip_values_by_model[[i]] * AICwts[i]
@@ -749,8 +758,31 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", force=TRUE)
   names(observed_tip_states) <- model.list[[1]]$hOUwie.dat$data.cor[,1]
   weighted_tip_values <- weighted_tip_values[match(names(observed_tip_states), rownames(weighted_tip_values)),]
   weighted_tip_values$tip_state <- observed_tip_states
-  weighted_tip_values$waiting_times <- 1/weighted_tip_values$waiting_times
   return(weighted_tip_values)
+}
+
+getExpectedValues <- function(model, return_anc = FALSE){
+  all_joint_liks <- model$all_cont_liks + model$all_disc_liks
+  sclaed_p <- exp(all_joint_liks - max(all_joint_liks))/sum(exp(all_joint_liks - max(all_joint_liks)))
+  prec_index <- sclaed_p > 0.0099
+  if(!prec_index[2]){
+    prec_index[2] <- TRUE
+  }
+  sclaed_p <- sclaed_p[prec_index]
+  sclaed_p <- sclaed_p/sum(sclaed_p)
+  expected_values <- lapply(model$simmaps[prec_index], function(x) getOUExpectations(x, model$solution.cont))
+  expected_mean <- do.call(cbind, lapply(expected_values, "[[", "expected_means"))
+  expected_vars <- do.call(cbind, lapply(expected_values, "[[", "expected_variances"))
+  avg_mean <- colSums(t(expected_mean) * sclaed_p)
+  avg_vars <- colSums(t(expected_vars) * sclaed_p)
+  full_df <- data.frame(sp = names(avg_mean), expected_mean = avg_mean, expected_var = avg_vars)
+  if(!return_anc){
+    out <- full_df[1:length(model$phy$tip.label),]
+    out$sp <- model$phy$tip.label
+  }else{
+    out <- full_df
+  }
+  return(out)
 }
 
 # different OU models have different parameter structures. This will evaluate the appropriate one.
