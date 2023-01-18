@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.10</span>
       </span>
     </div>
 
@@ -26,13 +26,16 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/OUwie_2.1_adds.html">New additions as of OUwie 2.1</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -60,31 +63,40 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for OUwie.contour</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, mle.point<span class="op">=</span><span class="cn">NULL</span>, levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">*</span><span class="fl">0.1</span><span class="op">)</span>, xlab<span class="op">=</span><span class="cn">NULL</span>, 
-ylab<span class="op">=</span><span class="cn">NULL</span>, xlim<span class="op">=</span><span class="cn">NULL</span>, ylim<span class="op">=</span><span class="cn">NULL</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html" class="external-link">grey.colors</a></span><span class="op">(</span><span class="fl">21</span>, start<span class="op">=</span><span class="fl">0</span>, end<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for OUwie.contour</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, mle.point<span class="op">=</span><span class="cn">NULL</span>, levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">*</span><span class="fl">0.1</span><span class="op">)</span>, xlab<span class="op">=</span><span class="cn">NULL</span>, </span>
+<span>ylab<span class="op">=</span><span class="cn">NULL</span>, xlim<span class="op">=</span><span class="cn">NULL</span>, ylim<span class="op">=</span><span class="cn">NULL</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.colors.html" class="external-link">grey.colors</a></span><span class="op">(</span><span class="fl">21</span>, start<span class="op">=</span><span class="fl">0</span>, end<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a <code>OUwie.contour</code> object.</p></dd>
+
 <dt>mle.point</dt>
 <dd><p>specifies the color for the maximum likelihood set of parameters. By default the point is not plotted (i.e., set to <code>NULL</code>.</p></dd>
+
 <dt>levels</dt>
 <dd><p>the levels at which to draw contour lines, measured as lnL units away from the best values.</p></dd>
+
 <dt>xlab</dt>
 <dd><p>allows users to specify the x-axis label.</p></dd>
+
 <dt>ylab</dt>
 <dd><p>allows users to specify the y-axis label.</p></dd>
+
 <dt>xlim</dt>
 <dd><p>allows users to specify the lower and upper limits of the x-axis.</p></dd>
+
 <dt>ylim</dt>
 <dd><p>allows users to specify the lower and upper limits of the y-axis.</p></dd>
+
 <dt>col</dt>
 <dd><p>indicates the color gradient.</p></dd>
+
 <dt>...</dt>
 <dd><p>additional parameters to control the plot.</p></dd>
+
 </dl></div>
     <div id="references">
     <h2>References</h2>
@@ -107,7 +119,7 @@ ylab<span class="op">=</span><span class="cn">NULL</span>, xlim<span class="op">
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

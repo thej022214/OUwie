@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.10</span>
       </span>
     </div>
 
@@ -26,13 +26,16 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/OUwie_2.1_adds.html">New additions as of OUwie 2.1</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -60,55 +63,75 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">OUwie.boot</span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BM1"</span>,<span class="st">"BMS"</span>,<span class="st">"OU1"</span>,<span class="st">"OUM"</span>,<span class="st">"OUMV"</span>,<span class="st">"OUMA"</span>,<span class="st">"OUMVA"</span><span class="op">)</span>,
- nboot<span class="op">=</span><span class="fl">100</span>, <span class="va">alpha</span>, <span class="va">sigma.sq</span>, <span class="va">theta</span>, <span class="va">theta0</span>, simmap.tree<span class="op">=</span><span class="cn">FALSE</span>, root.age<span class="op">=</span><span class="cn">NULL</span>,
- scaleHeight<span class="op">=</span><span class="cn">FALSE</span>, root.station<span class="op">=</span><span class="cn">FALSE</span>, get.root.theta<span class="op">=</span><span class="cn">FALSE</span>, shift.point<span class="op">=</span><span class="fl">0.5</span>, 
- clade<span class="op">=</span><span class="cn">NULL</span>, mserr<span class="op">=</span><span class="st">"none"</span>, algorithm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"invert"</span>, <span class="st">"three.point"</span><span class="op">)</span>, 
- diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="op">=</span><span class="cn">TRUE</span>, warn<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">OUwie.boot</span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BM1"</span>,<span class="st">"BMS"</span>,<span class="st">"OU1"</span>,<span class="st">"OUM"</span>,<span class="st">"OUMV"</span>,<span class="st">"OUMA"</span>,<span class="st">"OUMVA"</span><span class="op">)</span>,</span>
+<span> nboot<span class="op">=</span><span class="fl">100</span>, <span class="va">alpha</span>, <span class="va">sigma.sq</span>, <span class="va">theta</span>, <span class="va">theta0</span>, simmap.tree<span class="op">=</span><span class="cn">FALSE</span>, root.age<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span> scaleHeight<span class="op">=</span><span class="cn">FALSE</span>, root.station<span class="op">=</span><span class="cn">FALSE</span>, get.root.theta<span class="op">=</span><span class="cn">FALSE</span>, shift.point<span class="op">=</span><span class="fl">0.5</span>, </span>
+<span> clade<span class="op">=</span><span class="cn">NULL</span>, mserr<span class="op">=</span><span class="st">"none"</span>, algorithm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"invert"</span>, <span class="st">"three.point"</span><span class="op">)</span>, </span>
+<span> diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="op">=</span><span class="cn">TRUE</span>, warn<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>phy</dt>
 <dd><p>a phylogenetic tree, in <code>ape</code> “phylo” format and with internal nodes labeled denoting the ancestral selective regimes.</p></dd>
+
 <dt>data</dt>
 <dd><p>a data matrix containing species information.</p></dd>
+
 <dt>model</dt>
 <dd><p>models to fit to comparative data.</p></dd>
+
 <dt>nboot</dt>
 <dd><p>The number of bootstrap replicates.</p></dd>
+
 <dt>alpha</dt>
 <dd><p>a numeric vector giving the values of \(\alpha\) for each selective regime.</p></dd>
+
 <dt>sigma.sq</dt>
 <dd><p>a numeric vector giving the values of \(\sigma^2\) for each selective regime.</p></dd>
+ 
 <dt>theta</dt>
 <dd><p>a numeric vector giving the values of \(\theta\) for each selective regime.</p></dd>
+
 <dt>theta0</dt>
 <dd><p>a numeric indicating the starting state, \(\theta_0\)</p></dd>
+
 <dt>simmap.tree</dt>
 <dd><p>a logical indicating whether the input tree is in SIMMAP format. The default is <code>FALSE</code>.</p></dd>
+ 
 <dt>root.age</dt>
 <dd><p>indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is <code>NULL</code> meaning latest tip is modern day.</p></dd>
+
 <dt>get.root.theta</dt>
 <dd><p>a logical indicating whether the starting state, \(\theta_0\), should be estimated (see Details).</p></dd>
+
 <dt>scaleHeight</dt>
 <dd><p>a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is <code>FALSE</code>.</p></dd>
+ 
 <dt>root.station</dt>
 <dd><p>a logical indicating whether the starting state, \(\theta_0\), should be estimated (see Details).</p></dd>
+ 
 <dt>shift.point</dt>
 <dd><p>the point along a branch where a regime change is assumed to have occurred (if <code>SIMMAP=FALSE</code>. The default is set to 0.5, or halfway along a branch.</p></dd>
+
 <dt>clade</dt>
 <dd><p>a list containing a pair of taxa whose MRCA is the clade of interest.</p></dd>
+
 <dt>mserr</dt>
 <dd><p>designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".</p></dd>
+
 <dt>algorithm</dt>
 <dd><p>designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.</p></dd>
+
 <dt>diagn</dt>
 <dd><p>a logical indicating whether the full diagnostic analysis should be carried out. The default is <code>FALSE</code>.</p></dd>
+
 <dt>quiet</dt>
 <dd><p>a logical indicating whether progress should be written to the screen. The default is <code>TRUE</code>.</p></dd>
+
 <dt>warn</dt>
 <dd><p>a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -119,7 +142,12 @@
     </div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>OUwie.boot</code> returns an object of class <code>OUwie.boot</code>. This is a matrix of column length equal to the number of parameters, and row length of the number of bootstrap replicates specified.</p>
+    
+
+
+<p><code>OUwie.boot</code> returns an object of class <code>OUwie.boot</code>. This is a matrix of column length equal to the number of parameters, and row length of the number of bootstrap replicates specified.</p>
+
+
     </div>
     <div id="references">
     <h2>References</h2>
@@ -134,30 +162,30 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">##First step is estimate parameters under a particular model:</span></span>
-<span class="r-in"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>,root.station<span class="op">=</span><span class="cn">FALSE</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">##First step is estimate parameters under a particular model:</span></span></span>
+<span class="r-in"><span><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>,root.station<span class="op">=</span><span class="cn">FALSE</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Finished. Begin thorough search... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Finished. Summarizing results. </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">##Second step is to run bootstrap replicates:</span></span>
-<span class="r-in"><span class="va">boot.reps</span> <span class="op">&lt;-</span> <span class="fu">OUwie.boot</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="st">"OUMV"</span>, nboot<span class="op">=</span><span class="fl">10</span>, alpha<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">solution</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, </span>
-<span class="r-in">sigma.sq<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">solution</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>,theta<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">theta</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, theta0<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">theta</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, </span>
-<span class="r-in">algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">##Second step is to run bootstrap replicates:</span></span></span>
+<span class="r-in"><span><span class="va">boot.reps</span> <span class="op">&lt;-</span> <span class="fu">OUwie.boot</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="st">"OUMV"</span>, nboot<span class="op">=</span><span class="fl">10</span>, alpha<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">solution</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, </span></span>
+<span class="r-in"><span>sigma.sq<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">solution</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>,theta<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">theta</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, theta0<span class="op">=</span><span class="va">pp</span><span class="op">$</span><span class="va">theta</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, </span></span>
+<span class="r-in"><span>algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Beginning parametric bootstrap -- performing 10 replicates </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">##Finally summarize to obtain the desired confidence -- here is the 95% CI:</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">boot.reps</span>, <span class="fl">2</span>, <span class="va">quantile</span>, probs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         alpha_1   alpha_2 sigma.sq_1 sigma.sq_2  theta_1    theta_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2.5%  0.3312435 0.3312435 0.06515231  0.2238840 1.591566 0.06037738</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97.5% 1.1303054 1.1303054 0.15263603  0.4591535 1.763746 1.07652948</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">##Finally summarize to obtain the desired confidence -- here is the 95% CI:</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">boot.reps</span>, <span class="fl">2</span>, <span class="va">quantile</span>, probs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        alpha_1  alpha_2 sigma.sq_1 sigma.sq_2  theta_1   theta_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.5%  0.331952 0.331952 0.05984498  0.2192576 1.502808 0.3782582</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 97.5% 1.508083 1.508083 0.15860767  0.6438871 1.917138 1.1142401</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -172,7 +200,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
