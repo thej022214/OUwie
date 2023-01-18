@@ -165,6 +165,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   }
   # find the best nSim mappings after adaptive sampling
   sorted_likelihoods <- sort(llik_houwies, decreasing = TRUE, index.return = TRUE)
+  unsorted_lliks_df <- data.frame(llik_discrete=llik_discrete, llik_continuous=llik_continuous)
   llik_houwies <- llik_houwies[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
   llik_discrete <- llik_discrete[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
   llik_continuous <- llik_continuous[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
@@ -183,7 +184,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
     if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
       llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
     }
-    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
+    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df))
   }
   if(!is.null(global_liks_mat)){
     new_row <- which(global_liks_mat$X1 == 0)[1]
@@ -803,6 +804,7 @@ getJointBranchMatrix <- function(possible_internal, possible_external, tip_value
 
 # a function for getting OU expectations per node and tip: both variance and means
 getOUExpectations <- function(simmap, Rate.mat, tip.paths=NULL){
+  Rate.mat[is.na(Rate.mat)] <- 1e-10
   # phy must be of class simmap
   nTip <- length(simmap$tip.label)
   if(is.null(tip.paths)){
@@ -1335,14 +1337,17 @@ get_tip_values <- function(model){
   all_tip_states <- lapply(model$simmaps, get_tip_states)
   all_joint_liks <- model$all_disc_liks + model$all_cont_liks
   weights <- exp(all_joint_liks - max(all_joint_liks))/sum(exp(all_joint_liks - max(all_joint_liks)))
-  waiting_times <- rowSums(model$solution.disc, na.rm = TRUE)
+  rates <- rowSums(model$solution.disc, na.rm = TRUE)
   continuous_solution <- model$solution.cont
   continuous_solution[is.na(continuous_solution)] <- 0
-  parameter_table_list <- lapply(all_tip_states, function(x) index_paramers_from_tip_states(x, waiting_times, continuous_solution))
+  parameter_table_list <- lapply(all_tip_states, function(x) index_paramers_from_tip_states(x, rates, continuous_solution))
   for(i in 1:length(parameter_table_list)){
     parameter_table_list[[i]] <- parameter_table_list[[i]] * weights[i]
   }
   tip_value_table <- Reduce("+", parameter_table_list)
+  expected_values <- getExpectedValues(model, FALSE)
+  expected_values <- expected_values[match(rownames(tip_value_table), expected_values$sp),]
+  tip_value_table <- cbind(tip_value_table, expected_values[,c(2,3)])
   return(tip_value_table)
 }
 
@@ -1353,8 +1358,8 @@ get_tip_states <- function(simmap){
   return(tip_states)
 }
 
-index_paramers_from_tip_states <- function(tip_states, waiting_times, continuous_solution){
-  parameter_df <- data.frame(waiting_times = waiting_times[tip_states],
+index_paramers_from_tip_states <- function(tip_states, rates, continuous_solution){
+  parameter_df <- data.frame(rates = rates[tip_states],
                              alpha = continuous_solution[1,tip_states],
                              sigma.sq = continuous_solution[2,tip_states],
                              theta = continuous_solution[3,tip_states],

@@ -1,6 +1,6 @@
 ---
 title: "hOUwie User Guide"
-author: "James D. Boyko"
+author: ".  "
 date: "11/07/2022"
 output:
   pdf_document:
