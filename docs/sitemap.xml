@@ -7,6 +7,9 @@
     <loc>/articles/OUwie_2.1_adds.html</loc>
   </url>
   <url>
+    <loc>/articles/hOUwieStarterGuide.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -43,12 +46,54 @@
     <loc>/reference/check.identify.html</loc>
   </url>
   <url>
+    <loc>/reference/dent_propose.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dent_walk.html</loc>
+  </url>
+  <url>
     <loc>/reference/fix.kappa.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getModelAvgParams.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getModelTable.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getOUParamStructure.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.fixed.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.recon.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.sim.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.thorough.html</loc>
+  </url>
+  <url>
+    <loc>/reference/hOUwie.walk.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/plot.OUwie.contour.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot.dentist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.dentist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary.dentist.html</loc>
   </url>
 </urlset>

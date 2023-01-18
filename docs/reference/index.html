@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.10</span>
       </span>
     </div>
 
@@ -26,13 +26,16 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/OUwie_2.1_adds.html">New additions as of OUwie 2.1</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -58,7 +61,7 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="Example.html">Example</a></code> </p>
+          <p><code><a href="Example.html">tree</a></code> <code><a href="Example.html">trait</a></code> </p>
         </td>
         <td><p>An example dataset</p></td>
       </tr><tr><td>
@@ -94,13 +97,73 @@
         </td>
         <td><p>A test of regime identifiability</p></td>
       </tr><tr><td>
+          <p><code><a href="dent_propose.html">dent_propose()</a></code> </p>
+        </td>
+        <td><p>Propose new values
+This proposes new values using a normal distribution centered on the original parameter values, with desired standard deviation. If any proposed values are outside the bounds, it will propose again.</p></td>
+      </tr><tr><td>
+          <p><code><a href="dent_walk.html">dent_walk()</a></code> </p>
+        </td>
+        <td><p>Sample points from along a ridge</p></td>
+      </tr><tr><td>
           <p><code><a href="fix.kappa.html">fix.kappa()</a></code> </p>
         </td>
         <td><p>Adjust tree for matrix condition</p></td>
       </tr><tr><td>
+          <p><code><a href="getModelAvgParams.html">getModelAvgParams()</a></code> </p>
+        </td>
+        <td><p>Model average the parameter estimates over severl hOUwie fits.</p></td>
+      </tr><tr><td>
+          <p><code><a href="getModelTable.html">getModelTable()</a></code> </p>
+        </td>
+        <td><p>Generate a table from a set of hOUwie models describing their relative fit to data.</p></td>
+      </tr><tr><td>
+          <p><code><a href="getOUParamStructure.html">getOUParamStructure()</a></code> </p>
+        </td>
+        <td><p>Generate a continuous model parameter structure</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.html">hOUwie()</a></code> </p>
+        </td>
+        <td><p>Fit a joint model of discrete and continuous characters via maximum-likelihood.</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.fixed.html">hOUwie.fixed()</a></code> </p>
+        </td>
+        <td><p>Fit a joint model of discrete and continuous characters via maximum-likelihood with fixed regimes.</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.recon.html">hOUwie.recon()</a></code> </p>
+        </td>
+        <td><p>Reconstruct the marginal probability of discrete node states under the hOUwie model.</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.sim.html">hOUwie.sim()</a></code> </p>
+        </td>
+        <td><p>Simulate a discrete and continuous character following a Markov and Ornstein-Uhlenbeck model.</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.thorough.html">hOUwie.thorough()</a></code> </p>
+        </td>
+        <td><p>Rerun a set of hOUwie models with the best mappings of the set.</p></td>
+      </tr><tr><td>
+          <p><code><a href="hOUwie.walk.html">hOUwie.walk()</a></code> </p>
+        </td>
+        <td><p>Sample points from along a ridge for a hOUwie model</p></td>
+      </tr><tr><td>
           <p><code><a href="plot.OUwie.contour.html">plot(<i>&lt;OUwie.contour&gt;</i>)</a></code> </p>
         </td>
         <td><p>Contour plot</p></td>
+      </tr><tr><td>
+          <p><code><a href="plot.dentist.html">plot(<i>&lt;dentist&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Plot the dented samples
+This will show the univariate plots of the parameter values versus the likelihood as well as bivariate plots of pairs of parameters to look for ridges.</p></td>
+      </tr><tr><td>
+          <p><code><a href="print.dentist.html">print(<i>&lt;dentist&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print dentist
+print summary of output from dent_walk</p></td>
+      </tr><tr><td>
+          <p><code><a href="summary.dentist.html">summary(<i>&lt;dentist&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summarize dentist
+Display summary of output from dent_walk</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -114,7 +177,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

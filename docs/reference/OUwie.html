@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.10</span>
       </span>
     </div>
 
@@ -26,13 +26,16 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/OUwie_2.1_adds.html">New additions as of OUwie 2.1</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -60,56 +63,76 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">OUwie</span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BM1"</span>,<span class="st">"BMS"</span>,<span class="st">"OU1"</span>,<span class="st">"OUM"</span>,<span class="st">"OUMV"</span>,<span class="st">"OUMA"</span>,<span class="st">"OUMVA"</span>,
-<span class="st">"TrendyM"</span>,<span class="st">"TrendyMS"</span><span class="op">)</span>, simmap.tree<span class="op">=</span><span class="cn">FALSE</span>, root.age<span class="op">=</span><span class="cn">NULL</span>,scaleHeight<span class="op">=</span><span class="cn">FALSE</span>,
-root.station<span class="op">=</span><span class="cn">FALSE</span>, get.root.theta<span class="op">=</span><span class="cn">FALSE</span>, shift.point<span class="op">=</span><span class="fl">0.5</span>, clade<span class="op">=</span><span class="cn">NULL</span>, mserr<span class="op">=</span><span class="st">"none"</span>,
-starting.vals<span class="op">=</span><span class="cn">NULL</span>, check.identify<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"invert"</span>, <span class="st">"three.point"</span><span class="op">)</span>,
-diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="op">=</span><span class="cn">FALSE</span>, warn<span class="op">=</span><span class="cn">TRUE</span>, lb <span class="op">=</span> <span class="cn">NULL</span>, ub <span class="op">=</span> <span class="cn">NULL</span>, opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>algorithm <span class="op">=</span> 
-<span class="st">"NLOPT_LN_SBPLX"</span>, maxeval <span class="op">=</span> <span class="st">"1000"</span>, ftol_rel <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">OUwie</span><span class="op">(</span><span class="va">phy</span>, <span class="va">data</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BM1"</span>,<span class="st">"BMS"</span>,<span class="st">"OU1"</span>,<span class="st">"OUM"</span>,<span class="st">"OUMV"</span>,<span class="st">"OUMA"</span>,<span class="st">"OUMVA"</span>,</span>
+<span><span class="st">"TrendyM"</span>,<span class="st">"TrendyMS"</span><span class="op">)</span>, simmap.tree<span class="op">=</span><span class="cn">FALSE</span>, root.age<span class="op">=</span><span class="cn">NULL</span>,scaleHeight<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>root.station<span class="op">=</span><span class="cn">FALSE</span>, get.root.theta<span class="op">=</span><span class="cn">FALSE</span>, shift.point<span class="op">=</span><span class="fl">0.5</span>, clade<span class="op">=</span><span class="cn">NULL</span>, mserr<span class="op">=</span><span class="st">"none"</span>,</span>
+<span>starting.vals<span class="op">=</span><span class="cn">NULL</span>, check.identify<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"invert"</span>, <span class="st">"three.point"</span><span class="op">)</span>,</span>
+<span>diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="op">=</span><span class="cn">FALSE</span>, warn<span class="op">=</span><span class="cn">TRUE</span>, lb <span class="op">=</span> <span class="cn">NULL</span>, ub <span class="op">=</span> <span class="cn">NULL</span>, opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>algorithm <span class="op">=</span> </span>
+<span><span class="st">"NLOPT_LN_SBPLX"</span>, maxeval <span class="op">=</span> <span class="st">"1000"</span>, ftol_rel <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>phy</dt>
 <dd><p>a phylogenetic tree, in <code>ape</code> “phylo” format and with internal nodes labeled denoting the ancestral selective regimes.</p></dd>
+
 <dt>data</dt>
 <dd><p>a data.frame containing species information (see Details).</p></dd>
+
 <dt>model</dt>
 <dd><p>models to fit to comparative data (see Details).</p></dd>
+
 <dt>simmap.tree</dt>
 <dd><p>a logical indicating whether the input tree is in SIMMAP format. The default is <code>FALSE</code>.</p></dd>
+
 <dt>root.age</dt>
 <dd><p>indicates the age of the tree. This is to be used in cases where the "tips" are not contemporary, such as in cases for fossil trees. Default is <code>NULL</code> meaning latest tip is modern day.</p></dd>
+
 <dt>scaleHeight</dt>
 <dd><p>a logical indicating whether the total tree height should be scaled to 1 (see Details). The default is <code>FALSE</code>.</p></dd>
+
 <dt>root.station</dt>
 <dd><p>a logical indicating whether to assume a random starting point (TRUE) or a fixed starting point (FALSE) (see Details).</p></dd>
+
 <dt>get.root.theta</dt>
 <dd><p>a logical indicating whether the starting state, \(\theta_0\), should be estimated (see Details).</p></dd>
+
 <dt>shift.point</dt>
 <dd><p>the point along a branch where a regime change is assumed to have occurred (if <code>SIMMAP=FALSE</code>. The default is set to 0.5, or halfway along a branch.</p></dd>
+
 <dt>clade</dt>
 <dd><p>a list containing a pair of taxa whose MRCA is the clade of interest (see Details).</p></dd>
+
 <dt>mserr</dt>
 <dd><p>designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".</p></dd>
+
 <dt>starting.vals</dt>
 <dd><p>a vector of initial values for the optimization search. For OU models, two must be supplied, with the first being the initial alpha value and the second being the initial sigma squared. For BM models, just a single value is needed.</p></dd>
+
 <dt>check.identify</dt>
 <dd><p>a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is <code>TRUE</code>.</p></dd>
+
 <dt>algorithm</dt>
 <dd><p>designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.</p></dd>
+
 <dt>diagn</dt>
 <dd><p>a logical indicating whether the full diagnostic analysis should be carried out. The default is <code>FALSE</code>.</p></dd>
+
 <dt>quiet</dt>
 <dd><p>a logical indicating whether progress should be written to the screen. The default is <code>FALSE</code>.</p></dd>
+
 <dt>warn</dt>
 <dd><p>a logical indicating whether a warning should be printed if the number of parameters exceeds ntips/10. The default is <code>TRUE</code>.</p></dd>
+
 <dt>lb</dt>
 <dd><p>if algorithm == "invert" a single value indicating the lower bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha lower bound, position 2 as sigma.sq's lower bound, position 3 as theta's lower bound. when set to NULL it will be a default value of 1e-9. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.</p></dd>
+
 <dt>ub</dt>
 <dd><p>if algorithm == "invert" a single value indicating the upper bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha upper bound, position 2 as sigma.sq's upper bound, position 3 as theta's upper bound. when set to NULL it will be a default value of 100. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.</p></dd>
+
 <dt>opts</dt>
 <dd><p>a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -122,65 +145,96 @@ diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="o
     </div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>OUwie</code> returns an object of class <code>OUwie</code>. This is a list with elements:</p>
+    
+
+<p><code>OUwie</code> returns an object of class <code>OUwie</code>. This is a list with elements:</p>
 <dl><dt>$loglik</dt>
 <dd><p>the maximum log-likelihood.</p></dd>
+
 <dt>$AIC</dt>
 <dd><p>Akaike information criterion.</p></dd>
+
 <dt>$AICc</dt>
 <dd><p>Akaike information criterion corrected for sample-size.</p></dd>
+
 <dt>$BIC</dt>
 <dd><p>Bayesian information criterion.</p></dd>
+
 <dt>$mBIC</dt>
 <dd><p>modified Bayesian information criterion of Ho and Ane (2014).</p></dd>
+
 <dt>$model</dt>
 <dd><p>The model being fit.</p></dd>
+
 <dt>$param.count</dt>
 <dd><p>The number of parameters counted in the model.</p></dd>
+
 <dt>$solution</dt>
 <dd><p>a matrix containing the maximum likelihood estimates of \(\alpha\) and \(\sigma^2\).</p></dd>
+
 <dt>$theta</dt>
 <dd><p>a matrix containing the maximum likelihood estimates of \(\theta\) and its standard error.</p></dd>
+
 <dt>$solution.se</dt>
 <dd><p>a matrix containing the approximate standard errors of \(\alpha\) and \(\sigma^2\). The standard error is calculated as the diagonal of the inverse of the Hessian matrix.</p></dd>
+
 <dt>$tot.state</dt>
 <dd><p>A vector of names for the different regimes</p></dd>
+
 <dt>$index.mat</dt>
 <dd><p>The indices of the parameters being estimated are returned. The numbers correspond to the row in the <code>eigvect</code> and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details).</p></dd>
+
 <dt>$simmap.tree</dt>
 <dd><p>A logical indicating whether the input phylogeny is a SIMMAP formatted tree.</p></dd>
+
 <dt>$root.age</dt>
 <dd><p>The user-supplied age at the root of the tree.</p></dd>
+
 <dt>$split.point</dt>
 <dd><p>The user-supplied point at which regime changes are assumed to have occurred.</p></dd>
+
 <dt>$opts</dt>
 <dd><p>Internal settings of the likelihood search.</p></dd>
+
 <dt>$data</dt>
 <dd><p>User-supplied dataset.</p></dd>
+
 <dt>$phy</dt>
 <dd><p>User-supplied tree.</p></dd>
+
 <dt>$root.station</dt>
 <dd><p>A logical indicating whether the starting state, \(\theta_0\), was estimated.</p></dd>
+
 <dt>$starting.vals</dt>
 <dd><p>A vector of user-supplied initial search parameters.</p></dd>
+
 <dt>$lb</dt>
 <dd><p>The lower bound set.</p></dd>
+
 <dt>$ub</dt>
 <dd><p>The upper bound set.</p></dd>
+
 <dt>$iterations</dt>
 <dd><p>Number of iterations of the likelihood search that were executed.</p></dd>
+
 <dt>$get.root.theta</dt>
 <dd><p>Indicates whether the root.theta was included in the model.</p></dd>
+
 <dt>$regime.weights</dt>
 <dd><p>A table containing parameter estimates and the weights for time spent in each regime for each tip.</p></dd>
+
 <dt>$eigval</dt>
 <dd><p>The eigenvalues from the decomposition of the Hessian of the likelihood function. If any <code>eigval&lt;0</code> then one or more parameters were not optimized during the likelihood search (see Details).</p></dd>
+
 <dt>$eigvect</dt>
 <dd><p>The eigenvectors from the decomposition of the Hessian of the likelihood function is returned (see Details).</p></dd>
+
 <dt>$new.start</dt>
 <dd><p>The vector of values to use if you want to restart the run from this point (starting.vals for a new run).</p></dd>
+
 <dt>$algorithm</dt>
 <dd><p>The algorithm used to estimate parameters</p></dd>
+
 </dl></div>
     <div id="references">
     <h2>References</h2>
@@ -197,49 +251,49 @@ diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="o
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#Plot the tree and the internal nodes to highlight the selective regimes:</span></span>
-<span class="r-in"><span class="va">select.reg</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">select.reg</span><span class="op">[</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span>
-<span class="r-in"><span class="va">select.reg</span><span class="op">[</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"red"</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">nodelabels</span><span class="op">(</span>pch<span class="op">=</span><span class="fl">21</span>, bg<span class="op">=</span><span class="va">select.reg</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Plot the tree and the internal nodes to highlight the selective regimes:</span></span></span>
+<span class="r-in"><span><span class="va">select.reg</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">select.reg</span><span class="op">[</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></span>
+<span class="r-in"><span><span class="va">select.reg</span><span class="op">[</span><span class="va">tree</span><span class="op">$</span><span class="va">node.label</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"red"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">nodelabels</span><span class="op">(</span>pch<span class="op">=</span><span class="fl">21</span>, bg<span class="op">=</span><span class="va">select.reg</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="OUwie-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># }</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co">#To see the first 5 lines of the data matrix to see what how to</span></span>
-<span class="r-in"><span class="co">#structure the data:</span></span>
-<span class="r-in"><span class="va">trait</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#Now fit an OU model that allows different sigma^2:</span></span>
-<span class="r-in"><span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#Fit an OU model based on a clade of interest:</span></span>
-<span class="r-in"><span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, clade<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"t50"</span>, <span class="st">"t64"</span><span class="op">)</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#For large trees, it may be useful to have ways to restart the search (due to</span></span>
-<span class="r-in"><span class="co">#finite time per run on a computing cluster, for example). You can do this</span></span>
-<span class="r-in"><span class="co">#by changing settings of OUwie runs. For example:</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">run1</span> <span class="op">&lt;-</span> <span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, root.station<span class="op">=</span><span class="cn">FALSE</span>, algorithm<span class="op">=</span><span class="st">"invert"</span>, </span>
-<span class="r-in">opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"algorithm"</span><span class="op">=</span><span class="st">"NLOPT_LN_SBPLX"</span>, <span class="st">"maxeval"</span><span class="op">=</span><span class="st">"500"</span>, <span class="st">"ftol_abs"</span><span class="op">=</span><span class="fl">0.001</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">run1</span>, file<span class="op">=</span><span class="st">"run1.rda"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#Then, later or in a different session:</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"run1.rda"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">run2</span> <span class="op">&lt;-</span> <span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span>, </span>
-<span class="r-in">opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"algorithm"</span><span class="op">=</span><span class="st">"NLOPT_LN_SBPLX"</span>, <span class="st">"maxeval"</span><span class="op">=</span><span class="st">"500"</span>, <span class="st">"ftol_abs"</span><span class="op">=</span><span class="fl">0.001</span><span class="op">)</span>,</span>
-<span class="r-in">starting.vals<span class="op">=</span><span class="va">run1</span><span class="op">$</span><span class="va">new.start</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#run2 will start off where run1 stopped.</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">#To see the first 5 lines of the data matrix to see what how to</span></span></span>
+<span class="r-in"><span><span class="co">#structure the data:</span></span></span>
+<span class="r-in"><span><span class="va">trait</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Now fit an OU model that allows different sigma^2:</span></span></span>
+<span class="r-in"><span><span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Fit an OU model based on a clade of interest:</span></span></span>
+<span class="r-in"><span><span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, clade<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"t50"</span>, <span class="st">"t64"</span><span class="op">)</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#For large trees, it may be useful to have ways to restart the search (due to</span></span></span>
+<span class="r-in"><span><span class="co">#finite time per run on a computing cluster, for example). You can do this</span></span></span>
+<span class="r-in"><span><span class="co">#by changing settings of OUwie runs. For example:</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">run1</span> <span class="op">&lt;-</span> <span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>,<span class="va">trait</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, root.station<span class="op">=</span><span class="cn">FALSE</span>, algorithm<span class="op">=</span><span class="st">"invert"</span>, </span></span>
+<span class="r-in"><span>opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"algorithm"</span><span class="op">=</span><span class="st">"NLOPT_LN_SBPLX"</span>, <span class="st">"maxeval"</span><span class="op">=</span><span class="st">"500"</span>, <span class="st">"ftol_abs"</span><span class="op">=</span><span class="fl">0.001</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">run1</span>, file<span class="op">=</span><span class="st">"run1.rda"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Then, later or in a different session:</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"run1.rda"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">run2</span> <span class="op">&lt;-</span> <span class="fu">OUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OUMV"</span><span class="op">)</span>, algorithm<span class="op">=</span><span class="st">"three.point"</span>, </span></span>
+<span class="r-in"><span>opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"algorithm"</span><span class="op">=</span><span class="st">"NLOPT_LN_SBPLX"</span>, <span class="st">"maxeval"</span><span class="op">=</span><span class="st">"500"</span>, <span class="st">"ftol_abs"</span><span class="op">=</span><span class="fl">0.001</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>starting.vals<span class="op">=</span><span class="va">run1</span><span class="op">$</span><span class="va">new.start</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#run2 will start off where run1 stopped.</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -254,7 +308,7 @@ diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="o
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
