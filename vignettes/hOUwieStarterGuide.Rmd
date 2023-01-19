@@ -7,7 +7,7 @@ output:
     fig_caption: yes
 vignette: >
    %\VignetteEngine{knitr::rmarkdown}
-   %\VignetteIndexEntry{New additions as of OUwie 2.1}
+   %\VignetteIndexEntry{hOUwie User Guide}
    \usepackage[utf8]{inputenc}
 ---
 
@@ -18,10 +18,10 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=75),tidy=TRUE)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-require(OUwie)
-require(corHMM)
-require(ggplot2)
-require(reshape2)
+library(OUwie)
+library(corHMM)
+library(ggplot2)
+library(reshape2)
 ```
 
 ## Introduction
