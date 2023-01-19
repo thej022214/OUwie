@@ -65,14 +65,16 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   Tmax <- max(branching.times(phy))
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   
-  if(class(discrete_model)[1] == "character"){
+  if(inherits(discrete_model[1], what="character")){
+  #if(class(discrete_model)[1] == "character"){
     index.disc <- getDiscreteModel(cor_dat, discrete_model, rate.cat, dual, collapse)
     index.disc[index.disc == 0] <- NA
   }else{
     index.disc <- discrete_model
     index.disc[index.disc == 0] <- NA
   }
-  if(class(continuous_model)[1] == "character"){
+  if(inherits(continuous_model[1], what="character")){
+  #if(class(continuous_model)[1] == "character"){
     index.cont <- getOUParamStructure(continuous_model, nStates, rate.cat, null.model)
   }else{
     continuous_model[continuous_model == 0] <- NA
@@ -84,7 +86,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   if(dim(index.cont)[2] > dim(index.disc)[2]){
     stop("You have specified more OU parameters than there are states in the discrete process. Please check that your discrete index matrix matches your continuous index matrix.")
   }
-  if(class(root.p[1]) != "character"){
+  if(!inherits(root.p[1], what="character")){
+  #if(class(root.p[1]) != "character"){
     if(dim(index.disc)[2] != length(root.p)){
       stop("You have entered a custom root prior whose length does not equal the number of states in your discrete model.")
     }
@@ -311,14 +314,16 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   Tmax <- max(branching.times(simmaps[[1]]))
   all.paths <- lapply(1:(Nnode(simmaps[[1]]) + Ntip(simmaps[[1]])), function(x) getPathToRoot(simmaps[[1]], x))
   
-  if(class(discrete_model)[1] == "character"){
+  if(inherits(discrete_model[1], what="character")){
+  #if(class(discrete_model)[1] == "character"){
     index.disc <- getDiscreteModel(hOUwie.dat$data.cor, discrete_model, rate.cat, dual, collapse)
     index.disc[index.disc == 0] <- NA
   }else{
     index.disc <- discrete_model
     index.disc[index.disc == 0] <- NA
   }
-  if(class(continuous_model)[1] == "character"){
+  if(inherits(continuous_model[1], what="character")){
+  #if(class(continuous_model)[1] == "character"){
     index.cont <- getOUParamStructure(continuous_model, nStates, rate.cat, null.model)
   }else{
     continuous_model[continuous_model == 0] <- NA
@@ -330,7 +335,8 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   if(dim(index.cont)[2] > dim(index.disc)[2]){
     stop("You have specified more OU parameters than there are states in the discrete process. Please check that your discrete index matrix matches your continuous index matrix.")
   }
-  if(class(root.p[1]) != "character"){
+  if(!inherits(root.p[1], what="character")){
+  #if(class(root.p[1]) != "character"){
     if(dim(index.disc)[2] != length(root.p)){
       stop("You have entered a custom root prior whose length does not equal the number of states in your discrete model.")
     }
@@ -689,7 +695,8 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
 
 getModelTable <- function(model.list, type="BIC"){
   # checks
-  if(class(model.list) != "list"){
+  if(!inherits(model.list, what="list")){
+  #if(class(model.list) != "list"){
     stop("Input object must be of class list with each element as a separet fit model to the same dataset.", call. = FALSE)
   }
   if(!all(unlist(lapply(model.list, function(x) class(x))) == "houwie")){
@@ -721,7 +728,8 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
     warning("Some of the input models are not of class houwie, these have been removed.")
     model.list <- model.list[which(unlist(lapply(model.list, class))=="houwie")]
   }
-  if(class(model.list) != "list" | length(model.list) < 2){
+  if(!inherits(model.list, what="list") | length(model.list) < 2){
+  #if(class(model.list) != "list" | length(model.list) < 2){
     stop("getModelAvgParams requires multiple houwie model objects to be input as a list.", call. = FALSE)
   }
   rate_cats <- simplify2array(lapply(model.list, "[[", "rate.cat"))

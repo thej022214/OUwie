@@ -40,7 +40,8 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   # altering the conditional probabilities based on jointly sampled decendent species
   if(sample_nodes){
     edge_liks_list <- try(getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths))
-    if(class(edge_liks_list) == "try-error"){
+    if(inherits(edge_liks_list, what="try-error")){
+    #if(class(edge_liks_list) == "try-error"){
       return(1e10)
     }
   }
@@ -124,7 +125,8 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
       current_ou_expectations <- getOUExpectations(best_mapping, Rate.mat, all.paths)
       # generate a new conditional probability based on the new expected values
       edge_liks_list <- try(getAdaptiveConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths, current_ou_expectations))
-      if(class(edge_liks_list) == "try-error"){
+      if(inherits(edge_liks_list, what="try-error")){
+      #if(class(edge_liks_list) == "try-error"){
         next
       }
       for(recon_index in 1:length(edge_liks_list)){
@@ -235,7 +237,8 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   Q[] <- c(p.mk, 0)[rate]
   diag(Q) <- -rowSums(Q)
   # calculte the discrete probabilities based on the given Q matrix (Pij already calculated)
-  if(class(root.p)[1] == "character"){
+  if(inherits(root.p[1], what="character")){
+  #if(class(root.p)[1] == "character"){
     if(root.p == "yang"){
       root_liks <- c(MASS::Null(Q))
       root_liks <- root_liks/sum(root_liks)
@@ -1009,7 +1012,8 @@ getRootLiks <- function(conditional_probs, Q, root.p){
   if(any(is.na(conditional_probs$root_state))){
     return(NULL)
   }
-  if(class(root.p)[1] == "character"){
+  if(inherits(root.p[1], what="character")){
+  #if(class(root.p)[1] == "character"){
     if(root.p == "yang"){
       root_liks <- c(MASS::Null(Q))
       root_liks <- root_liks/sum(root_liks)
