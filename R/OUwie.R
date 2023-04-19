@@ -546,6 +546,9 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		if(quiet==FALSE){
 			cat("Finished. Begin thorough search...", "\n")
 		}
+		if(any(is.na(log(ip)))){
+			stop("Currently this assumes the mean values within each regime are greater than zero, but this is not the case for your data. This is a limitation of the program, not your data; in the interim, you may want to add a constant to your trait values and then subtract it back out later from your theta estimates.")
+		}
 		out <- nloptr(x0=log(ip), eval_f=dev, lb=lower, ub=upper, opts=opts, index.mat=index.mat, edges=edges, mserr=mserr, trendy=trendy, get.root.theta=get.root.theta)
 	}
 	else{

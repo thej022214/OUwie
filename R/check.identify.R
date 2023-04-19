@@ -32,7 +32,12 @@ check.identify <- function(phy, data, simmap.tree=FALSE, quiet=FALSE){
             }
         }
     }
-    
+    if(shift.number==0) {
+		if(quiet == FALSE){
+            cat("The regime optimum is identifiable given there are no shifts.", "\n")
+        }
+        return(1)
+	}
     graph_tree <- graph_from_edgelist(phy$edge[-c(regime_shifts),], directed=FALSE)
     comp.count <- count_components(graph_tree)
     
