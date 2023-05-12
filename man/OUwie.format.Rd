@@ -3,7 +3,8 @@
 \title{Format data and tree for OUwie}
 \description{Simplifies conversion of a tree and, optionally, data, for OUwie.}
 \usage{
-OUwie.format(phy, tip.regimes=NULL, tip.data=NULL, tip.measurement.error=NULL, tip.measurement.error.percentage=NULL, verbose=TRUE)
+OUwie.format(phy, tip.regimes=NULL, tip.data=NULL, tip.measurement.error=NULL, 
+tip.measurement.error.percentage=NULL, verbose=TRUE)
 }
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and optionally with internal nodes labeled denoting the ancestral selective regimes}

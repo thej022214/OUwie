@@ -33,7 +33,7 @@ OUwie.format <- function(phy, tip.regimes=NULL, tip.data=NULL, tip.measurement.e
 	if(!is.null(tip.measurement.error)) {
 		traits$MeasurementError <- NA # so that lack of matches don't get assigned zero
 		if(is.vector(tip.measurement.error)) {
-			if(length(tip.mearurement.error)==1) {
+			if(length(tip.measurement.error)==1) {
 				traits$MeasurementError <- tip.measurement.error
 			} else {
 				traits$MeasurementError <- tip.measurement.error[match(traits$Taxa, names(tip.measurement.error))]
