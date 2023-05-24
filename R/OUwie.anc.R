@@ -66,14 +66,91 @@ anc.likelihood <- function(x, fitted.OUwie.object) {
 }
 
 
-OUwie.anc <- function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_abs"=0.001), knowledge=FALSE){
+OUwie.anc <- function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_BOBYQA", "maxeval"="1000", "ftol_abs"=0.001), knowledge=FALSE, multiple_starts=1){
     if(!knowledge) {
       stop("You are trying to run the function without having read all the documentation. Please do ?OUwie.anc before using this function and read ALL the documentation.")
     }
-    fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
+	
+	fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
     fitted.OUwie.object$data <- add.stub.taxa.to.data(fitted.OUwie.object$phy, ouwie.row.names.to.col(fitted.OUwie.object$data))
     traits <- fitted.OUwie.object$data
-    result <- nloptr(x0=rep(median(traits[,3], na.rm=TRUE), sum(grepl("node_", traits[,1]))), eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=fitted.OUwie.object)
+	n_values <- sum(grepl("node_", traits[,1]))
+	recon_values <- rep(NA, n_values)
+	names(recon_values) <- traits[grepl("node_", traits[,1]),1]
+	print("Doing reconstructions")
+	for (i in sequence(n_values)) {
+		cat("Working on node ", i, " of ", n_values, "\r")
+		to_delete <- names(recon_values)[-i]
+		local.fitted <- fitted.OUwie.object
+		local.fitted$phy <- ape::drop.tip(local.fitted$phy, to_delete)
+		local.fitted$data <- local.fitted$data[-match(to_delete, local.fitted$data[,1]),]
+		starting_val <- median(traits[,3], na.rm=TRUE)
+		result <- nloptr(x0=starting_val, eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=local.fitted)
+		recon_values[i] <- result$solution
+		for (j in sequence(multiple_starts-1)) {
+			algorithm_original <- opts$algorithm
+			opts$algorithm <- sample(c("NLOPT_LN_SBPLX", "NLOPT_LN_BOBYQA"), 1)
+			new_starting_val <- rnorm(1, mean=sample(c(starting_val, recon_values[i]), 1), sd=0.1*abs(recon_values[i]))
+			new_result <- nloptr(x0=new_starting_val, eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=local.fitted)
+			opts$algorithm <- algorithm_original
+			if(new_result$objective < result$objective) {
+				result <- new_result
+				recon_values[i] <- result$solution
+			}
+		}
+	}
+	print("Done reconstructions")
+	traits[grepl("node_", traits[,1]),3] <- recon_values
+ 	fitted.OUwie.object$data <- ouwie.col.to.row.names(traits)
+    quantitative.trait <- fitted.OUwie.object$data[,2]
+    names(quantitative.trait) <- rownames(fitted.OUwie.object$data)
+    user.recons <- rep(NA, ape::Nnode(fitted.OUwie.object$phy))
+    for(i in sequence(ape::Nnode(fitted.OUwie.object$phy))) {
+        if(i==1) { #we're at the root
+            user.recons[1] <- fitted.OUwie.object$theta[min(nrow(fitted.OUwie.object$theta), fitted.OUwie.object$phy$node.label[1]),1] #so get the estimate for the regime of there are more than one, otherwise, BM
+        } else {
+            node.index <- i+ape::Ntip(fitted.OUwie.object$phy)-sum(grepl("node_", fitted.OUwie.object$phy$tip.label))
+            # match up here
+            user.recons[i] <- fitted.OUwie.object$data[paste0("node_", node.index),2]
+        }
+    }
+    fitted.OUwie.object$NodeRecon <- user.recons
+    class(fitted.OUwie.object) <- c("OUwie.anc", "OUwie")
+    return(fitted.OUwie.object)
+}
+
+
+
+OUwie.anc.older.simultaneous <- function(fitted.OUwie.object, opts = list("algorithm"="NLOPT_LN_BOBYQA", "maxeval"="1000", "ftol_abs"=0.001), knowledge=FALSE, multiple_starts=1){
+    if(!knowledge) {
+      stop("You are trying to run the function without having read all the documentation. Please do ?OUwie.anc before using this function and read ALL the documentation.")
+    }
+	
+	fitted.OUwie.object$phy <- attach.stub.taxa(fitted.OUwie.object$phy)
+    fitted.OUwie.object$data <- add.stub.taxa.to.data(fitted.OUwie.object$phy, ouwie.row.names.to.col(fitted.OUwie.object$data))
+    traits <- fitted.OUwie.object$data
+	n_values <- sum(grepl("node_", traits[,1]))
+	print(paste0("Starting optimization 1 of ", multiple_starts))
+	median_values <- rep(median(traits[,3], na.rm=TRUE), n_values)
+	print(median_values)
+    result <- nloptr(x0=median_values, eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=fitted.OUwie.object)
+	if(multiple_starts>1) {
+		print(paste0("Found reconstruction with likelihood: ", result$objective))
+		print(result$solution)
+		for(i in sequence(multiple_starts-1)) {
+			opts$algorithm <- sample(c("NLOPT_LN_SBPLX", "NLOPT_LN_BOBYQA"), 1)
+			print(paste0("Starting optimization ", i+1, " of ", multiple_starts))
+			x0_start <- rnorm(n=n_values, mean=ifelse(sample(c(TRUE, FALSE), n_values, replace=TRUE, prob=c(0.8, 0.2)), median_values, result$solution), sd=runif(1, min=0, max=sqrt(diff(range(traits[,3], na.rm=TRUE)))))
+			print(x0_start)
+			result_restart <- nloptr(x0=x0_start, eval_f=anc.likelihood, opts=opts, fitted.OUwie.object=fitted.OUwie.object)
+			print(paste0("Found reconstruction with likelihood: ", result_restart$objective))
+			print(result_restart$solution)
+			if(result_restart$objective < result$objective) {
+				print(paste0("Found better reconstruction: ", result_restart$objective, " vs ", result$objective))
+				result <- result_restart
+			}
+		}	
+	}
     traits[grepl("node_", traits[,1]),3] <- result$solution
     fitted.OUwie.object$data <- ouwie.col.to.row.names(traits)
     quantitative.trait <- fitted.OUwie.object$data[,2]
