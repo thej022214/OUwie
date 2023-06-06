@@ -333,7 +333,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
         if(algorithm == "three.point"){
             pars <- matrix(c(Rate.mat[3,], Rate.mat[2,], Rate.mat[1,]), dim(Rate.mat)[2], 3, 
-                           dimnames = list(levels(factor(as.numeric(tot.states))), c("opt", "sig", "alp")))
+                           dimnames = list(levels(factor((tot.states))), c("opt", "sig", "alp")))
             if(get.root.theta == TRUE){
                 expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
                 names(expected.vals) <- phy$tip.label
