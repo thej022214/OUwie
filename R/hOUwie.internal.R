@@ -656,7 +656,10 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
     transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
   }
   comp <- NA
-  try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag, check.precision = FALSE), silent=TRUE)
+  try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag, check.precision = FALSE), silent=TRUE) # for the newest version (github) of phylolm
+  if(is.na(comp[1])){
+    try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE) # for the cran version of phylolm
+  }
   if(is.na(comp[1])){
     return(-1e10)
   }else{

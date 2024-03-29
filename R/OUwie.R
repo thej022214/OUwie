@@ -523,7 +523,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	  phy$edge.length <- phy$edge.length/Tmax
 	  Tmax <- 1
 	}else{
-	  Tmax <- max(branching.times(phy))
+	  Tmax <- max(MakeAgeTable(phy, root.age=root.age))
 	}
 	
 	if(model == "OU1" | model == "OUM" | model == "OUMV" | model == "OUMA" | model == "OUMVA"){
