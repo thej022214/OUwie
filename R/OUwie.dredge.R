@@ -1,6 +1,6 @@
 
 
-OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), shift.max=3, sigma.sq.max.k=3, alpha.max.k=3, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, mserr="none", algorithm=c("invert", "three.point"), lb=NULL, ub=NULL, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)) {
+OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), shift.max=3, sigma.sq.max.k=3, alpha.max.k=3, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, mserr="none", algorithm=c("invert", "three.point"), lb=NULL, ub=NULL, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5), verbose=FALSE) {
     
     ### ADD WARNINGS ###
     ## Number of alpha or sigma pars cannot exceed 1+max shifts
@@ -26,7 +26,7 @@ OUwie.dredge <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), s
     start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, root.station=TRUE, scaleHeight=scaleHeight, mserr=mserr, check.identify=FALSE, algorithm="invert", lb=lb, ub=ub)
     cat("Begin optimization routine -- Starting values:", c(start.vals$solution[1,1], start.vals$solution[2,1]), "\n")
     phy$node.label <- NULL
-    find.shifts <- GetShiftModel(phy=phy, data=data, nmax=shift.max, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, algorithm=algorithm, opts=opts)
+    find.shifts <- GetShiftModel(phy=phy, data=data, nmax=shift.max, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, algorithm=algorithm, opts=opts, verbose=verbose)
 
     cat("Finished. Summarizing", "\n")
 
@@ -90,7 +90,7 @@ print.OUwie.dredge <- function(x, ...) {
 }
 
 
-GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mBIC"), alpha.max.k, sigma.sq.max.k, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, start.vals, mserr="none", algorithm, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mBIC"), alpha.max.k, sigma.sq.max.k, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, shift.point=0.5, start.vals, mserr="none", algorithm, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5), verbose=FALSE){
     
     phy <- reorder(phy, "pruningwise")
     n <- length(phy$tip.label)
@@ -108,12 +108,19 @@ GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mB
 
     while (flag==0) {
         for (i in 1:N) {
+			if(verbose) {
+				cat("Step: ", i, "\n")
+			}
             if (sum(which(curmodel==i))>0) {
                 pos = which(curmodel==i)
                 tempmodel = curmodel[-pos]
 
                 ###### Make sure the right stuff is passed here ######
                 temp <- OptimizeDredgeLikelihood(curmodel=tempmodel, phy=phy, data=data, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, algorithm=algorithm, opts=opts)
+				
+				if(verbose) {
+					cat("Temp: ", temp$criterion, "\n")
+				}
                 #####################################################
 
                 if (temp$criterion < pro$criterion) {
@@ -131,6 +138,10 @@ GetShiftModel <- function(phy, data, nmax, criterion=c("AIC", "AICc", "BIC", "mB
                     ###### Make sure the right stuff is passed here ######
                     temp <- OptimizeDredgeLikelihood(curmodel=tempmodel, phy=phy, data=data, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, algorithm=algorithm, opts=opts)
                     #####################################################
+					
+					if(verbose) {
+						cat("Temp: ", temp$criterion, "\n")
+					}
 
                     if (temp$criterion < pro$criterion) {
                         promodel = tempmodel
