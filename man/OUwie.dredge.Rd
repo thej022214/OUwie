@@ -7,7 +7,7 @@ OUwie.dredge(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), shift.max=3,
 sigma.sq.max.k=3, alpha.max.k=3, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, 
 shift.point=0.5, mserr="none", algorithm=c("invert", "three.point"), lb=NULL, ub=NULL, 
 opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", 
-"ftol_rel"=.Machine$double.eps^0.5))
+"ftol_rel"=.Machine$double.eps^0.5), verbose=FALSE)
 }  
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes}
@@ -25,6 +25,7 @@ opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000",
 \item{lb}{if algorithm == "invert" a single value indicating the lower bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha lower bound, position 2 as sigma.sq's lower bound, position 3 as theta's lower bound. when set to NULL it will be a default value of 1e-9. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
 \item{ub}{if algorithm == "invert" a single value indicating the upper bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha upper bound, position 2 as sigma.sq's upper bound, position 3 as theta's upper bound. when set to NULL it will be a default value of 100. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
 \item{opts}{a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches}
+\item{verbose}{a logical indicating whether to print incremental steps}
 }
 \details{
 This is an expanded version of the shift point model of Ho and Ane (2014). This is currently being tested, but as of now we strongly recommend using the mBIC criterion when searching for shifts.
