@@ -355,6 +355,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                 transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
             }
+			if(mserr == "estimated"){
+				TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
+				transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (sigma.sq.me/transformed.tree$diag/transformed.tree$diag)
+			}
             comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
             logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
             se <- rep(NA,length(theta))
@@ -362,7 +366,8 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             return(list(-logl, theta.est))
         }
     }
-    if(quiet==FALSE){
+    
+	if(quiet==FALSE){
         cat("Calculating likelihood using fixed parameter values:",c(alpha,sigma.sq,theta), "\n")
     }
     

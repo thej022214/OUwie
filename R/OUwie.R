@@ -414,7 +414,6 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
                 if(mserr=="estimate"){
                     TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                     transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (sigma.sq.me/transformed.tree$diag/transformed.tree$diag)
-
                 }
                 comp <- NA
                 try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE)
@@ -920,6 +919,11 @@ print.OUwie<-function(x, ...){
                     print(log(2)/param.est['alpha',])
                 }
                 cat("\n")
+				if(!is.null(x$sigma.sq.me){
+					cat("\nTip fog estimate\n")
+					print(x$sigma.sq.me)
+					cat("\n")
+				}
             }
         }
     }
