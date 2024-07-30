@@ -355,12 +355,17 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
                 TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                 transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
             }
-			if(mserr == "estimated"){
+			if(is.numeric(mserr)){
 				TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
 				transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (mserr/transformed.tree$diag/transformed.tree$diag)
 			}
-            comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag)
-            logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
+			comp <- NA
+			try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE)
+			if(is.na(comp[1])){
+				return(10000000)
+			}else{
+				logl <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
+			}
             se <- rep(NA,length(theta))
             theta.est <- cbind(theta,se)
             return(list(-logl, theta.est))

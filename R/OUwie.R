@@ -868,6 +868,11 @@ print.OUwie<-function(x, ...){
 			cat("Optima\n")
 			print(theta.mat)
 			cat("\n")
+			if(!is.null(x$sigma.sq.me)){
+				cat("\nTip fog estimate\n")
+				print(x$sigma.sq.me)
+				cat("\n")
+			}
 		}
         if (x$get.root.theta == FALSE){
             if (x$model == "OU1" | x$model == "OUM"| x$model == "OUMV"| x$model == "OUMA" | x$model == "OUMVA"){
@@ -893,6 +898,11 @@ print.OUwie<-function(x, ...){
                     print(log(2)/param.est['alpha',])
                 }
                 cat("\n")
+				if(!is.null(x$sigma.sq.me)){
+					cat("\nTip fog estimate\n")
+					print(x$sigma.sq.me)
+					cat("\n")
+				}
             }
         }
         if (x$get.root.theta == TRUE){
