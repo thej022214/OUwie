@@ -66,7 +66,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     
     #Makes sure the data is in the same order as the tip labels
-    if(mserr=="none"){
+    if(mserr=="none" | is.numeric(mserr)){
         data <- data.frame(data[,2], data[,3], row.names=data[,1])
         data <- data[phy$tip.label,]
     }
@@ -308,7 +308,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     #Likelihood function for estimating model parameters
     dev.fixed <- function(){
         if(algorithm == "invert"){
-            
+			
             N <- length(x[,1])
             V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
             
@@ -317,7 +317,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             }
 			
 			if(is.numeric(mserr)){
-				diag(V) <- diag(V)+mserr
+				diag(V) <- diag(V) + mserr
 			}
 
             if(is.null(theta)){
