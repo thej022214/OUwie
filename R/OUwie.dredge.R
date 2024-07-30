@@ -95,8 +95,7 @@ OUwie.dredge.bom <- function(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"
     start.vals <- OUwie(phy, data2, model=c("OU1"), quiet=TRUE, root.station=TRUE, scaleHeight=scaleHeight, mserr=mserr, check.identify=FALSE, algorithm="invert", lb=lb, ub=ub)
     cat("Begin optimization routine -- Starting values:", c(start.vals$solution[1,1], start.vals$solution[2,1]), "\n")
     phy$node.label <- NULL
-	
-	
+
     find.shifts <- GetShiftModel.bom(phy=phy, data=data, nmax=shift.max, criterion=criterion, alpha.max.k=alpha.max.k, sigma.sq.max.k=sigma.sq.max.k, root.age=root.age, scaleHeight=scaleHeight, root.station=root.station, shift.point=shift.point, start.vals=start.vals, mserr=mserr, algorithm=algorithm, opts=opts, verbose=verbose)
 
     cat("Finished. Summarizing", "\n")

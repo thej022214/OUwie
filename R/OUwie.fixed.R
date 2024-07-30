@@ -293,6 +293,10 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
+	if(is.numeric(mserr)){
+		param.count <- param.count + 1
+	}
+
     obj <- NULL
     
     if(get.root.theta == TRUE){
@@ -311,7 +315,11 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             if(mserr=="known"){
                 diag(V) <- diag(V)+(data[,3]^2)
             }
-            
+			
+			if(is.numeric(mserr)){
+				diag(V) <- diag(V)+mserr
+			}
+
             if(is.null(theta)){
                 theta <- pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)%*%t(W)%*%pseudoinverse(V)%*%x
                 se <- sqrt(diag(pseudoinverse(t(W)%*%pseudoinverse(V)%*%W)))

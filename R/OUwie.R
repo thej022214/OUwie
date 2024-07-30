@@ -65,7 +65,6 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
             }
     }
 
-
     #Makes sure the data is in the same order as the tip labels
     if(mserr == "none" | mserr == "estimate"){
 		data <- data.frame(data[,2], data[,3], row.names=data[,1])
