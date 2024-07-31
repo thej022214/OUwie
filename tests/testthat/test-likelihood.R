@@ -210,6 +210,7 @@ test_that("testing OUMV likelihood invert vs three.point", {
     OUMVInvert <- OUwie.fixed(tree, trait, model=c("OUMV"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq,theta=theta, shift.point=0.5, algorithm="invert", check.identify=FALSE)
     OUMV3Point <- OUwie.fixed(tree, trait, model=c("OUMV"), simmap.tree=FALSE, scaleHeight=TRUE, clade=NULL, alpha=alpha, sigma.sq=sigma.sq,theta=theta, shift.point=0.5, algorithm="three.point", check.identify=FALSE)
     comparison <- identical(round(as.numeric(OUMVInvert$loglik),5), round(as.numeric(OUMV3Point$loglik),5))
+		
     expect_true(comparison)
 })
 
@@ -330,7 +331,7 @@ test_that("testing mserr vs three-point", {
     
     data(tworegime)
     trait[,4] <- abs(rnorm(length(tree$tip.label), mean = 1, sd = 1/10))
-    alpha=c(5, 10)
+    alpha=c(5,9)
     sigma.sq=c(1, 2)
     theta=c(5, 10)
     INV <- c(OUwie.fixed(tree,trait,model=c("OUMVA"), simmap.tree=FALSE, scaleHeight=TRUE, mserr = "known", clade=NULL, alpha=alpha,sigma.sq=sigma.sq,theta=theta, algorithm = "invert", quiet=TRUE, check.identify=FALSE)$loglik)
