@@ -427,18 +427,23 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     state_samples <- vector("list", nSim)
     sim_counter <- 0
     while(!(sim_counter >= nSim | current.attempts >= max.attempts)){
-      state_sample <- getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge)
-      current_mapping_id <- paste0(unlist(state_sample), collapse="")
-      if(!current_mapping_id %in% check_vector){
-        sim_counter <- sim_counter + 1
-        state_samples[[sim_counter]] <- state_sample
-        check_vector <- c(check_vector, current_mapping_id)
-      }else{
+      state_sample <- try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge))
+      if(class(state_sample) == "try-error"){
         current.attempts <- current.attempts + 1
+      }else{
+        current_mapping_id <- paste0(unlist(state_sample), collapse="")
+        if(!current_mapping_id %in% check_vector){
+          sim_counter <- sim_counter + 1
+          state_samples[[sim_counter]] <- state_sample
+          check_vector <- c(check_vector, current_mapping_id)
+        }else{
+          current.attempts <- current.attempts + 1
+        }
       }
     }
   }else{
-    state_samples <- lapply(1:nSim, function(x) getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge))
+    state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge)))
+    state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
   state_samples <- state_samples[!duplicated(mapping_ids, nmax = 1)]
