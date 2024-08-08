@@ -178,9 +178,11 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
-  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-    return(1e10)
+  if(!is.null(global_liks_mat)){
+    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+      return(1e10)
+    }
   }
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
