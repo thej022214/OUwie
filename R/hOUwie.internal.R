@@ -102,13 +102,15 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
-  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-    return(1e10)
-  }
-  if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
-    # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
-    return(1e10)
+  if(!is.null(global_liks_mat)){
+    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+      return(1e10)
+    }
+    if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
+      # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
+      return(1e10)
+    }
   }
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
