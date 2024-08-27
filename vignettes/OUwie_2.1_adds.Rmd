@@ -211,6 +211,20 @@ invert
 In this particular example, the log-likelihoods are identical. However, users are cautioned that some slight differences between the `algorithm="invert"` and `algorithm="three.point"` will likely be common. The use of the three-point structured algorithm requires that $\theta_i$ be optimized like any other parameter in the model, whereas with the matrix inversion approach $\theta_i$ are solved numerically. This means that when there are differences in the log-likelihood it is likely because one or more of $\theta_i$ is not at the MLE after using the three-point algorithm. Users are encouraged then to examine the contours of pairs of $\theta_i$. Also note, that the speed-ups afforded by the three-point algorithm is most observable when the tree size exceeds 500 taxa.
 
 
+### Estimating tip fog
+
+In comparative biology, we often overlook the complexity of uncertainty. We might consider “measurement error” as the standard error of the observed measurements for species, but the common default is to assume this error is zero. Moreover, the array of factors contributing to this uncertainty extends far beyond what we traditionally categorize as measurement error. This intraspecific variance has been described by various terms, including "specific variances", "residual variation", "phenotypic variation", and measurement error. Some of these terms suggest specific mechanisms. Other terms are more descriptive but may have meanings outside the field that can cause confusion. To avoid ambiguity, we recently propose a new term: "tip fog" (Beaulieu and O'Meara, 2024), This term captures the variance that occurs at the present between the true species mean derived from the evolutionary process and what an experimenter records as a value, without being tied to any particular mechanism, and it applies to characters that are discrete or continuous.
+
+There are various ways to specify tip fog. First, recall from the individual manuals that the trait data.frame must have column entries in the following order: species names, current selective regime, and the continuous trait of interest. If the user wants to incorporate tip fog based on their own measurements (`tip.fog="known"`), then a fourth column must be included that provides the *standard error estimates for each species mean*. However, a global tip fog for all taxa can be estimated from the data (`tip.fog="estimate"`). Specifically, to estimate the tip fog parameter:
+```{r, eval=FALSE, echo=TRUE}
+data(tworegime)
+invert <- OUwie(tree, trait, model="OUMV", root.station=FALSE, scaleHeight=TRUE, shift.point=0.5, tip.fog="estimate", algorithm="invert", quiet=TRUE)
+invert
+```
+
+In simulation we've found that not accounting for tip fog can have a substantial effect on the rate estimates. That is, rates quicky become severally overestimated with even a modest amount of tip fog. It is for these reasons we suggest that user at least set `tip.fog="estimate"` for now. In future version, this option will become the default.
+
+
 # References
 
 Beaulieu J.M., D.C. Jhwueng, C. Boettiger, and B.C. O'Meara. 2012. Modeling stabilizing selection: Expanding the Ornstein-Uhlenbeck model of adaptive evolution. Evolution, 66:2369-2383.

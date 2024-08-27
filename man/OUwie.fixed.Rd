@@ -6,7 +6,7 @@
 OUwie.fixed(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), 
 simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, 
 get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, 
-clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), 
+clade=NULL, tip.fog="none", check.identify=TRUE, algorithm=c("invert", "three.point"), 
 tip.paths=NULL, quiet=FALSE)
 }       
 \arguments{
@@ -23,7 +23,7 @@ tip.paths=NULL, quiet=FALSE)
 \item{sigma.sq}{a numeric vector giving the values of \eqn{\sigma^2}{sigma^2} for each selective regime} 
 \item{theta}{a numeric vector giving the values of \eqn{\theta}{theta} for each selective regime}
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest.}
-\item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. If a single numeric value is supplied it will be applied to all species uniformly. The default is "none", meaning no measurement error is used.}
+\item{tip.fog}{designates whether a fourth column in the data matrix contains tip fog for each species value ("known"). The tip fog is assumed to be the standard error of the species mean. If a single numeric value is supplied it will be applied to all species uniformly. The default is "none", meaning no tip fog is used.}
 \item{check.identify}{a logical indicating whether to check that the user-supplied regime paintings will produce identifiable theta estimates. The default is \code{TRUE}.}
 \item{algorithm}{designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.}
 \item{tip.paths}{an optional list that can be provided by the user where each element from 1:nTips is the path from tip to root by labeled node number. The default is NULL and this option is used for internal speedups.}

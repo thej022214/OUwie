@@ -1,6 +1,6 @@
 ##### Main internal functions ##### 
-hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
-                       index.disc, index.cont, root.p, 
+hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
+                       index.disc, index.cont, root.p,
                        edge_liks_list, nSim, all.paths=NULL, 
                        sample_tips=FALSE, sample_nodes=FALSE,
                        adaptive_sampling=FALSE, split.liks=FALSE, 
@@ -94,10 +94,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   # if there is no character dependence the map has no influence on continuous likleihood
   character_dependence_check <- all(apply(index.cont, 1, function(x) length(unique(x)) == 1))
   if(character_dependence_check){
-    llik_continuous <- OUwie.basic(simmaps[[1]], data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr)
+    llik_continuous <- OUwie.basic(simmaps[[1]], data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)
     llik_continuous <- rep(llik_continuous, length(simmaps))
   }else{
-    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr)))
+    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)))
   }
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
@@ -153,7 +153,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
         }
         # evaluate the new mappings' joint likelhood
         discrete_probs <- lapply(internode_maps_and_discrete_probs$state_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
-        continuous_probs <- lapply(new_simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr))
+        continuous_probs <- lapply(new_simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog))
         new_liks <- unlist(continuous_probs) + unlist(discrete_probs)
         adaptive_criteria <- max(llik_houwies) > max(new_liks)
         llik_continuous <- c(llik_continuous, unlist(continuous_probs))
@@ -181,7 +181,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
     return(1e10)
   }
   if(split.liks){
-    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
+    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
     if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
       llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
@@ -199,7 +199,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, mserr,
   return(-llik_houwie)
 }
 
-hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
+hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
                              index.disc, index.cont, root.p, 
                              edge_liks_list, all.paths=NULL, 
                              sample_tips=FALSE, sample_nodes=FALSE,
@@ -260,10 +260,10 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   # if there is no character dependence the map has no influence on continuous likleihood
   character_dependence_check <- all(apply(index.cont, 1, function(x) length(unique(x)) == 1))
   if(character_dependence_check){
-    llik_continuous <- OUwie.basic(simmaps[[1]], data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr)
+    llik_continuous <- OUwie.basic(simmaps[[1]], data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)
     llik_continuous <- rep(llik_continuous, length(simmaps))
   }else{
-    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr)))
+    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)))
   }
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
@@ -274,7 +274,7 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   # find the best nSim mappings after adaptive sampling
   if(split.liks){
-    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr,return.expected.vals=TRUE))
+    # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
     if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
       llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
@@ -296,7 +296,7 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, mserr,
 runSingleThorough <- function(houwie_obj, new_maps, init_pars){
   hOUwie.dat <- houwie_obj$hOUwie.dat
   root.p <- houwie_obj$root.p
-  mserr <- houwie_obj$mserr
+  tip.fog <- houwie_obj$tip.fog
   rate.cat <- houwie_obj$rate.cat
   index.disc <- houwie_obj$index.disc
   n_p_trans <- max(index.disc, na.rm = TRUE)
@@ -543,7 +543,7 @@ getMapFromSubstHistory <- function(maps, phy){
   
 }
 # a basic optimization for OUwie basic
-OUwie.basic.dev <- function(p, phy, data, mserr, index.cont, tip.paths=NULL){
+OUwie.basic.dev <- function(p, phy, data, tip.fog, index.cont, tip.paths=NULL){
   p <- exp(p)
   index.cont[is.na(index.cont)] <- max(index.cont, na.rm = TRUE) + 1
   Rate.mat <- matrix(1, 3, dim(index.cont)[2])
@@ -551,13 +551,13 @@ OUwie.basic.dev <- function(p, phy, data, mserr, index.cont, tip.paths=NULL){
   alpha = Rate.mat[1,]
   sigma.sq = Rate.mat[2,]
   theta = Rate.mat[3,]
-  llik_continuous <- OUwie.basic(phy, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr=mserr)
+  llik_continuous <- OUwie.basic(phy, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)
   return(-llik_continuous)
 }
 
 
 # probability of the continuous parameter
-OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha, sigma.sq, theta, mserr="none", algorithm="three.point", tip.paths=NULL, return.expected.vals=FALSE){
+OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha, sigma.sq, theta, tip.fog="none", algorithm="three.point", tip.paths=NULL, return.expected.vals=FALSE){
   # organize tip states based on what the simmap suggests
   mapping <- unlist(lapply(phy$maps, function(x) names(x[length(x)])))
   nTip <- length(phy$tip.label)
@@ -565,11 +565,11 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
   data[,2] <- TipStates
   
   #Makes sure the data is in the same order as the tip labels
-  if(mserr=="none"){
+  if(tip.fog=="none"){
     data <- data.frame(data[,2], data[,3], row.names=data[,1])
     data <- data[phy$tip.label,]
   }
-  if(mserr=="known"){
+  if(tip.fog=="known"){
     # algorithm = "invert"
     if(!dim(data)[2]==4){
       stop("You specified measurement error should be incorporated, but this information is missing.", call. = FALSE)
@@ -651,7 +651,7 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
   }
   transformed.tree <- transformPhy(phy, map, pars, tip.paths)
   # generate a map from node based reconstructions
-  if(mserr=="known"){
+  if(tip.fog=="known"){
     TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
     transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
   }
@@ -751,7 +751,7 @@ getAllJointProbs<- function(phy, data, rate.cat, time_slice, Q, alpha, sigma.sq,
     llik_discrete <- unlist(lapply(internode_samples, function(x) getStateSampleProb(state_sample = x, Pij = tmp$Pij, root_liks = root_liks, root_edges = tmp$root_edges)))
     # generate a stochstic map
     simmaps <- getMapFromSubstHistory(internode_maps, phy)
-    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, mserr="none")))
+    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog="none")))
     simmap_list[[i]] <- simmaps[[1]]
     joint_probability_table[i,] <- c(llik_discrete, llik_continuous, llik_discrete + llik_continuous)
   }
@@ -1085,9 +1085,9 @@ getDiscreteModel <- function(data, model, rate.cat, dual, collapse){
 # }
 
 
-organizeHOUwieDat <- function(data, mserr, collapse = TRUE){
+organizeHOUwieDat <- function(data, tip.fog, collapse = TRUE){
   # return a list of corHMM data and OU data
-  if(mserr=="known"){
+  if(tip.fog=="known"){
     data.cor <- data[, 1:(dim(data)[2]-2)]
     data.cor <- corHMM:::corProcessData(data.cor, collapse = collapse)
     data.ou <- data.frame(sp = data[,1], 
@@ -1095,7 +1095,7 @@ organizeHOUwieDat <- function(data, mserr, collapse = TRUE){
                           x = data[, dim(data)[2]-1],
                           err = data[, dim(data)[2]])
   }
-  if(mserr=="none"){
+  if(tip.fog=="none"){
     data.cor <- data[, 1:(dim(data)[2]-1)]
     data.cor <- corHMM:::corProcessData(data.cor)
     data.ou <- data.frame(sp = data[,1], 
@@ -1200,7 +1200,7 @@ simCharacterHistory <- function(phy, Q, root.freqs, Q2 = NA, NoI = NA){
   #return(CharacterHistory)
 }
 # organize the houwie output
-getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mserr, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values){
+getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip.fog, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values){
   param.count <- max(index.disc, na.rm = TRUE) + max(index.cont, na.rm = TRUE)
   nb.tip <- length(phy$tip.label)
   solution <- organizeHOUwiePars(pars=pars, index.disc=index.disc, index.cont=index.cont)
@@ -1215,7 +1215,7 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mse
   if(negative_values){
     n_theta <- length(unique(index.cont[3,]))
     pars[(length(pars) - n_theta + 1):length(pars)] <- pars[(length(pars) - n_theta + 1):length(pars)]- 50
-    if(mserr == "none"){
+    if(tip.fog == "none"){
       data[,dim(data)[2]] <- data[,dim(data)[2]] - 50
       solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
     }else{
@@ -1247,7 +1247,7 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, mse
     time_slice=time_slice,
     root.station=root.station, 
     get.root.theta=get.root.theta, 
-    mserr = mserr, 
+    tip.fog = tip.fog, 
     sample_tips = sample_tips,
     sample_nodes = sample_nodes,
     adaptive_sampling = adaptive_sampling,
@@ -1374,11 +1374,11 @@ index_paramers_from_tip_states <- function(tip_states, rates, continuous_solutio
   return(parameter_df)
 }
 
-# hOUwie.twostep <- function(phy, data, rate.cat, discrete_model, continuous_model, nSim=1000, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, mserr = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, n_starts = 1, ncores = 1){
+# hOUwie.twostep <- function(phy, data, rate.cat, discrete_model, continuous_model, nSim=1000, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip="fast", optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=TRUE, n_starts = 1, ncores = 1){
 #   start_time <- Sys.time()
 #   # if the data has negative values, shift it right - we will shift it back later
 #   negative_values <- FALSE
-#   if(mserr == "none"){
+#   if(tip.fog == "none"){
 #     if(any(data[,dim(data)[2]] < 0)){
 #       cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
 #       negative_values <- TRUE
@@ -1407,9 +1407,9 @@ index_paramers_from_tip_states <- function(tip_states, rates, continuous_solutio
 #   
 #   # organize the data
 #   phy <- reorder.phylo(phy, "pruningwise")
-#   hOUwie.dat <- organizeHOUwieDat(data, mserr, collapse)
+#   hOUwie.dat <- organizeHOUwieDat(data, tip.fog, collapse)
 #   nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
-#   nCol <- dim(data)[2] - ifelse(mserr == "none", 2, 3)
+#   nCol <- dim(data)[2] - ifelse(tip.fog == "none", 2, 3)
 #   Tmax <- max(branching.times(phy))
 #   tip.paths <- lapply(1:Ntip(phy), function(x) OUwie:::getPathToRoot(phy, x))
 #   
@@ -1553,7 +1553,7 @@ index_paramers_from_tip_states <- function(tip_states, rates, continuous_solutio
 #       discrete_fit <- corHMM(phy=phy, data=hOUwie.dat$data.cor, rate.cat=rate.cat, rate.mat=index.disc, node.states="none", opts = opts)
 #       cat("\nGenerating", nSim, "simmaps and optimizing the continuous model to each.")
 #       simmap_list <- makeSimmap(tree=phy, data=hOUwie.dat$data.cor, model=discrete_fit$solution, rate.cat=1, nSim=nSim, nCores=1)
-#       continuous_fit <- mclapply(simmap_list, function(x) nloptr(x0 = log(c(starts.alpha, starts.sigma, start.theta)), eval_f = OUwie.basic.dev, lb=lower[-seq(n_p_trans)], ub=upper[-seq(n_p_trans)], opts=opts, phy = x, data = hOUwie.dat$data.ou, mserr = mserr, index.cont = index.cont, tip.paths = tip.paths), mc.cores=ncores)
+#       continuous_fit <- mclapply(simmap_list, function(x) nloptr(x0 = log(c(starts.alpha, starts.sigma, start.theta)), eval_f = OUwie.basic.dev, lb=lower[-seq(n_p_trans)], ub=upper[-seq(n_p_trans)], opts=opts, phy = x, data = hOUwie.dat$data.ou, tip.fog = tip.fog, index.cont = index.cont, tip.paths = tip.paths), mc.cores=ncores)
 #     }
 #   }
 #   return(list(discrete_fit, continuous_fit))

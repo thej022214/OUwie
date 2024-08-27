@@ -4,7 +4,7 @@
 
 #Allows the user to calculate the likelihood given a specified set of parameter values.
 
-OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, mserr="none", check.identify=TRUE, algorithm=c("invert", "three.point"), tip.paths=NULL, quiet=FALSE){
+OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha=NULL, sigma.sq=NULL, theta=NULL, clade=NULL, tip.fog="none", check.identify=TRUE, algorithm=c("invert", "three.point"), tip.paths=NULL, quiet=FALSE){
     
     if(length(algorithm) == 2){
         algorithm = "invert"
@@ -66,11 +66,11 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
     }
     
     #Makes sure the data is in the same order as the tip labels
-    if(mserr=="none" | is.numeric(mserr)){
+    if(tip.fog=="none" | is.numeric(tip.fog)){
         data <- data.frame(data[,2], data[,3], row.names=data[,1])
         data <- data[phy$tip.label,]
     }
-    if(mserr=="known"){
+    if(tip.fog=="known"){
         # algorithm = "invert"
         if(!dim(data)[2]==4){
             stop("You specified measurement error should be incorporated, but this information is missing.", call. = FALSE)
@@ -293,7 +293,7 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
         }
     }
     
-	if(is.numeric(mserr)){
+	if(is.numeric(tip.fog)){
 		param.count <- param.count + 1
 	}
 
@@ -312,12 +312,12 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             N <- length(x[,1])
             V <- varcov.ou(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=root.station, shift.point=shift.point)
             
-            if(mserr=="known"){
+            if(tip.fog=="known"){
                 diag(V) <- diag(V)+(data[,3]^2)
             }
 			
-			if(is.numeric(mserr)){
-				diag(V) <- diag(V) + mserr
+			if(is.numeric(tip.fog)){
+				diag(V) <- diag(V) + tip.fog
 			}
 
             if(is.null(theta)){
@@ -351,13 +351,13 @@ OUwie.fixed<-function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","
             }
             transformed.tree <- transformPhy(phy, map, pars, tip.paths)
             # generate a map from node based reconstructions
-            if(mserr=="known"){
+            if(tip.fog=="known"){
                 TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
                 transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (data[,3]^2/transformed.tree$diag/transformed.tree$diag)
             }
-			if(is.numeric(mserr)){
+			if(is.numeric(tip.fog)){
 				TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)
-				transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (mserr/transformed.tree$diag/transformed.tree$diag)
+				transformed.tree$tree$edge.length[TIPS] <- transformed.tree$tree$edge.length[TIPS] + (tip.fog/transformed.tree$diag/transformed.tree$diag)
 			}
 			comp <- NA
 			try(comp <- phylolm::three.point.compute(transformed.tree$tree, x, expected.vals, transformed.tree$diag), silent=TRUE)

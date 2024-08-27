@@ -1,7 +1,7 @@
 # Format a tree and data for OUwie. By Brian O'Meara
 
-OUwie.format <- function(phy, tip.regimes=NULL, tip.data=NULL, tip.measurement.error=NULL, tip.measurement.error.percentage=NULL, verbose=TRUE){
-	traits <- data.frame(Taxa=phy$tip.label, Regime=1, Trait=NA, MeasurementError=0, stringsAsFactors=FALSE)
+OUwie.format <- function(phy, tip.regimes=NULL, tip.data=NULL, tip.fog=NULL, tip.fog.percentage=NULL, verbose=TRUE){
+	traits <- data.frame(Taxa=phy$tip.label, Regime=1, Trait=NA, TipFog=0, stringsAsFactors=FALSE)
 	if(!is.null(tip.regimes)) {
 		traits$Regime <- NA # so that lack of matches don't get assigned to regime 1
 		if(is.vector(tip.regimes)) {
@@ -30,29 +30,29 @@ OUwie.format <- function(phy, tip.regimes=NULL, tip.data=NULL, tip.measurement.e
 			warning(paste0("Some taxa (", sum(is.na(traits$Trait))," total) in the tree are not in the tip.data input"))
 		}
 	}
-	if(!is.null(tip.measurement.error)) {
-		traits$MeasurementError <- NA # so that lack of matches don't get assigned zero
-		if(is.vector(tip.measurement.error)) {
-			if(length(tip.measurement.error)==1) {
-				traits$MeasurementError <- tip.measurement.error
+	if(!is.null(tip.fog)) {
+		traits$TipFog <- NA # so that lack of matches don't get assigned zero
+		if(is.vector(tip.fog)) {
+			if(length(tip.fog)==1) {
+				traits$TipFog <- tip.fog
 			} else {
-				traits$MeasurementError <- tip.measurement.error[match(traits$Taxa, names(tip.measurement.error))]
+				traits$TipFog <- tip.fog[match(traits$Taxa, names(tip.fog))]
 			}
 		} else {
-			if(ncol(tip.measurement.error)!= 1) {
-				stop("This assumes tip.measurement.error is either a named vector or a data.frame with one column with taxon names as rownames")	
+			if(ncol(tip.fog)!= 1) {
+				stop("This assumes tip.mfog is either a named vector or a data.frame with one column with taxon names as rownames")
 			}
-			traits$MeasurementError <- tip.measurement.error[match(traits$Taxa, rownames(tip.measurement.error)),]
+			traits$TipFog <- tip.fog[match(traits$Taxa, rownames(tip.fog)),]
 		}
-		if(any(is.na(traits$MeasurementError))) {
-			warning(paste0("Some taxa (", sum(is.na(traits$MeasurementError))," total) in the tree are not in the tip.measurement.error input"))
+		if(any(is.na(traits$TipFog))) {
+			warning(paste0("Some taxa (", sum(is.na(traits$TipFog))," total) in the tree are not in the tip.fog input"))
 		}
-	} else if (!is.null(tip.measurement.error.percentage)) {
-		traits$MeasurementError <- traits$Trait * tip.measurement.error.percentage/100
+	} else if (!is.null(tip.fog.percentage)) {
+		traits$TipFog <- traits$Trait * tip.fog.percentage/100
 	} else {
 		if(verbose) {
-			warning("No tip.measurement.error input, so assuming zero measurement error for all taxa. This is almost surely untrue in reality and is a strong bias")	
-		}	
+			warning("No tip.fog input, so assuming zero tip fog for all taxa. This is almost surely untrue in reality and is a strong bias")
+		}
 	}
 	if(is.null(phy$node.label)) {
 		phy$node.label <- rep(1, ape::Nnode(phy))	

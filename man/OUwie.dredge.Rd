@@ -5,7 +5,7 @@
 \usage{
 OUwie.dredge(phy, data, criterion=c("AIC", "AICc", "BIC", "mBIC"), shift.max=3, 
 sigma.sq.max.k=3, alpha.max.k=3, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, 
-shift.point=0.5, mserr="none", algorithm=c("invert", "three.point"), lb=NULL, ub=NULL, 
+shift.point=0.5, tip.fog="none", algorithm=c("invert", "three.point"), lb=NULL, ub=NULL, 
 opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", 
 "ftol_rel"=.Machine$double.eps^0.5), verbose=FALSE)
 }  
@@ -20,7 +20,7 @@ opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000",
 \item{scaleHeight}{a logical indicating whether the total tree height should be scaled to 1. The default is \code{FALSE}.} 
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated.}
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
-\item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{tip.fog}{designates whether a fourth column in the data matrix contains tip fog for each species value ("known"). The tip fog is assumed to be the standard error of the species mean. The default is "none".}
 \item{algorithm}{designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.}
 \item{lb}{if algorithm == "invert" a single value indicating the lower bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha lower bound, position 2 as sigma.sq's lower bound, position 3 as theta's lower bound. when set to NULL it will be a default value of 1e-9. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
 \item{ub}{if algorithm == "invert" a single value indicating the upper bound for the parameter values. if algorithm == "three.point", a vector of length 3 with position 1 as alpha upper bound, position 2 as sigma.sq's upper bound, position 3 as theta's upper bound. when set to NULL it will be a default value of 100. Note that even if the model you're using doesn't include alpha (e.g. BM1), it must be included in this vector, but it will not be used to set any bounds.}
@@ -37,7 +37,7 @@ This is an expanded version of the shift point model of Ho and Ane (2014). This 
 \item{$criterion.score}{the information criterion score used for shift detection.}
 \item{$shift.model}{The shift model estimated from the data.}
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
-\item{$mserr.est}{indicates value of the measurement error if it was estimated from the data.}
+\item{$tip.fog.est}{indicates value of the measurement error if it was estimated from the data.}
 \item{$theta}{a matrix containing the maximum likelihood estimates of \eqn{\theta}{theta}.}
 \item{$tot.states}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details)}

@@ -1,6 +1,6 @@
 Package: OUwie
-Version: 2.12
-Date: 2023-05-23
+Version: 2.13
+Date: 2024-08-21
 Title: Analysis of Evolutionary Rates in an OU Framework
 Author: Jeremy M. Beaulieu <jmbeauli@uark.edu>, Brian O'Meara <bomeara@utk.edu>
 Maintainer: Jeremy Beaulieu <jmbeauli@uark.edu>

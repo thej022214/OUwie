@@ -6,7 +6,7 @@
 OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
  nboot=100, alpha, sigma.sq, theta, theta0, simmap.tree=FALSE, root.age=NULL,
  scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, 
- clade=NULL, mserr="none", algorithm=c("invert", "three.point"), 
+ clade=NULL, tip.fog="none", algorithm=c("invert", "three.point"), 
  diagn=FALSE, quiet=TRUE, warn=FALSE)
 }       
 \arguments{
@@ -25,7 +25,7 @@ OUwie.boot(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA"),
 \item{root.station}{a logical indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details).} 
 \item{shift.point}{the point along a branch where a regime change is assumed to have occurred (if \code{SIMMAP=FALSE}. The default is set to 0.5, or halfway along a branch.}
 \item{clade}{a list containing a pair of taxa whose MRCA is the clade of interest.}
-\item{mserr}{designates whether a fourth column in the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{tip.fog}{designates whether a fourth column in the data matrix contains tip fog for each species value ("known"). The tip fog is assumed to be the standard error of the species mean. The default is "none".}
 \item{algorithm}{designates whether the standard matrix inversion ('invert') or the faster 'three-point' algorithm of Ho and Ane (2013) should be used.}
 \item{diagn}{a logical indicating whether the full diagnostic analysis should be carried out. The default is \code{FALSE}.}
 \item{quiet}{a logical indicating whether progress should be written to the screen. The default is \code{TRUE}.}

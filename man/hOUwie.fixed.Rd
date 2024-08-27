@@ -18,7 +18,7 @@ hOUwie.fixed(simmaps,
              collapse            = TRUE, 
              root.station        = FALSE, 
              get.root.theta      = FALSE, 
-             mserr               = "none", 
+             tip.fog             = "none", 
              lb_discrete_model   = NULL, 
              ub_discrete_model   = NULL, 
              lb_continuous_model = NULL, 
@@ -51,7 +51,7 @@ hOUwie.fixed(simmaps,
 \item{collapse}{A boolean indicating whether to collapse multiple character combinations into only the observed states. For example, if true a two character dataset contained (0,0), (1,0), and (1,1), this would be collapsed into 1,2,3. However, if set to false it would 1,2,4. In combination with a custom rate matrix this allows for the estimation of transitions between unobserved character combinations. Transitions to and from unobserved state combinations may not be estimatable: See Boyko and Beaulieu (2022).} 
 \item{root.station}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details of OUwie function).} 
 \item{get.root.theta}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, should be estimated (see Details of OUwie function).}
-\item{mserr}{Designates whether the last column of the data matrix contains measurement error for each species value ("known"). The measurement error is assumed to be the standard error of the species mean. The default is "none".}
+\item{tip.fog}{designates whether a fourth column in the data matrix contains within species variation for each species value ("known"). The tip fog is assumed to be the standard error of the species mean. The default is "none".}
 \item{lb_discrete_model}{A single value for the lower bound of discrete character evolution during the ML search. The default is \code{1/(Tmax*10000)}.} 
 \item{ub_discrete_model}{A single value for the upper bound of discrete character evolution during the ML search. The default is \code{1/(Tmax*0.0001)}.} 
 \item{lb_continuous_model}{Three values specifying the lower bound of continuous character evolution during the ML search. Should be provided in the order of lower.bound for alpha, sigma squared, theta. The default is \code{c(1e-10, 1e-10, smallest_continuous_value/10)}.} 
@@ -104,7 +104,7 @@ A named list with the following elements:
 \item{time_slice}{Sets how often internodes are sampled. At the moment it is automatically set to be the \code{max(branching.times(phy))+1}.}
 \item{root.station}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated (recommended FALSE).}
 \item{get.root.theta}{A boolean indicating whether the root.theta was included in the model.}
-\item{mserr}{Either includes measurement error for each species value ("known"). The default is "none".}
+\item{tip.fog}{Either includes measurement error for each species value ("known"). The default is "none".}
 \item{sample_tips}{A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).}
 \item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
 \item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
