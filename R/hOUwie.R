@@ -263,7 +263,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   # }
   # conducting ancestra state resconstruction
   if(recon){
-    houwie_recon <- hOUwie.recon(houwie_obj, nodes)
+    # if for whatever reason houwie recon fails, i don't want to lose the optimization of houwie, hence the try error.
+    houwie_recon <- try(hOUwie.recon(houwie_obj, nodes))
     houwie_obj$recon <- houwie_recon
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete

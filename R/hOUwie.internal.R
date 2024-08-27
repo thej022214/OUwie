@@ -102,13 +102,15 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
-  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-    return(1e10)
-  }
-  if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
-    # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
-    return(1e10)
+  if(!is.null(global_liks_mat)){
+    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+      return(1e10)
+    }
+    if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
+      # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
+      return(1e10)
+    }
   }
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
@@ -176,9 +178,11 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
-  if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-    # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-    return(1e10)
+  if(!is.null(global_liks_mat)){
+    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
+      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
+      return(1e10)
+    }
   }
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
@@ -427,18 +431,23 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     state_samples <- vector("list", nSim)
     sim_counter <- 0
     while(!(sim_counter >= nSim | current.attempts >= max.attempts)){
-      state_sample <- getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge)
-      current_mapping_id <- paste0(unlist(state_sample), collapse="")
-      if(!current_mapping_id %in% check_vector){
-        sim_counter <- sim_counter + 1
-        state_samples[[sim_counter]] <- state_sample
-        check_vector <- c(check_vector, current_mapping_id)
-      }else{
+      state_sample <- try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge), silent = TRUE)
+      if(class(state_sample) == "try-error"){
         current.attempts <- current.attempts + 1
+      }else{
+        current_mapping_id <- paste0(unlist(state_sample), collapse="")
+        if(!current_mapping_id %in% check_vector){
+          sim_counter <- sim_counter + 1
+          state_samples[[sim_counter]] <- state_sample
+          check_vector <- c(check_vector, current_mapping_id)
+        }else{
+          current.attempts <- current.attempts + 1
+        }
       }
     }
   }else{
-    state_samples <- lapply(1:nSim, function(x) getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge))
+    state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge), silent = TRUE))
+    state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
   state_samples <- state_samples[!duplicated(mapping_ids, nmax = 1)]
