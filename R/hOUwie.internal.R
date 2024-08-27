@@ -432,7 +432,7 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     sim_counter <- 0
     while(!(sim_counter >= nSim | current.attempts >= max.attempts)){
       state_sample <- try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge), silent = TRUE)
-      if(class(state_sample) == "try-error"){
+      if(inherits(state_sample, "try-error")){
         current.attempts <- current.attempts + 1
       }else{
         current_mapping_id <- paste0(unlist(state_sample), collapse="")
