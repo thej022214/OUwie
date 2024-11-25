@@ -24,22 +24,24 @@ OUwie.boot <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA",
 	
 	for(i in 1:nboot){
 		tmp.phy<-phy
-		if(tip.fog=="known"){
-			if(!dim(data)[2]==4){
-				stop("You specified tip fog should be incorporated, but this information is missing.", .call=FALSE)
-			}else{
+		#if(tip.fog=="known"){
+			#else{
 				#Now lengthen the terminal branches to reflect the intraspecific variation at the tips:
-				terminals <- tmp.phy$edge[,2] <= Ntip(tmp.phy)
-				terminal.edges <- tmp.phy$edge.length[terminals]
-				tmp.phy$edge.length[terminals] <- terminal.edges + data[,4]
-			}
-		}
+				#terminals <- tmp.phy$edge[,2] <= Ntip(tmp.phy)
+				#terminal.edges <- tmp.phy$edge.length[terminals]
+				#tmp.phy$edge.length[terminals] <- terminal.edges + data[,4]
+			#}
+		#}
 		#This calls the OUwie simulator and simulates datasets:
         if(tip.fog == "none"){
             tmp <- OUwie.sim(tmp.phy, data, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0, tip.fog=tip.fog, shift.point=shift.point)
         }
         if(tip.fog == "known"){
-            tmp <- OUwie.sim(tmp.phy, data[,c(1,2,4)], simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0, tip.fog=tip.fog, shift.point=shift.point)
+			if(!dim(data)[2]==4){
+				stop("You specified tip fog should be incorporated, but this information is missing.", .call=FALSE)
+			}else{
+				tmp <- OUwie.sim(tmp.phy, data[,c(1,2,4)], simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, alpha=alpha, sigma.sq=sigma.sq, theta=theta, theta0=theta0, tip.fog=tip.fog, shift.point=shift.point)
+			}
         }
 		#OUwie.sim outputs the trait file in the order of the tree, but the trait file is likely not to be this way. So I alphabetized the input trait file above, and I do the same to the simulated trait file:
 		data <- data[order(data[,1]),]

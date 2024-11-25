@@ -929,9 +929,9 @@ print.OUwie<-function(x, ...){
                     print(log(2)/param.est['alpha',])
                 }
                 cat("\n")
-				if(!is.null(x$sigma.sq.me)){
+				if(!is.null(x$tip.fog.est)){
 					cat("\nTip fog estimate\n")
-					print(x$sigma.sq.me)
+					print(x$tip.fog.est)
 					cat("\n")
 				}
             }
