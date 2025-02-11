@@ -54,14 +54,14 @@ contourSearchOUwie <- function(phy, data, num.regimes, param.points, index.vecto
             print(nrep.index)
             fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
             opts <- opts
-            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=fix_lower(lower, log(init.vals)), ub=fix_upper(upper, log(init.vals)), phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
             res[nrep.index,] <- c(-out$objective, fixed.pars[1], fixed.pars[2])
         }
     }else{
         PointEval <- function(nrep.index){
             fixed.pars <- c(param.points[nrep.index,1], param.points[nrep.index,2])
             opts <- opts
-            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=lower, ub=upper, phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
+            out <- nloptr(x0=log(init.vals), eval_f=OUwie.semifixed, opts=opts, lb=fix_lower(lower, log(init.vals)), ub=fix_upper(upper, log(init.vals)), phy=phy, data=data, num.regimes=num.regimes, index.vector=index.vector, fixed.pars=fixed.pars, simmap.tree=simmap.tree, scaleHeight=scaleHeight, root.station=root.station, get.root.theta=get.root.theta, shift.point=shift.point, algorithm=algorithm)
             return(c(-out$objective, fixed.pars[1], fixed.pars[2]))
         }
         res.list <- mclapply(1:nreps, PointEval, mc.cores=n.cores)

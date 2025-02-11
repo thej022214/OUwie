@@ -569,8 +569,8 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
            ip <- c(ip, mean(pic(x, phy)^2)/2)
            lower <- c(lower, log(lb))
            upper <- c(upper, log(ub))
-        }
-		out <- nloptr(x0=log(ip), eval_f=dev, lb=lower, ub=upper, opts=opts, index.mat=index.mat, edges=edges, tip.fog=tip.fog, trendy=trendy, get.root.theta=get.root.theta)
+        } 
+		out <- nloptr(x0=log(ip), eval_f=dev, lb=fix_lower(lower, log(ip)), ub=fix_upper(upper, log(ip)), opts=opts, index.mat=index.mat, edges=edges, tip.fog=tip.fog, trendy=trendy, get.root.theta=get.root.theta)
 	}
 	else{
         if(is.null(starting.vals)){
