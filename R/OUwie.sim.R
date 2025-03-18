@@ -180,7 +180,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(tip.fog == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3], data[i,2])
                 }
             }
         }else{
@@ -193,7 +193,7 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(tip.fog == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3],data[i,2])
+                    sim.dat[i,3] <- rnorm(1,sim.dat[i,3], data[i,2])
                 }
             }
         }
@@ -204,6 +204,28 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		}
 	}
 	if(simmap.tree==TRUE){
+		#This is annoying, but the second column has to be in there twice otherwise, error.
+		if(tip.fog == "none"){
+			data <- data.frame(data[,2], data[,2], row.names=data[,1])
+		}
+		if(tip.fog == "known"){
+			data <- data.frame(data[,2], data[,3], row.names=data[,1])
+			tip.fog_vector <- data[,2] #because we've shifted things over
+		}
+		if(is.numeric(tip.fog)){
+			if(length(tip.fog) == length(phy$tip.label)){
+				data <- data.frame(data[,2], tip.fog, row.names=data[,1])
+				tip.fog_vector <- tip.fog
+			}
+			if(length(tip.fog)==1){
+				data <- data.frame(data[,2], rep(tip.fog, length(phy$tip.label)), row.names=data[,1])
+				tip.fog_vector <- rep(tip.fog, length(phy$tip.label))
+			}
+			tip.fog <- "known"
+		}
+		
+		data <- data[phy$tip.label,]
+
 		n=max(phy$edge[,1])
 		ntips=length(phy$tip.label)
 
@@ -284,17 +306,19 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
             
             if(tip.fog == "known"){
                 for(i in TIPS){
-                    sim.dat[i,3] <- rnorm(1, sim.dat[i,2], data[i,2])
+                    sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,2])
                 }
             }
         }else{
-            sim.dat<-matrix(,ntips,2)
-            sim.dat<-data.frame(sim.dat)
+            sim.dat <- matrix(,ntips,2)
+            sim.dat <- data.frame(sim.dat)
             
-            sim.dat[,1]<-phy$tip.label
-            sim.dat[,2]<-x[TIPS,]
-            if(tip.fog == "known"){
+            sim.dat[,1] <- phy$tip.label
+            sim.dat[,2] <- x[TIPS,]
+			if(tip.fog == "known"){
                 for(i in TIPS){
+					print(sim.dat[i,2])
+					print(data[i,2])
                     sim.dat[i,2] <- rnorm(1, sim.dat[i,2], data[i,2])
                 }
             }
