@@ -338,6 +338,9 @@ getEdgeLiks <- function(phy, data, n.traits, rate.cat, time_slice){
     if(phy$edge[edge_i,2] <= nTip){
       tmp <- numeric(n.traits)
       species_i <- phy$tip.label[phy$edge[edge_i,2]]
+      if(!species_i %in% data[,1]){
+        next
+      }
       state_i <- data[data[,1] == species_i, 2]
       state_i_index<- as.numeric(unlist(strsplit(as.character(state_i), "&")))
       tmp[state_i_index] <- 1
