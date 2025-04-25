@@ -479,7 +479,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	    lb <- 1e-9
 	  }else{
 	    lower = c(rep(log(lb[1]), k.alpha), rep(log(lb[2]), k.sigma))
-	    ub <- ub[3] # theta's are added later
+	    lb <- lb[3] # theta's are added later
 	  }
 	  if(is.null(ub)){
 	    ub.alpha <- 100
