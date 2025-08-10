@@ -747,6 +747,7 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
   
   # pull the aic weights
   mods_table <- getModelTable(model.list, type=type)
+  print(mods_table)
   if(diff(range(mods_table[,5])) > 1e5){
     if(!force){
       max_aic <- max(mods_table[,5])
@@ -757,8 +758,12 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
       warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e10. Set force=FALSE to automatically remove potentially failed runs.")
     }
   }
+  print(mods_table)
   AICwts <- mods_table[,7]
+  print(AICwts)
   tip_values_by_model <- lapply(model.list, get_tip_values)
+  print("here")
+  print(tip_values_by_model)
   for(i in 1:length(tip_values_by_model)){
     tip_values_by_model[[i]] <- tip_values_by_model[[i]] * AICwts[i]
   }
@@ -770,9 +775,11 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
   return(weighted_tip_values)
 }
 
+
 getExpectedValues <- function(model, return_anc = FALSE){
   all_joint_liks <- model$all_cont_liks + model$all_disc_liks
   sclaed_p <- exp(all_joint_liks - max(all_joint_liks))/sum(exp(all_joint_liks - max(all_joint_liks)))
+  scaled_p <- 0.999
   prec_index <- sclaed_p > 0.0099
   if(!prec_index[2]){
     prec_index[2] <- TRUE
