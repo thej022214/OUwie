@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.15</span>
       </span>
     </div>
 
@@ -156,10 +156,9 @@ petals). To round things out, we also have a continuous measure of
 flower size.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sp <span class="op">=</span> <span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span>,</span>
-<span>                  X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>                  Y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>                  FS <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sp <span class="op">=</span> <span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span>, X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>,</span>
+<span>    replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, Y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    FS <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   sp X Y        FS</span></span>
 <span><span class="co">## 1 t1 0 0  6.467310</span></span>
@@ -194,9 +193,9 @@ fixed set of parameters to evaluate the likelihood. When you use it,
 most likely you will not set an argument for p and just leave that out
 of your hOUwie function call.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01670113</span>, <span class="fl">0.39489947</span>, <span class="fl">0.18619839</span>, <span class="fl">1.67259459</span>, <span class="fl">0.16817414</span><span class="op">)</span> <span class="co"># my fixed set of parameters</span></span>
-<span><span class="va">pp_oum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p</span><span class="op">)</span> <span class="co"># you likely won't use this p argument</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01670113</span>, <span class="fl">0.39489947</span>, <span class="fl">0.18619839</span>, <span class="fl">1.67259459</span>, <span class="fl">0.16817414</span><span class="op">)</span>  <span class="co"># my fixed set of parameters</span></span>
+<span><span class="va">pp_oum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="st">"OUM"</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p</span><span class="op">)</span>  <span class="co"># you likely won't use this p argument</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
@@ -277,25 +276,25 @@ I.e., all of the parameters are identical for states (1) and (2). BMV on
 the other hand suggests that the rates of evolution in state (1) differ
 from those in state (2) as measure by sigma2.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_bm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01663838</span>, <span class="fl">0.13324222</span>, <span class="fl">1.32800027</span><span class="op">)</span> </span>
-<span><span class="va">pp_bm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"BM1"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bm1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p_bm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01663838</span>, <span class="fl">0.13324222</span>, <span class="fl">1.32800027</span><span class="op">)</span></span>
+<span><span class="va">pp_bm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="st">"BM1"</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bm1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
 <span><span class="co">## [1]  0.01663838  0.13324222 51.32800027</span></span></code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_ou1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01686173</span>, <span class="fl">0.16642882</span>, <span class="fl">0.17165229</span>, <span class="fl">1.33223112</span><span class="op">)</span></span>
-<span><span class="va">pp_ou1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"OU1"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_ou1</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">pp_ou1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="st">"OU1"</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_ou1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
 <span><span class="co">## [1]  0.01686173  0.16642882  0.17165229 51.33223112</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_bmv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01662943</span>, <span class="fl">0.06926977</span>, <span class="fl">0.19887583</span>, <span class="fl">1.46411994</span><span class="op">)</span></span>
-<span><span class="va">pp_bmv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"BMV"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bmv</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">pp_bmv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="st">"BMV"</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bmv</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
@@ -306,11 +305,19 @@ input into a list.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bm1_fit <span class="op">=</span> <span class="va">pp_bm1</span>, ou1_fit <span class="op">=</span> <span class="va">pp_ou1</span>, bmv_fit <span class="op">=</span> <span class="va">pp_bmv</span>, oum_fit <span class="op">=</span> <span class="va">pp_oum</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/getModelTable.html">getModelTable</a></span><span class="op">(</span><span class="va">model_set</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##         np     lnLik   DiscLik   ContLik      BIC     dBIC      BICwt</span></span>
-<span><span class="co">## bm1_fit  3 -27.22403 -5.264855 -18.74030 66.92472 3.995652 0.11594223</span></span>
-<span><span class="co">## ou1_fit  4 -27.18725 -5.268256 -18.70012 71.01004 8.080973 0.01503576</span></span>
-<span><span class="co">## bmv_fit  4 -23.14677 -5.268170 -16.57538 62.92906 0.000000 0.85484326</span></span>
-<span><span class="co">## oum_fit  5 -25.16650 -5.268176 -19.19106 71.12741 8.198348 0.01417875</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">##           np nRateCat     lnLik      AIC     dAIC      AICwt</span></span>
+<span><span class="co">## bm1_fit -Inf        1 -27.22403 60.44807 6.154535 0.04142517</span></span>
+<span><span class="co">## ou1_fit -Inf        1 -27.18725 62.37451 8.080973 0.01581043</span></span>
+<span><span class="co">## bmv_fit -Inf        1 -23.14677 54.29353 0.000000 0.89888594</span></span>
+<span><span class="co">## oum_fit -Inf        1 -25.16650 60.33300 6.039465 0.04387846</span></span></code></pre>
 <p>So BMV (variable sigma model) is currently the best fitting model.
 But, we are biasing ourselves towards finding correlation because we may
 be misconstruing evidence of rate heterogeneity as evidence of
@@ -323,19 +330,21 @@ it is not linked to the focal character (i.e., actually correlated). We
 can account for this with CID+ models which allow for variable parameter
 models without it being linked to an observed character. To do this we
 simply set null.model to TRUE.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_bmv_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.915276e+02</span>, <span class="fl">5.319353e-03</span>, <span class="fl">1.728115e-04</span>, <span class="fl">5.529171e+00</span>, <span class="fl">2.053390e-01</span>, <span class="fl">1.666330e-01</span>, <span class="fl">1.318453e+00</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_bmv_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">291.5276</span>, <span class="fl">0.005319353</span>, <span class="fl">0.0001728115</span>, <span class="fl">5.529171</span>, <span class="fl">0.205339</span>, <span class="fl">0.166633</span>,</span>
+<span>    <span class="fl">1.318453</span><span class="op">)</span></span>
 <span><span class="va">pp_bmv_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">2</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, null.model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"BMV"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bmv_cid</span><span class="op">)</span></span></code></pre></div>
+<span>    continuous_model <span class="op">=</span> <span class="st">"BMV"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_bmv_cid</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
 <span><span class="co">## [1] 2.915276e+02 5.319353e-03 1.728115e-04 5.529171e+00 2.053390e-01</span></span>
 <span><span class="co">## [6] 1.666330e-01 5.131845e+01</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_oum_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.206646e+02</span>, <span class="fl">1.639380e-02</span>, <span class="fl">1.172179e-03</span>, <span class="fl">1.639380e+00</span>, <span class="fl">1.977996e-01</span>, <span class="fl">2.080072e-01</span>, <span class="fl">3.560215e-01</span>, <span class="fl">1.518203e+00</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_oum_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">320.6646</span>, <span class="fl">0.0163938</span>, <span class="fl">0.001172179</span>, <span class="fl">1.63938</span>, <span class="fl">0.1977996</span>, <span class="fl">0.2080072</span>,</span>
+<span>    <span class="fl">0.3560215</span>, <span class="fl">1.518203</span><span class="op">)</span></span>
 <span><span class="va">pp_oum_cid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">2</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, null.model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_oum_cid</span><span class="op">)</span></span></code></pre></div>
+<span>    continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p_oum_cid</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Negative values detected... adding 50 to the trait mean for optimization purposes</span></span>
 <span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
@@ -347,17 +356,29 @@ approach. This is because there is a lot more mapping space to explore
 and with the number of stochastic maps being so low (nSim=25) for this
 demonstration, it’s hard to achieve a good likelihood. Nonetheless, let
 us create our full model set and examine our model table.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bm1_fit <span class="op">=</span> <span class="va">pp_bm1</span>, ou1_fit <span class="op">=</span> <span class="va">pp_ou1</span>, bmv_fit <span class="op">=</span> <span class="va">pp_bmv</span>,</span>
-<span>                  oum_fit <span class="op">=</span> <span class="va">pp_oum</span>, bmv_cid_fit <span class="op">=</span> <span class="va">pp_bmv_cid</span>, oum_cid_fit <span class="op">=</span> <span class="va">pp_oum_cid</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bm1_fit <span class="op">=</span> <span class="va">pp_bm1</span>, ou1_fit <span class="op">=</span> <span class="va">pp_ou1</span>, bmv_fit <span class="op">=</span> <span class="va">pp_bmv</span>, oum_fit <span class="op">=</span> <span class="va">pp_oum</span>,</span>
+<span>    bmv_cid_fit <span class="op">=</span> <span class="va">pp_bmv_cid</span>, oum_cid_fit <span class="op">=</span> <span class="va">pp_oum_cid</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/getModelTable.html">getModelTable</a></span><span class="op">(</span><span class="va">model_set</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##             np     lnLik   DiscLik   ContLik      BIC      dBIC        BICwt</span></span>
-<span><span class="co">## bm1_fit      3 -27.22403 -5.264855 -18.74030 66.92472  3.995652 1.159411e-01</span></span>
-<span><span class="co">## ou1_fit      4 -27.18725 -5.268256 -18.70012 71.01004  8.080973 1.503562e-02</span></span>
-<span><span class="co">## bmv_fit      4 -23.14677 -5.268170 -16.57538 62.92906  0.000000 8.548350e-01</span></span>
-<span><span class="co">## oum_fit      5 -25.16650 -5.268176 -19.19106 71.12741  8.198348 1.417861e-02</span></span>
-<span><span class="co">## bmv_cid_fit  7 -28.42047 -5.717233 -19.50771 85.95313 23.024062 8.556000e-06</span></span>
-<span><span class="co">## oum_cid_fit  8 -28.35437 -5.300178 -20.79948 89.97981 27.050747 1.142582e-06</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">##               np nRateCat     lnLik      AIC      dAIC        AICwt</span></span>
+<span><span class="co">## bm1_fit     -Inf        1 -27.22403 60.44807  6.154535 4.141194e-02</span></span>
+<span><span class="co">## ou1_fit     -Inf        1 -27.18725 62.37451  8.080973 1.580538e-02</span></span>
+<span><span class="co">## bmv_fit     -Inf        1 -23.14677 54.29353  0.000000 8.985989e-01</span></span>
+<span><span class="co">## oum_fit     -Inf        1 -25.16650 60.33300  6.039465 4.386445e-02</span></span>
+<span><span class="co">## bmv_cid_fit -Inf        2 -28.42047 70.84094 16.547413 2.292666e-04</span></span>
+<span><span class="co">## oum_cid_fit -Inf        2 -28.35437 72.70875 18.415214 9.010584e-05</span></span></code></pre>
 <p>It’s important to account for our model selection uncertainty.
 Although sometimes you will find that a single model best explains the
 data, most of the time there will be several reasonable explanations of
@@ -367,9 +388,428 @@ Anderson 2002). This is done in getModelAvgParams. These provide
 parameter estimates per tip, averaging over the uncertainty in model
 selection (See: Caetano et al. (2018) and Vasoncelos et al. (2021) for
 more detail).</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model_avg_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getModelAvgParams.html">getModelAvgParams</a></span><span class="op">(</span><span class="va">model_set</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model_avg_pars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_avg_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getModelAvgParams.html">getModelAvgParams</a></span><span class="op">(</span><span class="va">model_set</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##             np     lnLik   DiscLik   ContLik      BIC      dBIC        BICwt</span></span>
+<span><span class="co">## bm1_fit      3 -27.22403 -5.264855 -18.74030 66.92472  3.995652 1.159411e-01</span></span>
+<span><span class="co">## ou1_fit      4 -27.18725 -5.268256 -18.70012 71.01004  8.080973 1.503562e-02</span></span>
+<span><span class="co">## bmv_fit      4 -23.14677 -5.268170 -16.57538 62.92906  0.000000 8.548350e-01</span></span>
+<span><span class="co">## oum_fit      5 -25.16650 -5.268176 -19.19106 71.12741  8.198348 1.417861e-02</span></span>
+<span><span class="co">## bmv_cid_fit  7 -28.42047 -5.717233 -19.50771 85.95313 23.024062 8.556000e-06</span></span>
+<span><span class="co">## oum_cid_fit  8 -28.35437 -5.300178 -20.79948 89.97981 27.050747 1.142582e-06</span></span>
+<span><span class="co">##             np     lnLik   DiscLik   ContLik      BIC      dBIC        BICwt</span></span>
+<span><span class="co">## bm1_fit      3 -27.22403 -5.264855 -18.74030 66.92472  3.995652 1.159411e-01</span></span>
+<span><span class="co">## ou1_fit      4 -27.18725 -5.268256 -18.70012 71.01004  8.080973 1.503562e-02</span></span>
+<span><span class="co">## bmv_fit      4 -23.14677 -5.268170 -16.57538 62.92906  0.000000 8.548350e-01</span></span>
+<span><span class="co">## oum_fit      5 -25.16650 -5.268176 -19.19106 71.12741  8.198348 1.417861e-02</span></span>
+<span><span class="co">## bmv_cid_fit  7 -28.42047 -5.717233 -19.50771 85.95313 23.024062 8.556000e-06</span></span>
+<span><span class="co">## oum_cid_fit  8 -28.35437 -5.300178 -20.79948 89.97981 27.050747 1.142582e-06</span></span>
+<span><span class="co">## [1] 1.159411e-01 1.503562e-02 8.548350e-01 1.417861e-02 8.556000e-06</span></span>
+<span><span class="co">## [6] 1.142582e-06</span></span>
+<span><span class="co">## [1] "here"</span></span>
+<span><span class="co">## $bm1_fit</span></span>
+<span><span class="co">##          rates alpha  sigma.sq theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t2  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t3  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t4  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t5  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t6  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t7  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t8  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t9  0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t10 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t11 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t12 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t13 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t14 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t15 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t16 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t17 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t18 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t19 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t20 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t21 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t22 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t23 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t24 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t25 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t26 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t27 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t28 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t29 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t30 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t31 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t32 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t33 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t34 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t35 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t36 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t37 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t38 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t39 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t40 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t41 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t42 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t43 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t44 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t45 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t46 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t47 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t48 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t49 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t50 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t51 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t52 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t53 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t54 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t55 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t56 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t57 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t58 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t59 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t60 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t61 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t62 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t63 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## t64 0.01663838     0 0.1332422 1.328         1.328    0.4669193</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $ou1_fit</span></span>
+<span><span class="co">##          rates     alpha  sigma.sq    theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t2  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t3  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t4  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t5  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t6  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t7  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t8  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t9  0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t10 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t11 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t12 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t13 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t14 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t15 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t16 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t17 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t18 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t19 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t20 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t21 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t22 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t23 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t24 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t25 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t26 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t27 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t28 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t29 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t30 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t31 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t32 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t33 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t34 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t35 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t36 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t37 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t38 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t39 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t40 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t41 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t42 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t43 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t44 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t45 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t46 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t47 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t48 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t49 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t50 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t51 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t52 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t53 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t54 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t55 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t56 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t57 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t58 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t59 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t60 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t61 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t62 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t63 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## t64 0.01686173 0.1664288 0.1716523 1.332231      1.332231    0.3550663</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $bmv_fit</span></span>
+<span><span class="co">##          rates alpha   sigma.sq   theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t2  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t3  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t4  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t5  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t6  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t7  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t8  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t9  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t10 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t11 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t12 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t13 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t14 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t15 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t16 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t17 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t18 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t19 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t20 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t21 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t22 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t23 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t24 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t25 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t26 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t27 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t28 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t29 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t30 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t31 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t32 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
+<span><span class="co">## t33 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t34 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t35 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t36 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t37 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t38 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t39 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t40 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t41 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t42 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t43 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t44 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t45 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t46 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t47 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t48 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t49 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t50 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t51 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t52 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t53 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t54 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t55 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t56 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t57 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t58 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t59 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t60 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t61 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t62 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t63 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t64 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $oum_fit</span></span>
+<span><span class="co">##          rates     alpha  sigma.sq     theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t2  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t3  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t4  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t5  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t6  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t7  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t8  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t9  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t10 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t11 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t12 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t13 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t14 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t15 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t16 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t17 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t18 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t19 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t20 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t21 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t22 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t23 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t24 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t25 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t26 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t27 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t28 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t29 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t30 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t31 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t32 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
+<span><span class="co">## t33 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t34 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t35 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t36 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t37 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t38 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t39 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t40 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t41 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t42 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t43 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t44 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t45 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t46 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t47 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t48 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t49 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t50 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t51 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t52 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t53 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t54 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t55 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t56 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t57 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t58 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t59 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t60 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t61 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t62 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t63 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t64 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $bmv_cid_fit</span></span>
+<span><span class="co">##           rates alpha sigma.sq    theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t2  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t3  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t4  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t5  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t6  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t7  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t8  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t9  0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t10 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t11 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t12 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t13 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t14 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t15 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t16 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t17 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t18 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t19 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t20 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t21 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t22 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t23 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t24 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t25 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t26 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t27 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t28 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t29 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t30 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t31 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t32 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t33 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t34 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t35 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t36 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t37 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t38 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t39 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t40 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t41 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t42 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t43 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t44 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t45 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t46 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t47 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t48 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t49 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t50 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t51 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t52 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t53 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t54 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t55 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t56 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t57 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t58 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t59 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t60 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t61 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t62 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t63 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## t64 0.005492165     0 0.166633 1.318453      1.318453    0.5839302</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $oum_cid_fit</span></span>
+<span><span class="co">##          rates     alpha  sigma.sq    theta expected_mean expected_var</span></span>
+<span><span class="co">## t1  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t2  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t3  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t4  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t5  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t6  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t7  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t8  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t9  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t10 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t11 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t12 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t13 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t14 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t15 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t16 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t17 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t18 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t19 0.01756651 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t20 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t21 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t22 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t23 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t24 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t25 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t26 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t27 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t28 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t29 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t30 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t31 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t32 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t33 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t34 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t35 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t36 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t37 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t38 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t39 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t40 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t41 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t42 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t43 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t44 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t45 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t46 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t47 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t48 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t49 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t50 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t51 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t52 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t53 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t54 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t55 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t56 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t57 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t58 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t59 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t60 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t61 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t62 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t63 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
+<span><span class="co">## t64 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model_avg_pars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##         rates       alpha   sigma.sq   theta expected_mean expected_var</span></span>
 <span><span class="co">## t1 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
 <span><span class="co">## t2 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
@@ -385,16 +825,14 @@ more detail).</p>
 <span><span class="co">## t5         1</span></span>
 <span><span class="co">## t6         1</span></span></code></pre>
 <p>We can then summarize these results using reshape2 and ggplot2.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="fu">melt</span><span class="op">(</span><span class="va">model_avg_pars</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using tip_state as id variables</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">tip_state</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">tip_state</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">5</span>, shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stat_summary</span><span class="op">(</span>fun<span class="op">=</span><span class="va">mean</span>,geom<span class="op">=</span><span class="st">"point"</span>,<span class="fu">aes</span><span class="op">(</span>group<span class="op">=</span><span class="fl">1</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stat_summary</span><span class="op">(</span>fun.data <span class="op">=</span> <span class="st">"mean_se"</span>, geom <span class="op">=</span> <span class="st">"errorbar"</span>, <span class="fu">aes</span><span class="op">(</span>group<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">0.15</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">variable</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">tip_state</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">tip_state</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>    shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> <span class="fu">stat_summary</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"point"</span>, <span class="fu">aes</span><span class="op">(</span>group <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">stat_summary</span><span class="op">(</span>fun.data <span class="op">=</span> <span class="st">"mean_se"</span>, geom <span class="op">=</span> <span class="st">"errorbar"</span>, <span class="fu">aes</span><span class="op">(</span>group <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>        color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">variable</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>This takes all tip rate estimates and averages the results for the
 observed state. What we see is that even though our best model (BMV)
@@ -432,7 +870,7 @@ flower color and flower scent are correlated. Structuring our discrete
 models in particular ways can assess that question. For our purposes
 here though, we won’t delve into that.</p>
 <p>Let’s take a look at some hypothetical data.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulated data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">flower_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   sp scent color      size</span></span>
@@ -443,14 +881,15 @@ here though, we won’t delve into that.</p>
 <span><span class="co">## 5 t5     0   red  5.410799</span></span>
 <span><span class="co">## 6 t6     1   red  5.495283</span></span></code></pre>
 <p>And if we plot our data…</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tree</span>, show.tip.label <span class="op">=</span> <span class="cn">FALSE</span>, x.lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, no.margin <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu">tiplabels</span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">21</span>, col <span class="op">=</span> <span class="va">flower_data</span><span class="op">$</span><span class="va">scent</span>, cex <span class="op">=</span> <span class="fl">0.75</span>, offset <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
 <span><span class="fu">tiplabels</span><span class="op">(</span>pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="va">flower_data</span><span class="op">$</span><span class="va">color</span>, cex <span class="op">=</span> <span class="fl">0.75</span>, offset <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="va">proportions</span> <span class="op">&lt;-</span> <span class="va">dat</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">x</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="va">plotting_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">3.6</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>, <span class="fl">3.6</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0.4</span> <span class="op">*</span> <span class="va">proportions</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">64</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">plotting_matrix</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgrey"</span><span class="op">)</span></span>
+<span><span class="va">plotting_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">3.6</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span>,</span>
+<span>    <span class="fl">3.6</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0.4</span> <span class="op">*</span> <span class="va">proportions</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">tip.label</span><span class="op">)</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">64</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">plotting_matrix</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgrey"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>So it seems that there may be some correlation between flower color
@@ -465,8 +904,9 @@ models say.</p>
 models. Here we will be focusing on custom continuous models, but
 similar things can be done for discrete models (for discrete models see
 the corHMM vignette). Let’s start with the our simplest model BM1.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ou1_structure</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOUParamStructure.html">getOUParamStructure</a></span><span class="op">(</span>model <span class="op">=</span> <span class="st">"OU1"</span>, nObsState <span class="op">=</span> <span class="fl">4</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, null.model <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ou1_structure</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOUParamStructure.html">getOUParamStructure</a></span><span class="op">(</span>model <span class="op">=</span> <span class="st">"OU1"</span>, nObsState <span class="op">=</span> <span class="fl">4</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    null.model <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ou1_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
@@ -483,14 +923,14 @@ a state. All of the sigma squared, alpha, and theta values are the same
 for each character as is theta.</p>
 <p>We can then use this structure in our hOUwie function call as a
 custom input model.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_ou1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1.5</span>, <span class="fl">7.5</span><span class="op">)</span> <span class="co"># note: not the mle</span></span>
-<span><span class="va">ou1_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="va">ou1_structure</span>, nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_ou1</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_ou1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1.5</span>, <span class="fl">7.5</span><span class="op">)</span>  <span class="co"># note: not the mle</span></span>
+<span><span class="va">ou1_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="va">ou1_structure</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_ou1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
 <span><span class="co">## [1] 1.0 3.0 1.5 7.5</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ou1_fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Fit</span></span>
@@ -534,26 +974,26 @@ output. Alternatively, you can use a function from corHMM that hOUwie
 uses internally called getStateMat4Dat. The only catch for this function
 is that you have to remove the continuous character from your data.frame
 since it’s used for discrete characers.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">getStateMat4Dat</span><span class="op">(</span><span class="va">flower_data</span><span class="op">[</span>,<span class="op">-</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">legend</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">getStateMat4Dat</span><span class="op">(</span><span class="va">flower_data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">legend</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "scent|color"</span></span></code></pre>
 <p>Nonetheless, we now have our legend and can see that flower scent is
 abscent (0) for states 1 and 2, and present (1) for states 3 and 4.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m1_structure</span> <span class="op">&lt;-</span> <span class="va">ou1_structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Original OU1 structure"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Original OU1 structure"</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m1_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
 <span><span class="co">## sigma2   2   2   2   2</span></span>
 <span><span class="co">## theta    3   3   3   3</span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m1_structure</span><span class="op">[</span><span class="fl">3</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m1_structure</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Modified to allow differing optima based on flower scent"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Modified to allow differing optima based on flower scent"</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m1_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
@@ -562,31 +1002,31 @@ abscent (0) for states 1 and 2, and present (1) for states 3 and 4.</p>
 <p>We can do the same thing for M2 and M3 which predicted that the
 optimal flower sized depends on flower color and it depends on the
 combination of flower color and scent respectively.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m3_structure</span> <span class="op">&lt;-</span> <span class="va">m2_structure</span> <span class="op">&lt;-</span> <span class="va">ou1_structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Original OU1 structure"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Original OU1 structure"</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m1_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
 <span><span class="co">## sigma2   2   2   2   2</span></span>
 <span><span class="co">## theta    3   3   4   4</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m2_structure</span><span class="op">[</span><span class="fl">3</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m2_structure</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"M2: Depends on flower color"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "M2: Depends on flower color"</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m2_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
 <span><span class="co">## sigma2   2   2   2   2</span></span>
 <span><span class="co">## theta    3   4   3   4</span></span></code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m3_structure</span><span class="op">[</span><span class="fl">3</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m3_structure</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"M3: Depends on flower scent and flower color"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "M3: Depends on flower scent and flower color"</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m3_structure</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##        (1) (2) (3) (4)</span></span>
 <span><span class="co">## alpha    1   1   1   1</span></span>
@@ -594,36 +1034,44 @@ combination of flower color and scent respectively.</p>
 <span><span class="co">## theta    3   4   5   6</span></span></code></pre>
 <p>Each of these models can be fit and added to our growing model
 set.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span> <span class="co"># note: not the mle</span></span>
-<span><span class="va">m1_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="va">m1_structure</span>, nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
-<span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
-<span><span class="co">## [1]  1.0  1.0  1.5  5.0 10.0</span></span></code></pre>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1.5</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span> <span class="co"># note: not the mle</span></span>
-<span><span class="va">m2_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="va">m2_structure</span>, nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m1</span>, adaptive_sampling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
-<span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
-<span><span class="co">## [1]  1.0  1.0  1.5  5.0 10.0</span></span></code></pre>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p_m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">11</span>, <span class="fl">6</span>, <span class="fl">12</span><span class="op">)</span> <span class="co"># note: not the mle</span></span>
-<span><span class="va">m3_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, </span>
-<span>                continuous_model <span class="op">=</span> <span class="va">m3_structure</span>, nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p_m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>  <span class="co"># note: not the mle</span></span>
+<span><span class="va">m1_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="va">m1_structure</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
+<span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
+<span><span class="co">## [1]  1.0  1.0  1.5  5.0 10.0</span></span></code></pre>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1.5</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>  <span class="co"># note: not the mle</span></span>
+<span><span class="va">m2_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="va">m2_structure</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m1</span>, adaptive_sampling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
+<span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
+<span><span class="co">## [1]  1.0  1.0  1.5  5.0 10.0</span></span></code></pre>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">11</span>, <span class="fl">6</span>, <span class="fl">12</span><span class="op">)</span>  <span class="co"># note: not the mle</span></span>
+<span><span class="va">m3_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hOUwie.html">hOUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">flower_data</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>, continuous_model <span class="op">=</span> <span class="va">m3_structure</span>,</span>
+<span>    nSim <span class="op">=</span> <span class="fl">50</span>, p <span class="op">=</span> <span class="va">p_m3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Your phylogeny had node labels, these have been removed.</span></span>
 <span><span class="co">## Calculating likelihood from a set of fixed parameters.</span></span>
 <span><span class="co">## [1]  1  3  2  5 11  6 12</span></span></code></pre>
 <p>Let’s put them all in a list and see what the relative fits of each
 model was.</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/getModelTable.html">getModelTable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ou1 <span class="op">=</span> <span class="va">ou1_fit</span>, m1 <span class="op">=</span> <span class="va">m1_fit</span>, m2 <span class="op">=</span> <span class="va">m2_fit</span>, m3 <span class="op">=</span> <span class="va">m3_fit</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##     np     lnLik   DiscLik   ContLik       BIC     dBIC         BICwt</span></span>
-<span><span class="co">## ou1  4 -550.7834 -115.9272 -430.9442 1118.2024 686.6442 7.890580e-150</span></span>
-<span><span class="co">## m1   5 -293.1567 -117.9669 -164.1689  607.1077 175.5495  7.584263e-39</span></span>
-<span><span class="co">## m2   5 -205.3819 -117.5332  -76.4667  431.5582   0.0000  1.000000e+00</span></span>
-<span><span class="co">## m3   7 -303.5883 -116.0940 -175.5556  636.2889 204.7306  3.493918e-45</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span>
+<span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
+<span><span class="co">## returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">##       np nRateCat     lnLik       AIC     dAIC         AICwt</span></span>
+<span><span class="co">## ou1 -Inf        1 -550.7834 1109.5669 688.8031 2.681103e-150</span></span>
+<span><span class="co">## m1  -Inf        1 -293.1567  596.3133 175.5495  7.584263e-39</span></span>
+<span><span class="co">## m2  -Inf        1 -205.3819  420.7638   0.0000  1.000000e+00</span></span>
+<span><span class="co">## m3  -Inf        1 -303.5883  621.1767 200.4128  3.026242e-44</span></span></code></pre>
 <p>So based on these results we could conclude fairly substantial
 evidence for model 2 which suggested that the optimum of flower size is
 correlated with flower color. Obviously, for a real analysis we would

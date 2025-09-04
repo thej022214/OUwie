@@ -10,6 +10,9 @@
 #and the multiple alphas and sigmas (OUMVA).
 
 OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMVA", "TrendyM", "TrendyMS"), simmap.tree=FALSE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, clade=NULL, tip.fog="none", starting.vals=NULL, check.identify=TRUE, algorithm=c("invert", "three.point"), diagn=FALSE, quiet=FALSE, warn=TRUE, lb = NULL, ub = NULL, opts = list("algorithm"="NLOPT_LN_SBPLX", "maxeval"="1000", "ftol_rel"=.Machine$double.eps^0.5)){
+	if(model %in% c("OUMA", "OUMVA", "OUVA")) {
+		warning("From feedback from a user, we have concerns about the likelihood function for the OUMA and OUMVA models. As of Sept. 4, 2025, we recommend not using these models for now, but we expect the situation to be resolved soon (either with corrected likelihood functions or a definite proof that they are ok as is). That said, we leave these as options for reproducibility and debugging. If you do use them, be sure to note the package version and report this in your work.", call.=FALSE, immediate.=TRUE)	
+	}
 
     if(length(algorithm) == 2){
         algorithm = "invert"

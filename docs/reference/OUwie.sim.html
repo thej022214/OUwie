@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.15</span>
       </span>
     </div>
 
@@ -150,6 +150,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Now fit a model to this and simulate from the fitted results</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="OUwie.html">OUwie</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">sim.data</span>, model<span class="op">=</span><span class="st">"OUMVA"</span>, simmap.tree<span class="op">=</span><span class="cn">FALSE</span>,scaleHeight<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>From feedback from a user, we have concerns about the likelihood function for the OUMA and OUMVA models. As of Sept. 4, 2025, we recommend not using these models for now, but we expect the situation to be resolved soon (either with corrected likelihood functions or a definite proof that they are ok as is). That said, we leave these as options for reproducibility and debugging. If you do use them, be sure to note the package version and report this in your work.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>An algorithm was not specified. Defaulting to computing the determinant and inversion of the vcv.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The supplied regime painting may be unidentifiable for the regime painting. All regimes form connected subtrees.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing... </span>

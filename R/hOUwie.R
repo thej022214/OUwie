@@ -1,6 +1,9 @@
 # set of functions for the hidden rates OU model
 ##### Main exported functions ##### 
 hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, nSim=100, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=FALSE, adaptive_sampling=FALSE, diagn_msg=FALSE, n_starts = 1, ncores = 1){
+	if(any(grepl("OUMA|OUMVA|OUVA", continuous_model))) {
+		warning("From feedback from a user, we have concerns about the likelihood function for the OUMA and OUMVA models. As of Sept. 4, 2025, we recommend not using these models for now, but we expect the situation to be resolved soon (either with corrected likelihood functions or a definite proof that they are ok as is). That said, we leave these as options for reproducibility and debugging. If you do use them, be sure to note the package version and report this in your work.", call.=FALSE, immediate.=TRUE)	
+	}
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
