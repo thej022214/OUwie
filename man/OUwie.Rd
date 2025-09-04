@@ -59,6 +59,7 @@ For models that allow \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2} to vary (i
 \item{$solution}{a matrix containing the maximum likelihood estimates of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}.}
 \item{$theta}{a matrix containing the maximum likelihood estimates of \eqn{\theta}{theta} and its standard error.}
 \item{$solution.se}{a matrix containing the approximate standard errors of \eqn{\alpha}{alpha} and \eqn{\sigma^2}{sigma^2}. The standard error is calculated as the diagonal of the inverse of the Hessian matrix.}
+\item{$tip.fog.est}{indicates value of the measurement error if it was estimated from the data.}
 \item{$tot.state}{A vector of names for the different regimes}
 \item{$index.mat}{The indices of the parameters being estimated are returned. The numbers correspond to the row in the \code{eigvect} and can useful for identifying the parameters that are causing the objective function to be at a saddlepoint (see Details).}
 \item{$simmap.tree}{A logical indicating whether the input phylogeny is a SIMMAP formatted tree.}
