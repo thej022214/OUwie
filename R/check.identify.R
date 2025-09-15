@@ -22,7 +22,6 @@ check.identify <- function(phy, data, simmap.tree=FALSE, quiet=FALSE){
             regimeindex <- colnames(phy$mapped.edge)
             currentmap <- phy$maps[[i]]
             if(length(currentmap) > 1){
-              print("hit")
                 shift.number <- shift.number + 1
                 regime_shifts[shift.number] <- i
             }
