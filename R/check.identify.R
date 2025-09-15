@@ -21,7 +21,8 @@ check.identify <- function(phy, data, simmap.tree=FALSE, quiet=FALSE){
         if(simmap.tree==TRUE){
             regimeindex <- colnames(phy$mapped.edge)
             currentmap <- phy$maps[[i]]
-            if(length(currentmap > 1)){
+            if(length(currentmap) > 1){
+              print("hit")
                 shift.number <- shift.number + 1
                 regime_shifts[shift.number] <- i
             }
@@ -82,7 +83,7 @@ check.identify.dredge <- function(phy, data, simmap.tree=FALSE, get.penalty=FALS
         if(simmap.tree==TRUE){
             regimeindex <- colnames(phy$mapped.edge)
             currentmap <- phy$maps[[i]]
-            if(length(currentmap > 1)){
+            if(length(currentmap) > 1){
                 shift.number <- shift.number + 1
                 regime_shifts[[shift.number]] <- i
             }
