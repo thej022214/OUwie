@@ -32,7 +32,9 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
         alpha[which(is.na(alpha))] <- 0
         sigma.sq <- fitted.object$solution['sigma.sq',]
         
-        if(tip.fog != "none"){
+		phy <- reorder.phylo(phy, "cladewise")
+        
+		if(tip.fog != "none"){
             warning("Tip fog is not yet handled for simulations from fitted.object")
         }
         
@@ -107,11 +109,11 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 
 		regime <- matrix(rep(0,(n-1)*k), n-1, k)
 
-		#Obtain root state and internal node labels
+		#Obtain root state and internal node labels:
 		root.state <- phy$node.label[1]
 		int.state <- phy$node.label[-1]
 
-		#New tree matrix to be used for subsetting regimes
+		#New tree matrix to be used for subsetting regimes:
 		edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
 		if(scaleHeight == TRUE){
 			edges[,4:5] <- edges[,4:5]/max(MakeAgeTable(phy, root.age=root.age))
@@ -122,14 +124,14 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		mm <- c(data[,1],int.state)
 
 		regime <- matrix(0,nrow=length(mm),ncol=length(unique(mm)))
-		#Generates an indicator matrix from the regime vector
+		#Generates an indicator matrix from the regime vector:
 		for (i in 1:length(mm)) {
 			regime[i,mm[i]] <- 1
 		}
-		#Finishes the edges matrix
+		#Finishes the edges matrix:
 		edges <- cbind(edges,regime)
 
-		#Resort the edge matrix so that it looks like the original matrix order
+		#Resort the edge matrix so that it looks like the original matrix order:
 		edges <- edges[sort.list(edges[,1]),]
 
 		oldregime <- root.state
@@ -226,8 +228,8 @@ OUwie.sim <- function(phy=NULL, data=NULL, simmap.tree=FALSE, root.age=NULL, sca
 		
 		data <- data[phy$tip.label,]
 
-		n=max(phy$edge[,1])
-		ntips=length(phy$tip.label)
+		n <- max(phy$edge[,1])
+		ntips <- length(phy$tip.label)
 
 		k=length(colnames(phy$mapped.edge))
 

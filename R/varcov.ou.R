@@ -33,7 +33,6 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         n.cov2=matrix(rep(0,n), n, 1)
         
         if(simmap.tree==TRUE){
-            regimeindex<-colnames(phy$mapped.edge)
             for(i in 1:length(edges[,1])){
                 anc = edges[i, 2]
                 desc = edges[i, 3]
@@ -95,14 +94,13 @@ varcov.ou <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, root.
         }
         vcv1 <- mat.gen(phy,n.cov1,pp)
         vcv2 <- mat.gen(phy,n.cov2,pp)
+		save(vcv1, vcv2, n.cov1, n.cov2, edges, file="vcv.Rsave")
         if(any(abs(diff(alpha)) > 0)){
             species.variances <- diag(vcv1)
             species.total.variances <- matrix(0, dim(vcv1)[2], dim(vcv1)[2])
-            count=0
             for(i in 1:dim(vcv1)[2]) {
                 for(j in 1:dim(vcv1)[2]){
-                    species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
-                    count=count+1 # the count is always watching
+					species.total.variances[i,j] <- exp(-(species.variances[i] + species.variances[j]))
                 }
             }
             vcv <- species.total.variances * vcv2
