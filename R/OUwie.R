@@ -31,7 +31,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	
 	if(algorithm == "three.point"){
 	  if(any(branching.times(phy)<0)){
-	    stop("Looks like your tree is producing negative branching times. This requires input of a known rootage, but pecific root ages are currently only available for the invert algorithm.")
+	    stop("Looks like your tree is producing negative branching times. This requires input of a known rootage, but specific root ages are currently only available for the invert algorithm.")
 	  }
 	}
 
