@@ -53,7 +53,68 @@ getPathToRoot <- function(phy, tip){
 
 
 # transforms the phylogeny based on a set of parameters and a simmap
-transformPhy <- function(phy, map, pars, tip.paths=NULL){
+transformPhy <- function(phy, map, pars, tip.paths = NULL) {
+	#phy must be of class simmap
+	nTip <- length(phy$tip.label)
+
+	#ensure we traverse edges from root toward tips so Ato[ancestor] is ready
+	phy <- ape::reorder.phylo(phy, "cladewise")
+
+	nEdge <- nrow(phy$edge)
+	nNodeTot <- nTip + phy$Nnode
+
+	Ato <- numeric(nNodeTot)
+	root <- nTip + 1
+	Ato[root] <- 0
+	D <- V_Tilde <- numeric(nEdge)
+
+	for (i in 1:nEdge) {
+		anc <- phy$edge[i, 1]
+		des <- phy$edge[i, 2]
+		Map_i <- map[[i]]
+		Acur <- Ato[anc] 
+		w <- 0
+		v <- 0
+		for (j in 1:length(Map_i)) {
+			dt <- as.numeric(Map_i[j])
+			Sigma_j <- pars[, 2][match(names(Map_i)[j], rownames(pars))]
+			Alpha_j <- pars[, 3][match(names(Map_i)[j], rownames(pars))]
+			tmp.w <- Alpha_j * dt
+			w <- w + tmp.w
+			if (Alpha_j == 0) {
+				tmp.v <- Sigma_j * exp(2 * Acur) * dt
+			}else{
+				Aend <- Acur + Alpha_j * dt
+				tmp.v <- Sigma_j * (exp(2 * Aend) - exp(2 * Acur)) / (2 * Alpha_j)
+			}
+			v <- v + tmp.v
+			Acur <- Acur + Alpha_j * dt
+		}
+		V_Tilde[i] <- v
+		D[i] <- w
+		Ato[des] <- Acur
+	}
+	phy$edge.length <- V_Tilde
+	#calculates the diagonal matrix for each tip i
+	DiagWt <- numeric(nTip)
+	names(DiagWt) <- phy$tip.label
+
+	if (is.null(tip.paths)) {
+		for (i in 1:nTip) {
+			DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+		}
+	}else{
+		for (i in 1:nTip) {
+			DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+		}
+	}
+	obj <- list(tree = phy, diag = DiagWt)
+	return(obj)
+}
+
+
+# transforms the phylogeny based on a set of parameters and a simmap
+transformPhy.old <- function(phy, map, pars, tip.paths=NULL){
   # phy must be of class simmap
   nTip <- length(phy$tip.label)
   RootAge <- max(branching.times(phy))
@@ -61,47 +122,48 @@ transformPhy <- function(phy, map, pars, tip.paths=NULL){
   # ModMap <- Map <- map
   D <- V_Tilde <- numeric(dim(phy$edge)[1])
   for(i in 1:dim(phy$edge)[1]){
-    # evaluate the map for this particular edge and calculate the tipward variance
-    NodeAge_i <- NodeAges[i]
-    DistRoot_i <- RootAge - NodeAge_i
-    Map_i <- map[[i]]
-    # the age of epoch j starts at the node age
-    Dist_rootward <- DistRoot_i
-    z <- w <- v <- 0
-    for(j in 1:length(Map_i)){
-      # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
-      Dist_tipward <- Dist_rootward + Map_i[j]
-      # the length of the epoch is scaled by the alpha parameter of that epoch
-      Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
-      Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
-      # calculate the descendant distance from the root based on a fixed root distribution
-      tmp.w <- Alpha_j * (Dist_tipward - Dist_rootward)
-      tmp.v <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
-      v <- v + tmp.v
-      w <- w + tmp.w
-      # ModMap[[i]][j] <- tmp.v
-      # The new distance from nodes
-      Dist_rootward <- Dist_tipward
-    }
-    V_Tilde[i] <- v 
-    D[i] <- w
+	# evaluate the map for this particular edge and calculate the tipward variance
+	NodeAge_i <- NodeAges[i]
+	DistRoot_i <- RootAge - NodeAge_i
+	Map_i <- map[[i]]
+	# the age of epoch j starts at the node age
+	Dist_rootward <- DistRoot_i
+	z <- w <- v <- 0
+	for(j in 1:length(Map_i)){
+	  # distance the root of epoch j starts at the node distance and ends at node dist + epoch length
+	  Dist_tipward <- Dist_rootward + Map_i[j]
+	  # the length of the epoch is scaled by the alpha parameter of that epoch
+	  Sigma_j <- pars[,2][match(names(Map_i)[j], rownames(pars))]
+	  Alpha_j <- pars[,3][match(names(Map_i)[j], rownames(pars))]
+	  # calculate the descendant distance from the root based on a fixed root distribution
+	  tmp.w <- Alpha_j * (Dist_tipward - Dist_rootward)
+	  tmp.v <- Sigma_j * (exp(2 * Alpha_j * Dist_tipward) - exp(2 * Alpha_j * Dist_rootward))/2/Alpha_j
+	  v <- v + tmp.v
+	  w <- w + tmp.w
+	  # ModMap[[i]][j] <- tmp.v
+	  # The new distance from nodes
+	  Dist_rootward <- Dist_tipward
+	}
+	V_Tilde[i] <- v
+	D[i] <- w
   }
   phy$edge.length <- V_Tilde
   # calculates the diagonal matrix for each tip i
   DiagWt <- numeric(nTip)
   names(DiagWt) <- phy$tip.label
   if(is.null(tip.paths)){
-    for(i in 1:nTip){
-      DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
-    }
+	for(i in 1:nTip){
+	  DiagWt[i] <- exp(-sum(D[getPathToRoot(phy, i)]))
+	}
   }else{
-    for(i in 1:nTip){
-      DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
-    }
+	for(i in 1:nTip){
+	  DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
+	}
   }
   obj <- list(tree = phy, diag = DiagWt)
   return(obj)
 }
+
 
 
 getOULik <- function(phy, y, X, pars){
