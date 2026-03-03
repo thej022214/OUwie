@@ -213,7 +213,7 @@ varcov.ou.old <- function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, r
 		}
 		vcv1 <- mat.gen(phy,n.cov1,pp)
 		vcv2 <- mat.gen(phy,n.cov2,pp)
-		save(vcv1, vcv2, n.cov1, n.cov2, edges, file="vcv.Rsave")
+		#save(vcv1, vcv2, n.cov1, n.cov2, edges, file="vcv.Rsave")
 		if(any(abs(diff(alpha)) > 0)){
 			species.variances <- diag(vcv1)
 			species.total.variances <- matrix(0, dim(vcv1)[2], dim(vcv1)[2])

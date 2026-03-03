@@ -121,7 +121,6 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	}else{
 		W <- cbind(w_root, W)
 	}
-
 	#Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter, but when alpha varies by regime they will sum to 1 (though proportionally should be ok).
 	W <- W / rowSums(W)
 	W
@@ -242,7 +241,6 @@ weight.mat.old <-function(phy, edges, Rate.mat, root.state, simmap.tree=FALSE, r
 		w.root.tot <- mat.gen(phy, n.cov.root.tot, pp)
 		W <- cbind(exp(diag(w.root.tot)), W)
 	}
-
 	#Restandardizes W so that the rows sum to 1 -- Generalized. Will reduce to the simpler model if assuming 1 alpha parameter, but when alpha varies by regime they will sum to 1 (though proportionally should be ok).
 	W <- W/rowSums(W)
 	W
