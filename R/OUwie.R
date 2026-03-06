@@ -128,11 +128,11 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 		root.edge.index <- which(phy$edge[,1] == ntips+1)
 		root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
 		##Begins the construction of the edges matrix -- similar to the ouch format##
-		edges=cbind(c(1:(n-1)),phy$edge, MakeAgeTable(phy, root.age=root.age))
+		edges=cbind(c(1:(n-1)),phy$edge, OUwie:::MakeAgeTable(phy, root.age=root.age))
 
 		if(scaleHeight==TRUE){
-            Tmax <- max(MakeAgeTable(phy, root.age=root.age))
-			edges[,4:5]<-edges[,4:5]/Tmax
+            Tmax <- max(OUwie:::MakeAgeTable(phy, root.age=root.age))
+			edges[,4:5] <- edges[,4:5]/Tmax
             root.age = 1
 		}
 		edges=edges[sort.list(edges[,3]),]
