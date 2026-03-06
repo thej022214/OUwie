@@ -1,6 +1,6 @@
 Package: OUwie
-Version: 2.17
-Date: 2026-03-3
+Version: 3.01
+Date: 2026-03-06
 Title: Analysis of Evolutionary Rates in an OU Framework
 Author: Jeremy M. Beaulieu <jmbeauli@uark.edu>, Brian O'Meara <bomeara@utk.edu>
 Maintainer: Jeremy Beaulieu <jmbeauli@uark.edu>
@@ -11,3 +11,4 @@ Description: Estimates rates for continuous character evolution under Brownian m
 URL: https://github.com/thej022214/OUwie
 License: GPL (>= 2)
 VignetteBuilder: knitr
+RoxygenNote: 7.3.3

@@ -2,12 +2,9 @@
 % Please edit documentation in R/dentist.R
 \name{dent_walk}
 \alias{dent_walk}
-\title{Sample points from along a ridge}
-\description{
-This "dents" the likelihood surface by reflecting points better than a threshold back across the threshold (think of taking a hollow plastic model of a mountain and punching the top so it's a volcano). It then uses essentially a Metropolis-Hastings walk to wander around the new rim. It adjusts the proposal width so that it samples points around the desired likelihood.
-This is better than using the curvature at the maximum likelihood estimate since it can actually sample points in case the assumptions of the curvature method do not hold. It is better than varying one parameter at a time while holding others constant because that could miss ridges: if I am fitting 5=x+y, and get a point estimate of (3,2), the reality is that there are an infinite range of values of x and y that will sum to 5, but if I hold x constant it looks like y is estimated very precisely. Of course, one could just fully embrace the Metropolis-Hastings lifestyle and use a full Bayesian approach.
-
-While running, it will display the current range of likelihoods in the desired range (by default, the best negative log likelihood + 2 negative log likelihood units) and the parameter values falling in that range. If things are working well, the range of values will stabilize during a search.}
+\title{Sample points from along a ridge
+This "dents" the likelihood surface by reflecting points better than a threshold back across the threshold (think of taking a hollow plastic model of a mountain and punching the top so it's a volcano). It then uses essentially a Metropolis-Hastings walk to wander around the new rim. It adjusts the proposal width so that it samples points around the desired likelihood. 
+This is better than using the curvature at the maximum likelihood estimate since it can actually sample points in case the assumptions of the curvature method do not hold. It is better than varying one parameter at a time while holding others constant because that could miss ridges: if I am fitting 5=x+y, and get a point estimate of (3,2), the reality is that there are an infinite range of values of x and y that will sum to 5, but if I hold x constant it looks like y is estimated very precisely. Of course, one could just fully embrace the Metropolis-Hastings lifestyle and use a full Bayesian approach.}
 \usage{
 dent_walk(
   par,
@@ -58,8 +55,45 @@ dent_walk(
 \value{
 A dentist object containing results, the data.frame of negative log likelihoods and the parameters associated with them; acceptances, the vector of whether a proposed move was accepted each step; best_neglnL, the best value passed into the analysis; delta, the desired offset; all_ranges, a summary of the results.
 }
+\description{
+While running, it will display the current range of likelihoods in the desired range (by default, the best negative log likelihood + 2 negative log likelihood units) and the parameter values falling in that range. If things are working well, the range of values will stabilize during a search.
+}
 \details{
-The algorithm tunes: if it is moving too far away from the desired likelihoods, it will decrease the proposal width; if it staying in areas better than the desired likelihood, it will increase the proposal width. It will also expand the proposal width for parameters where the extreme values still appear good enough to try to find out the full range for these values.
+The algorithm tunes: if it is moving too far away from the desired likelihoods, it will decrease the proposal width; if it staying in areas better than the desired likelihood, it will increase the proposal width. It will also expand the proposal width for parameters where the extreme values still appear good enough to try to find out the full range for these values. 
 
 In general, the idea of this is not to give you a pleasingly narrow range of possible values -- it is to try to find the actual uncertainty, including finding any ridges that would not be seen in univariate space.
+}
+\examples{
+# Univariate case
+sims <- stats::rnorm(100, mean=17)
+possible_means <- seq(from=16, to=18, length.out=100) # for optimize
+
+# Make sure we have a function that takes in a parameters vector, other arguments if needed,
+# and returns the negative log likelihood
+dnorm_to_run <- function(par, sims) {
+  return(-sum(stats::dnorm(x=sims, mean=par, log=TRUE)))
+}
+
+optimized_results <- stats::optimize(dnorm_to_run,interval=range(possible_means), 
+  sims=sims, maximum=FALSE)
+best_par <- optimized_results$minimum
+names(best_par) <- "mean"
+best_neglnL <- optimized_results$objective
+
+dented_results <- dent_walk(par=best_par, fn=dnorm_to_run, best_neglnL=best_neglnL, sims=sims)
+plot(dented_results)
+
+# Multivariate case
+sims <- stats::rlnorm(100, meanlog=1, sdlog=3)
+
+dlnorm_to_run <- function(par, sims) {
+  return(-sum(stats::dlnorm(sims, meanlog=par[1], sdlog=par[2], log=TRUE)))
+}
+
+optimized_results <- stats::optim(c(meanlog=.9, sdlog=2.9), dlnorm_to_run, sims=sims)
+best_par <- optimized_results$par
+best_neglnL <- optimized_results$value
+
+dented_results <- dent_walk(par=best_par, fn=dlnorm_to_run, best_neglnL=best_neglnL, sims=sims)
+plot(dented_results)
 }

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.01</span>
       </span>
     </div>
 
@@ -32,6 +32,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
     <li>
@@ -68,7 +71,7 @@
 <span>root.station<span class="op">=</span><span class="cn">FALSE</span>, get.root.theta<span class="op">=</span><span class="cn">FALSE</span>, shift.point<span class="op">=</span><span class="fl">0.5</span>, clade<span class="op">=</span><span class="cn">NULL</span>, tip.fog<span class="op">=</span><span class="st">"none"</span>,</span>
 <span>starting.vals<span class="op">=</span><span class="cn">NULL</span>, check.identify<span class="op">=</span><span class="cn">TRUE</span>, algorithm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"invert"</span>, <span class="st">"three.point"</span><span class="op">)</span>,</span>
 <span>diagn<span class="op">=</span><span class="cn">FALSE</span>, quiet<span class="op">=</span><span class="cn">FALSE</span>, warn<span class="op">=</span><span class="cn">TRUE</span>, lb <span class="op">=</span> <span class="cn">NULL</span>, ub <span class="op">=</span> <span class="cn">NULL</span>, opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>algorithm <span class="op">=</span> </span>
-<span><span class="st">"NLOPT_LN_SBPLX"</span>, maxeval <span class="op">=</span> <span class="st">"1000"</span>, ftol_rel <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="st">"NLOPT_LN_SBPLX"</span>, maxeval <span class="op">=</span> <span class="st">"1000"</span>, ftol_rel <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span>, revert.old<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -134,6 +137,9 @@
 
 <dt id="arg-opts">opts<a class="anchor" aria-label="anchor" href="#arg-opts"></a></dt>
 <dd><p>a list of options to pass to nloptr for the optimization: useful to adjust for faster, coarser searches</p></dd>
+
+<dt id="arg-revert-old">revert.old<a class="anchor" aria-label="anchor" href="#arg-revert-old"></a></dt>
+<dd><p>a logical indicating whether or not to use an older implementation of the multiple alpha models. The default is "FALSE".</p></dd>
 
 </dl></div>
     <div id="details">
@@ -312,7 +318,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

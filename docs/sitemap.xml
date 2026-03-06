@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/articles/OUwie_2.1_adds.html</loc></url>
+<url><loc>/articles/calculationUpdate.html</loc></url>
 <url><loc>/articles/hOUwieStarterGuide.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>/reference/OUwie.html</loc></url>
 <url><loc>/reference/OUwie.sim.html</loc></url>
 <url><loc>/reference/check.identify.html</loc></url>
+<url><loc>/reference/dent_likelihood.html</loc></url>
 <url><loc>/reference/dent_propose.html</loc></url>
 <url><loc>/reference/dent_walk.html</loc></url>
 <url><loc>/reference/fix.kappa.html</loc></url>

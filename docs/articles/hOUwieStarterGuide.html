@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.01</span>
       </span>
     </div>
 
@@ -49,6 +49,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
     <li>
@@ -204,8 +207,8 @@ of your hOUwie function call.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pp_oum</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Fit</span></span>
-<span><span class="co">##    lnLTot   lnLDisc   lnLCont    AIC     AICc      BIC nTaxa nPars</span></span>
-<span><span class="co">##  -25.1665 -5.268176 -19.19106 60.333 61.36748 71.12741    64     5</span></span>
+<span><span class="co">##     lnLTot   lnLDisc   lnLCont     AIC     AICc      BIC nTaxa nPars</span></span>
+<span><span class="co">##  -179.6015 -5.268176 -160.9503 369.203 370.2374 379.9974    64     5</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Legend</span></span>
 <span><span class="co">##   1   2 </span></span>
@@ -313,11 +316,11 @@ input into a list.</p>
 <span><span class="co">## returning -Inf</span></span>
 <span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
 <span><span class="co">## returning -Inf</span></span></code></pre>
-<pre><code><span><span class="co">##           np nRateCat     lnLik      AIC     dAIC      AICwt</span></span>
-<span><span class="co">## bm1_fit -Inf        1 -27.22403 60.44807 6.154535 0.04142517</span></span>
-<span><span class="co">## ou1_fit -Inf        1 -27.18725 62.37451 8.080973 0.01581043</span></span>
-<span><span class="co">## bmv_fit -Inf        1 -23.14677 54.29353 0.000000 0.89888594</span></span>
-<span><span class="co">## oum_fit -Inf        1 -25.16650 60.33300 6.039465 0.04387846</span></span></code></pre>
+<pre><code><span><span class="co">##           np nRateCat      lnLik      AIC      dAIC        AICwt</span></span>
+<span><span class="co">## bm1_fit -Inf        1  -78.96424 163.9285   0.00000 1.000000e+00</span></span>
+<span><span class="co">## ou1_fit -Inf        1 -101.23128 210.4626  46.53407 7.856981e-11</span></span>
+<span><span class="co">## bmv_fit -Inf        1 -137.39707 282.7941 118.86566 1.544009e-26</span></span>
+<span><span class="co">## oum_fit -Inf        1 -179.60148 369.2030 205.27447 2.662044e-45</span></span></code></pre>
 <p>So BMV (variable sigma model) is currently the best fitting model.
 But, we are biasing ourselves towards finding correlation because we may
 be misconstruing evidence of rate heterogeneity as evidence of
@@ -372,13 +375,13 @@ us create our full model set and examine our model table.</p>
 <span><span class="co">## returning -Inf</span></span>
 <span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
 <span><span class="co">## returning -Inf</span></span></code></pre>
-<pre><code><span><span class="co">##               np nRateCat     lnLik      AIC      dAIC        AICwt</span></span>
-<span><span class="co">## bm1_fit     -Inf        1 -27.22403 60.44807  6.154535 4.141194e-02</span></span>
-<span><span class="co">## ou1_fit     -Inf        1 -27.18725 62.37451  8.080973 1.580538e-02</span></span>
-<span><span class="co">## bmv_fit     -Inf        1 -23.14677 54.29353  0.000000 8.985989e-01</span></span>
-<span><span class="co">## oum_fit     -Inf        1 -25.16650 60.33300  6.039465 4.386445e-02</span></span>
-<span><span class="co">## bmv_cid_fit -Inf        2 -28.42047 70.84094 16.547413 2.292666e-04</span></span>
-<span><span class="co">## oum_cid_fit -Inf        2 -28.35437 72.70875 18.415214 9.010584e-05</span></span></code></pre>
+<pre><code><span><span class="co">##               np nRateCat      lnLik      AIC      dAIC        AICwt</span></span>
+<span><span class="co">## bm1_fit     -Inf        1  -78.96424 163.9285  10.68237 4.767363e-03</span></span>
+<span><span class="co">## ou1_fit     -Inf        1 -101.23128 210.4626  57.21643 3.745708e-13</span></span>
+<span><span class="co">## bmv_fit     -Inf        1 -137.39707 282.7941 129.54803 7.360849e-29</span></span>
+<span><span class="co">## oum_fit     -Inf        1 -179.60148 369.2030 215.95684 1.269093e-47</span></span>
+<span><span class="co">## bmv_cid_fit -Inf        2  -69.62306 153.2461   0.00000 9.952326e-01</span></span>
+<span><span class="co">## oum_cid_fit -Inf        2  -99.16991 214.3398  61.09370 5.390091e-14</span></span></code></pre>
 <p>It’s important to account for our model selection uncertainty.
 Although sometimes you will find that a single model best explains the
 data, most of the time there will be several reasonable explanations of
@@ -390,22 +393,22 @@ selection (See: Caetano et al. (2018) and Vasoncelos et al. (2021) for
 more detail).</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_avg_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getModelAvgParams.html">getModelAvgParams</a></span><span class="op">(</span><span class="va">model_set</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##             np     lnLik   DiscLik   ContLik      BIC      dBIC        BICwt</span></span>
-<span><span class="co">## bm1_fit      3 -27.22403 -5.264855 -18.74030 66.92472  3.995652 1.159411e-01</span></span>
-<span><span class="co">## ou1_fit      4 -27.18725 -5.268256 -18.70012 71.01004  8.080973 1.503562e-02</span></span>
-<span><span class="co">## bmv_fit      4 -23.14677 -5.268170 -16.57538 62.92906  0.000000 8.548350e-01</span></span>
-<span><span class="co">## oum_fit      5 -25.16650 -5.268176 -19.19106 71.12741  8.198348 1.417861e-02</span></span>
-<span><span class="co">## bmv_cid_fit  7 -28.42047 -5.717233 -19.50771 85.95313 23.024062 8.556000e-06</span></span>
-<span><span class="co">## oum_cid_fit  8 -28.35437 -5.300178 -20.79948 89.97981 27.050747 1.142582e-06</span></span>
-<span><span class="co">##             np     lnLik   DiscLik   ContLik      BIC      dBIC        BICwt</span></span>
-<span><span class="co">## bm1_fit      3 -27.22403 -5.264855 -18.74030 66.92472  3.995652 1.159411e-01</span></span>
-<span><span class="co">## ou1_fit      4 -27.18725 -5.268256 -18.70012 71.01004  8.080973 1.503562e-02</span></span>
-<span><span class="co">## bmv_fit      4 -23.14677 -5.268170 -16.57538 62.92906  0.000000 8.548350e-01</span></span>
-<span><span class="co">## oum_fit      5 -25.16650 -5.268176 -19.19106 71.12741  8.198348 1.417861e-02</span></span>
-<span><span class="co">## bmv_cid_fit  7 -28.42047 -5.717233 -19.50771 85.95313 23.024062 8.556000e-06</span></span>
-<span><span class="co">## oum_cid_fit  8 -28.35437 -5.300178 -20.79948 89.97981 27.050747 1.142582e-06</span></span>
-<span><span class="co">## [1] 1.159411e-01 1.503562e-02 8.548350e-01 1.417861e-02 8.556000e-06</span></span>
-<span><span class="co">## [6] 1.142582e-06</span></span>
+<pre><code><span><span class="co">##             np      lnLik   DiscLik    ContLik      BIC       dBIC        BICwt</span></span>
+<span><span class="co">## bm1_fit      3  -78.96424 -5.264855  -70.48051 170.4051   2.046834 2.643623e-01</span></span>
+<span><span class="co">## ou1_fit      4 -101.23128 -5.268256  -92.74414 219.0981  50.739784 7.057644e-12</span></span>
+<span><span class="co">## bmv_fit      4 -137.39707 -5.268170  -57.64444 291.4297 123.071378 1.386928e-27</span></span>
+<span><span class="co">## oum_fit      5 -179.60148 -5.268176 -160.95028 379.9974 211.639070 8.125008e-47</span></span>
+<span><span class="co">## bmv_cid_fit  7  -69.62306 -5.717233  -60.75219 168.3583   0.000000 7.356377e-01</span></span>
+<span><span class="co">## oum_cid_fit  8  -99.16991 -5.300178  -87.78158 231.6109  63.252584 1.353755e-14</span></span>
+<span><span class="co">##             np      lnLik   DiscLik    ContLik      BIC       dBIC        BICwt</span></span>
+<span><span class="co">## bm1_fit      3  -78.96424 -5.264855  -70.48051 170.4051   2.046834 2.643623e-01</span></span>
+<span><span class="co">## ou1_fit      4 -101.23128 -5.268256  -92.74414 219.0981  50.739784 7.057644e-12</span></span>
+<span><span class="co">## bmv_fit      4 -137.39707 -5.268170  -57.64444 291.4297 123.071378 1.386928e-27</span></span>
+<span><span class="co">## oum_fit      5 -179.60148 -5.268176 -160.95028 379.9974 211.639070 8.125008e-47</span></span>
+<span><span class="co">## bmv_cid_fit  7  -69.62306 -5.717233  -60.75219 168.3583   0.000000 7.356377e-01</span></span>
+<span><span class="co">## oum_cid_fit  8  -99.16991 -5.300178  -87.78158 231.6109  63.252584 1.353755e-14</span></span>
+<span><span class="co">## [1] 2.643623e-01 7.057644e-12 1.386928e-27 8.125008e-47 7.356377e-01</span></span>
+<span><span class="co">## [6] 1.353755e-14</span></span>
 <span><span class="co">## [1] "here"</span></span>
 <span><span class="co">## $bm1_fit</span></span>
 <span><span class="co">##          rates alpha  sigma.sq theta expected_mean expected_var</span></span>
@@ -543,137 +546,137 @@ more detail).</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## $bmv_fit</span></span>
 <span><span class="co">##          rates alpha   sigma.sq   theta expected_mean expected_var</span></span>
-<span><span class="co">## t1  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t2  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t3  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t4  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t5  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t6  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t7  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t8  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t9  0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t10 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t11 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t12 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t13 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t14 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t15 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t16 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t17 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t18 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t19 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t20 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t21 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t22 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t23 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t24 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t25 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t26 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t27 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t28 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t29 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t30 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t31 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t32 0.01662943     0 0.06926977 1.46412       1.46412    0.2561530</span></span>
-<span><span class="co">## t33 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t34 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t35 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t36 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t37 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t38 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t39 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t40 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t41 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t42 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t43 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t44 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t45 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t46 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t47 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t48 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t49 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t50 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t51 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t52 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t53 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t54 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t55 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t56 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t57 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t58 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t59 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t60 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t61 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t62 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t63 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
-<span><span class="co">## t64 0.01662943     0 0.19887583 1.46412       1.46412    0.6504027</span></span>
+<span><span class="co">## t1  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t2  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t3  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t4  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t5  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t6  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t7  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t8  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t9  0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t10 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t11 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t12 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t13 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t14 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t15 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t16 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t17 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t18 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t19 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t20 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t21 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t22 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t23 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t24 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t25 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t26 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t27 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t28 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t29 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t30 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t31 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t32 0.01662943     0 0.06926977 1.46412       1.46412    0.2546340</span></span>
+<span><span class="co">## t33 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t34 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t35 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t36 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t37 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t38 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t39 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t40 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t41 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t42 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t43 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t44 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t45 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t46 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t47 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t48 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t49 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t50 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t51 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t52 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t53 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t54 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t55 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t56 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t57 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t58 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t59 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t60 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t61 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t62 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t63 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
+<span><span class="co">## t64 0.01662943     0 0.19887583 1.46412       1.46412    0.6476817</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $oum_fit</span></span>
 <span><span class="co">##          rates     alpha  sigma.sq     theta expected_mean expected_var</span></span>
-<span><span class="co">## t1  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t2  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t3  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t4  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t5  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t6  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t7  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t8  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t9  0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t10 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t11 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t12 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t13 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t14 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t15 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t16 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t17 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t18 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t19 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t20 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t21 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t22 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t23 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t24 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t25 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t26 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t27 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t28 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t29 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t30 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t31 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t32 0.01670113 0.3948995 0.1861984 1.6725946     1.6725839    0.2209471</span></span>
-<span><span class="co">## t33 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t34 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t35 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t36 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t37 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t38 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t39 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t40 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t41 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t42 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t43 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t44 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t45 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t46 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t47 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t48 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t49 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t50 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t51 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t52 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t53 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t54 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t55 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t56 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t57 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t58 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t59 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t60 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t61 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t62 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t63 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
-<span><span class="co">## t64 0.01670113 0.3948995 0.1861984 0.1681741     0.6355941    0.2209471</span></span>
+<span><span class="co">## t1  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t2  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t3  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t4  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t5  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t6  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t7  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t8  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t9  0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t10 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t11 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t12 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t13 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t14 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t15 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t16 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t17 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t18 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t19 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t20 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t21 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t22 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t23 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t24 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t25 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t26 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t27 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t28 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t29 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t30 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t31 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t32 0.01670113 0.3948995 0.1861984 1.6725946     1.6725946    0.2209471</span></span>
+<span><span class="co">## t33 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t34 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t35 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t36 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t37 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t38 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t39 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t40 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t41 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t42 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t43 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t44 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t45 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t46 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t47 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t48 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t49 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t50 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t51 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t52 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t53 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t54 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t55 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t56 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t57 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t58 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t59 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t60 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t61 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t62 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t63 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
+<span><span class="co">## t64 0.01670113 0.3948995 0.1861984 0.1681741     0.6356059    0.2209471</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $bmv_cid_fit</span></span>
 <span><span class="co">##           rates alpha sigma.sq    theta expected_mean expected_var</span></span>
@@ -744,79 +747,79 @@ more detail).</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## $oum_cid_fit</span></span>
 <span><span class="co">##          rates     alpha  sigma.sq    theta expected_mean expected_var</span></span>
-<span><span class="co">## t1  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t2  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t3  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t4  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t5  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t6  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t7  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t8  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t9  0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t10 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t11 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t12 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t13 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t14 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t15 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t16 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t17 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t18 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t19 0.01756651 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t20 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t21 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t22 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t23 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t24 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t25 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t26 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t27 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t28 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t29 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t30 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t31 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t32 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t33 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t34 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t35 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t36 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t37 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t38 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t39 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t40 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t41 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t42 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t43 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t44 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t45 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t46 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t47 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t48 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t49 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t50 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t51 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t52 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t53 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t54 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t55 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t56 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t57 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t58 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t59 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t60 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t61 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t62 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t63 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span>
-<span><span class="co">## t64 0.01756598 0.1977996 0.2080072 1.518203      1.518203    0.3943521</span></span></code></pre>
+<span><span class="co">## t1  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t2  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t3  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t4  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t5  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t6  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t7  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t8  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t9  0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t10 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t11 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t12 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t13 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t14 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t15 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t16 0.01756598 0.1977996 0.2080072 1.518203      1.492866    0.3943521</span></span>
+<span><span class="co">## t17 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t18 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t19 0.01756617 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t20 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t21 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t22 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t23 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t24 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t25 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t26 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t27 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t28 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t29 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t30 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t31 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t32 0.01756598 0.1977996 0.2080072 1.518203      1.492182    0.3943521</span></span>
+<span><span class="co">## t33 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t34 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t35 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t36 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t37 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t38 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t39 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t40 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t41 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t42 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t43 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t44 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t45 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t46 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t47 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t48 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t49 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t50 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t51 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t52 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t53 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t54 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t55 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t56 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t57 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t58 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t59 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t60 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t61 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t62 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t63 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span>
+<span><span class="co">## t64 0.01756598 0.1977996 0.2080072 1.518203      1.494301    0.3943521</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model_avg_pars</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##         rates       alpha   sigma.sq   theta expected_mean expected_var</span></span>
-<span><span class="co">## t1 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
-<span><span class="co">## t2 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
-<span><span class="co">## t3 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
-<span><span class="co">## t4 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
-<span><span class="co">## t5 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
-<span><span class="co">## t6 0.01663488 0.008101711 0.07988507 1.44931       1.44931    0.2815805</span></span>
+<pre><code><span><span class="co">##          rates        alpha  sigma.sq    theta expected_mean expected_var</span></span>
+<span><span class="co">## t1 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
+<span><span class="co">## t2 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
+<span><span class="co">## t3 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
+<span><span class="co">## t4 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
+<span><span class="co">## t5 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
+<span><span class="co">## t6 0.008438804 1.177273e-12 0.1578057 1.320977      1.320977    0.5529969</span></span>
 <span><span class="co">##    tip_state</span></span>
 <span><span class="co">## t1         1</span></span>
 <span><span class="co">## t2         1</span></span>
@@ -833,7 +836,7 @@ more detail).</p>
 <span>    shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> <span class="fu">stat_summary</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"point"</span>, <span class="fu">aes</span><span class="op">(</span>group <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">stat_summary</span><span class="op">(</span>fun.data <span class="op">=</span> <span class="st">"mean_se"</span>, geom <span class="op">=</span> <span class="st">"errorbar"</span>, <span class="fu">aes</span><span class="op">(</span>group <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>        color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">variable</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <p>This takes all tip rate estimates and averages the results for the
 observed state. What we see is that even though our best model (BMV)
 only predicts a difference between estimates of sigma.sq, by
@@ -873,13 +876,13 @@ here though, we won’t delve into that.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulated data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">flower_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   sp scent color      size</span></span>
-<span><span class="co">## 1 t1     1  blue  6.143631</span></span>
-<span><span class="co">## 2 t2     1   red  5.068725</span></span>
-<span><span class="co">## 3 t3     1  blue  9.061639</span></span>
-<span><span class="co">## 4 t4     0  blue 10.021362</span></span>
-<span><span class="co">## 5 t5     0   red  5.410799</span></span>
-<span><span class="co">## 6 t6     1   red  5.495283</span></span></code></pre>
+<pre><code><span><span class="co">##   sp scent color     size</span></span>
+<span><span class="co">## 1 t1     1  blue 6.143631</span></span>
+<span><span class="co">## 2 t2     1   red 5.068725</span></span>
+<span><span class="co">## 3 t3     1  blue 9.061639</span></span>
+<span><span class="co">## 4 t4     1   red 5.469752</span></span>
+<span><span class="co">## 5 t5     0   red 5.410799</span></span>
+<span><span class="co">## 6 t6     1   red 5.495283</span></span></code></pre>
 <p>And if we plot our data…</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tree</span>, show.tip.label <span class="op">=</span> <span class="cn">FALSE</span>, x.lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, no.margin <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -891,7 +894,7 @@ here though, we won’t delve into that.</p>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">64</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">plotting_matrix</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgrey"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<p><img src="hOUwieStarterGuide_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="700"></p>
 <p>So it seems that there may be some correlation between flower color
 and optimal flower size, with blue flowers looking a little bit larger
 than red flowers. But, let’s create our model set and see what the
@@ -934,8 +937,8 @@ custom input model.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ou1_fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Fit</span></span>
-<span><span class="co">##     lnLTot   lnLDisc   lnLCont      AIC     AICc      BIC nTaxa nPars</span></span>
-<span><span class="co">##  -550.7834 -115.9272 -430.9442 1109.567 1110.245 1118.202    64     4</span></span>
+<span><span class="co">##      lnLTot lnLDisc    lnLCont       AIC      AICc       BIC nTaxa nPars</span></span>
+<span><span class="co">##  -308280181 -115.64 -308280062 616560370 616560371 616560379    64     4</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Legend</span></span>
 <span><span class="co">##        1        2        3        4 </span></span>
@@ -1067,11 +1070,11 @@ model was.</p>
 <span><span class="co">## returning -Inf</span></span>
 <span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
 <span><span class="co">## returning -Inf</span></span></code></pre>
-<pre><code><span><span class="co">##       np nRateCat     lnLik       AIC     dAIC         AICwt</span></span>
-<span><span class="co">## ou1 -Inf        1 -550.7834 1109.5669 688.8031 2.681103e-150</span></span>
-<span><span class="co">## m1  -Inf        1 -293.1567  596.3133 175.5495  7.584263e-39</span></span>
-<span><span class="co">## m2  -Inf        1 -205.3819  420.7638   0.0000  1.000000e+00</span></span>
-<span><span class="co">## m3  -Inf        1 -303.5883  621.1767 200.4128  3.026242e-44</span></span></code></pre>
+<pre><code><span><span class="co">##       np nRateCat         lnLik          AIC         dAIC AICwt</span></span>
+<span><span class="co">## ou1 -Inf        1 -3.082802e+08 6.165604e+08 6.165538e+08     0</span></span>
+<span><span class="co">## m1  -Inf        1 -4.894668e+03 9.799336e+03 3.191443e+03     0</span></span>
+<span><span class="co">## m2  -Inf        1 -3.298947e+03 6.607893e+03 0.000000e+00     1</span></span>
+<span><span class="co">## m3  -Inf        1 -9.892739e+07 1.978548e+08 1.978482e+08     0</span></span></code></pre>
 <p>So based on these results we could conclude fairly substantial
 evidence for model 2 which suggested that the optimum of flower size is
 correlated with flower color. Obviously, for a real analysis we would
@@ -1182,7 +1185,7 @@ Until then, we’re stuck with simulation.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

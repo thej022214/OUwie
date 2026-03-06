@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.01</span>
       </span>
     </div>
 
@@ -32,6 +32,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
     </li>
     <li>
@@ -101,13 +104,17 @@
         </td>
         <td><p>A test of regime identifiability</p></td>
       </tr><tr><td>
+          <p><code><a href="dent_likelihood.html">dent_likelihood()</a></code> </p>
+        </td>
+        <td><p>Dents the likelihood surface This takes any values that are better (lower) than the desired negative log likelihood and reflects them across the best_neglnL + delta line, "denting" the likelihood surface.</p></td>
+      </tr><tr><td>
           <p><code><a href="dent_propose.html">dent_propose()</a></code> </p>
         </td>
         <td><p>Propose new values This proposes new values using a normal distribution centered on the original parameter values, with desired standard deviation. If any proposed values are outside the bounds, it will propose again.</p></td>
       </tr><tr><td>
           <p><code><a href="dent_walk.html">dent_walk()</a></code> </p>
         </td>
-        <td><p>Sample points from along a ridge</p></td>
+        <td><p>Sample points from along a ridge This "dents" the likelihood surface by reflecting points better than a threshold back across the threshold (think of taking a hollow plastic model of a mountain and punching the top so it's a volcano). It then uses essentially a Metropolis-Hastings walk to wander around the new rim. It adjusts the proposal width so that it samples points around the desired likelihood. This is better than using the curvature at the maximum likelihood estimate since it can actually sample points in case the assumptions of the curvature method do not hold. It is better than varying one parameter at a time while holding others constant because that could miss ridges: if I am fitting 5=x+y, and get a point estimate of (3,2), the reality is that there are an infinite range of values of x and y that will sum to 5, but if I hold x constant it looks like y is estimated very precisely. Of course, one could just fully embrace the Metropolis-Hastings lifestyle and use a full Bayesian approach.</p></td>
       </tr><tr><td>
           <p><code><a href="fix.kappa.html">fix.kappa()</a></code> </p>
         </td>
@@ -177,7 +184,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
