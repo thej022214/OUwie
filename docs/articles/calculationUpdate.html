@@ -82,7 +82,8 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Calculation Update</h1>
                         <h4 data-toc-skip class="author">Priscilla Lau,
-Bjørn Kopperud, Sebastian Höhna, Jeremy Beaulieu, and Brian O’Meara</h4>
+Bjørn Kopperud, Sebastian Höhna, Jeremy M. Beaulieu, and Brian C.
+O’Meara</h4>
             
             <h4 data-toc-skip class="date">11/06/2025</h4>
       
@@ -100,58 +101,76 @@ its origin through 2.17. This has now been fixed. Details below:</p>
 </h3>
 <p>Priscilla Lau reached out to Jeremy Beaulieu in Aug, 2025, at a
 conference about an issue she and her collaborators (Bjørn Kopperud and
-Sebastian Höhna) found in how OUwie calculates the variance-covariance
-matrix under the OU model when there are different alphas, as well as an
-error in one of the equations in the original Beaulieu et al. (2012)
-paper. She followed up with an email on Sept 3, 2025; after a discussion
-of how best to handle this, we put a warning on the use of models with
-different alphas in OUwie (on Sept. 6, 2025). A further email from
-Priscilla and colleagues had additional details on the issues.</p>
+Sebastian Höhna) found in how <code>OUwie</code> calculates the
+variance-covariance matrix under the OU model when there are different
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+parameters, as well as an error in one of the equations in the original
+Beaulieu et al. (2012) paper. She followed up with an email on Sept 3,
+2025; after a discussion of how best to handle this, we put a warning on
+the use of models with different
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+in <code>OUwie</code> (on Sept. 6, 2025). A further email from Priscilla
+and colleagues had additional details on the issues.</p>
 <p>Brian spent some time trying to fix the code; Jeremy swooped in and
 <em>actually</em> fixed the code.</p>
 </div>
 <div class="section level3">
-<h3 id="equation-error-in-paper">Equation error in paper<a class="anchor" aria-label="anchor" href="#equation-error-in-paper"></a>
+<h3 id="rendered-equation-error-in-original-beaulieu-et-al--2012">Rendered equation error in original Beaulieu et al. (2012)<a class="anchor" aria-label="anchor" href="#rendered-equation-error-in-original-beaulieu-et-al--2012"></a>
 </h3>
-<p>In the appendix on page 2383 when it describes the covariation under
-an OU_MVA model, the final term is <strong>latex</strong>_ when it
-should be <strong><em>latex</em></strong>, as it is correctly written in
-equation A.26. This is unrelated to the issue below but still worth
-noting.</p>
+<p>In the appendix on page 2383, when it describes the covariation under
+an
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mi mathvariant="normal">O</mi><mi mathvariant="normal">U</mi></mrow><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">V</mi><mi mathvariant="normal">A</mi></mrow></msub><annotation encoding="application/x-tex">\mathrm{OU}_{\mathrm{MVA}}</annotation></semantics></math>
+model, the right-most calculation in the final term is rendered as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2s_{ij,\gamma}} - e^{2s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),
+</annotation></semantics></math> when it should be
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2 \alpha s_{ij,\gamma}} - e^{2 \alpha s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),
+</annotation></semantics></math> as it is correctly written in Eq. A.26.
+This is unrelated to the issue below but still worth noting.</p>
 </div>
 <div class="section level3">
 <h3 id="variance-covariance-matrix-calculation-error-in-ouwie">Variance-covariance matrix calculation error in OUwie<a class="anchor" aria-label="anchor" href="#variance-covariance-matrix-calculation-error-in-ouwie"></a>
 </h3>
-<p>Second, and of great practical significance, the way OUwie calculated
-the variance-covariance matrix under the OU model with multiple alphas
-was indeed incorrect. With an Ornstein-Uhlenbeck process, shared
-variance decays based on the alpha parameter: with stronger alpha, what
-matters more is where two tips are being pulled to rather than their
-shared history. When calculating this up the tree, OUwie versions before
-3.01 used a constant alpha rather than varying it based on the different
-regimes. This means that the variance-covariance matrix and weight
-vectors were calculated incorrectly when there are multiple alphas
-(OUMVA and OUMA models).</p>
+<p>Second, and of great practical significance, the way
+<code>OUwie</code> calculated the variance-covariance matrix under the
+OU model with multiple alphas was indeed incorrect. With an
+Ornstein-Uhlenbeck process, shared variance decays based on the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+parameter: with stronger
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+what matters more is where two tips are being pulled to rather than
+their shared history. When calculating this up the tree,
+<code>OUwie</code> versions before 3.01 used a constant
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+rather than varying it based on the different regimes. This means that
+the variance-covariance matrix and weight vectors were calculated
+incorrectly when there are multiple
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+parameters (i.e., OUMVA and OUMA models).</p>
 <p>Adopting the corrections proposed by Priscilla Lau and colleagues, we
-have updated the code in OUwie version 3.01 (released March 6, 2026) to
-correctly calculate the variance-covariance matrix under the OU model
-with multiple alphas. We thank Priscilla Lau, Bjørn Kopperud, and
-Sebastian Höhna for their careful work in identifying this issue and
-proposing a solution.</p>
+have updated the code in <code>OUwie</code> version 3.01 (released March
+6, 2026) to correctly calculate the variance-covariance matrix under the
+OU model with multiple
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+parameters. We thank Priscilla Lau, Bjørn Kopperud, and Sebastian Höhna
+for their careful work in identifying this issue and proposing a
+solution.</p>
 </div>
 <div class="section level3">
 <h3 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
 </h3>
 <p><strong>How big of a difference does this make?</strong></p>
-<p>The exact impact will depend on the tree, the alpha values, and the
-data. In some cases it could be substantial. There is no predicted
-effect of whether this makes OUMVA or OUMA models seem to fit better or
-worse than they should otherwise.</p>
+<p>The exact impact will depend on the tree, the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+values, and the data. In some cases it could be substantial. There is no
+predicted effect of whether this makes OUMVA or OUMA models seem to fit
+better or worse than they should otherwise.</p>
 <p><strong>Are the equations in the Beaulieu et al. (2012) paper
 correct?</strong></p>
 <p>Other than the one noted above, yes. So other software that
 implemented the equations correctly should be fine, this is just an
-issue with how OUwie implemented the calculations.</p>
+issue with how <code>OUwie</code> implemented the calculations.</p>
 <p><strong>Can I verify how this affects my analyses?</strong></p>
 <p>Yes, with OUwie() and similar functions we have added a
 <code>revert.old</code> argument that defaults to <code>FALSE</code>. If
@@ -161,8 +180,10 @@ matrix. You can compare results with <code>revert.old=TRUE</code> and
 <code>revert.old=FALSE</code> to see how much of a difference it makes
 for your specific analysis. We wanted to make sure that any problems are
 transparent and reproducible.</p>
-<p><strong>Was hOUwie affected?</strong></p>
-<p>Yes, in the same way, and corrected in the same way.</p>
+<p><strong>Was <code>hOUwie</code> affected?</strong></p>
+<p>Yes, in the same way for the multiple
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+models only, and corrected in the same way.</p>
 </div>
   </div>
 
