@@ -85,7 +85,7 @@
 Bjørn Kopperud, Sebastian Höhna, Jeremy M. Beaulieu, and Brian C.
 O’Meara</h4>
             
-            <h4 data-toc-skip class="date">11/06/2025</h4>
+            <h4 data-toc-skip class="date">03/27/2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/thej022214/OUwie/blob/HEAD/vignettes/calculationUpdate.Rmd" class="external-link"><code>vignettes/calculationUpdate.Rmd</code></a></small>
       <div class="hidden name"><code>calculationUpdate.Rmd</code></div>
@@ -118,36 +118,51 @@ and colleagues had additional details on the issues.</p>
 <h3 id="rendered-equation-error-in-original-beaulieu-et-al--2012">Rendered equation error in original Beaulieu et al. (2012)<a class="anchor" aria-label="anchor" href="#rendered-equation-error-in-original-beaulieu-et-al--2012"></a>
 </h3>
 <p>In the appendix on page 2383, when it describes the covariation under
-an
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mi mathvariant="normal">O</mi><mi mathvariant="normal">U</mi></mrow><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">V</mi><mi mathvariant="normal">A</mi></mrow></msub><annotation encoding="application/x-tex">\mathrm{OU}_{\mathrm{MVA}}</annotation></semantics></math>
-model, the right-most calculation in the final term is rendered as
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2s_{ij,\gamma}} - e^{2s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),
-</annotation></semantics></math> when it should be
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2 \alpha s_{ij,\gamma}} - e^{2 \alpha s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),
-</annotation></semantics></math> as it is correctly written in Eq. A.26.
-This is unrelated to the issue below but still worth noting.</p>
+an OUMVA model, the right-most calculation in the final term is rendered
+as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2s_{ij,\gamma}} - e^{2s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),</annotation></semantics></math>
+when it should be
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>α</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\left(\sum_{\gamma=1}^{k(i,j)} \sigma_\gamma^2 \frac{e^{2 \alpha s_{ij,\gamma}} - e^{2 \alpha s_{ij,\gamma-1}}}{2\alpha_\gamma}\right),</annotation></semantics></math>
+as it is correctly written in Eq. A.26. This is unrelated to the issue
+below but still worth noting.</p>
 </div>
 <div class="section level3">
 <h3 id="variance-covariance-matrix-calculation-error-in-ouwie">Variance-covariance matrix calculation error in OUwie<a class="anchor" aria-label="anchor" href="#variance-covariance-matrix-calculation-error-in-ouwie"></a>
 </h3>
-<p>Second, and of great practical significance, the way
-<code>OUwie</code> calculated the variance-covariance matrix under the
-OU model with multiple alphas was indeed incorrect. With an
-Ornstein-Uhlenbeck process, shared variance decays based on the
+<p>More importantly for model inference the way <code>OUwie</code>
+calculated the variance-covariance matrix under the OU model with
+multiple
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-parameter: with stronger
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-what matters more is where two tips are being pulled to rather than
-their shared history. When calculating this up the tree,
-<code>OUwie</code> versions before 3.01 used a constant
+parameters was indeed incorrect. In an Ornstein–Uhlenbeck process,
+shared variance decays through time as a function of the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-rather than varying it based on the different regimes. This means that
-the variance-covariance matrix and weight vectors were calculated
-incorrectly when there are multiple
+parameter: higher values of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-parameters (i.e., OUMVA and OUMA models).</p>
+cause trait values to lose memory of their shared history more rapidly,
+making the optima toward which lineages are pulled more important than
+their ancestral states.</p>
+<p>The derivation presented in Beaulieu et al. (2012) is correct;
+however, the appendix does not explicitly describe how the exponential
+decay term should accumulate when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+varies across regimes. In this situation, the decay of shared
+evolutionary history must accumulate along lineage segments using the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+associated with each regime. For developers, the decay factor is
+computed as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>−</mi><msub><mo>∑</mo><mi>γ</mi></msub><msub><mi>α</mi><mi>γ</mi></msub><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>γ</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp\left(-\sum_{\gamma} \alpha_\gamma \Delta t_\gamma\right)</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>γ</mi></msub></mrow><annotation encoding="application/x-tex">\Delta t_\gamma</annotation></semantics></math>
+is the duration of regime
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+along the lineage. Earlier versions of <code>OUwie</code> effectively
+applied a single
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+when calculating this decay while traversing the tree. As a result, the
+variance-covariance matrix and weight vectors were calculated
+incorrectly for models that allow multiple
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+parameters (i.e., OUMA and OUMVA models).</p>
 <p>Adopting the corrections proposed by Priscilla Lau and colleagues, we
 have updated the code in <code>OUwie</code> version 3.01 (released March
 6, 2026) to correctly calculate the variance-covariance matrix under the

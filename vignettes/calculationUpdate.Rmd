@@ -1,7 +1,7 @@
 ---
 title: "Calculation Update"
 author: "Priscilla Lau, Bjørn Kopperud, Sebastian Höhna, Jeremy M. Beaulieu, and Brian C. O'Meara"
-date: "11/06/2025"
+date: "03/27/2026"
 output:
   pdf_document:
     fig_caption: yes
@@ -41,9 +41,9 @@ as it is correctly written in Eq. A.26. This is unrelated to the issue below but
 
 ### Variance-covariance matrix calculation error in OUwie
 
-More importantly for model inference the way `OUwie` calculated the variance-covariance matrix under the OU model with multiple $\alpha$ parameters was indeed incorrect. In an Ornstein–Uhlenbeck process, shared variance decays through time as a function of the $\alpha$ parameter: stronger values of $\alpha$ cause trait values to lose memory of their shared history more rapidly, making the optima toward which lineages are pulled more important than their ancestral states.
+More importantly for model inference the way `OUwie` calculated the variance-covariance matrix under the OU model with multiple $\alpha$ parameters was indeed incorrect. In an Ornstein–Uhlenbeck process, shared variance decays through time as a function of the $\alpha$ parameter: higher values of $\alpha$ cause trait values to lose memory of their shared history more rapidly, making the optima toward which lineages are pulled more important than their ancestral states.
 
-The derivation presented in Beaulieu et al. (2012) is correct; however, the appendix does not explicitly describe how the exponential decay term should accumulate when $\alpha$ varies across regimes. In this situation, the decay of shared evolutionary history must accumulate along lineage segments using the $\alpha$ associated with each regime. For developers, the decay factor is computed as $\exp\left(-\sum_{\gamma} \alpha_\gamma \Delta t_\gamma\right)$, where $\Delta t_\gamma$ is the duration of regime $\gamma$ along the lineage. Earlier versions of `OUwie` effectively applied a single $\alpha$ when calculating this decay while traversing the tree. As a result, the variance-covariance matrix and weight vectors were calculated incorrectly for models that estimate multiple $\alpha$ parameters (i.e., OUMA and OUMVA models).
+The derivation presented in Beaulieu et al. (2012) is correct; however, the appendix does not explicitly describe how the exponential decay term should accumulate when $\alpha$ varies across regimes. In this situation, the decay of shared evolutionary history must accumulate along lineage segments using the $\alpha$ associated with each regime. For developers, the decay factor is computed as $\exp\left(-\sum_{\gamma} \alpha_\gamma \Delta t_\gamma\right)$, where $\Delta t_\gamma$ is the duration of regime $\gamma$ along the lineage. Earlier versions of `OUwie` effectively applied a single $\alpha$ when calculating this decay while traversing the tree. As a result, the variance-covariance matrix and weight vectors were calculated incorrectly for models that allow multiple $\alpha$ parameters (i.e., OUMA and OUMVA models).
 
 Adopting the corrections proposed by Priscilla Lau and colleagues, we have updated the code in `OUwie` version 3.01 (released March 6, 2026) to correctly calculate the variance-covariance matrix under the OU model with multiple $\alpha$ parameters. We thank Priscilla Lau, Bjørn Kopperud, and Sebastian Höhna for their careful work in identifying this issue and proposing a solution.
 
