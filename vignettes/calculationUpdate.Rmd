@@ -65,3 +65,38 @@ Yes, with OUwie() and similar functions we have added a `revert.old` argument th
 **Was `hOUwie` affected?**
 
 Yes, in the same way for the multiple $\alpha$ models only, and corrected in the same way.
+
+**Can I see more details on the changes?**
+
+Yes, compare, for example, the code around [line 58](https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L58) of weight.mat.R with the code around [line 174](https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L174) of the original calculation for trees with stochastic maps
+
+```
+for(regimeindex in 1:length(currentmap)){
+	dt <- as.numeric(currentmap[regimeindex])
+	regimenumber <- which(colnames(phy$mapped.edge) == names(currentmap)[regimeindex])
+	a <- alpha[regimenumber]
+	nodevar.root.tot[i] <- nodevar.root.tot[i] - a * dt
+	if(regimenumber == j){
+		nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a * dt) - exp(Acur))
+	}
+	Acur <- Acur + a * dt
+}
+```
+	
+```
+for (regimeindex in 1:length(currentmap)){
+	regimeduration <- currentmap[regimeindex]
+	newtime <- oldtime + regimeduration
+	regimenumber <- which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
+	if(regimenumber == j){
+		nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
+		nodevar.k[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
+	}else{
+		nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
+		nodevar.k[i] <- nodevar.k[i] + 0
+	}
+	oldtime <- newtime
+}
+```
+
+Some of the variables have changed names, but a key change is in how the time accumulates along the tree, with it being scaled by alpha in the new code.
