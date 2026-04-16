@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
       </span>
     </div>
 
@@ -876,13 +876,13 @@ here though, we won’t delve into that.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulated data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">flower_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   sp scent color     size</span></span>
-<span><span class="co">## 1 t1     1  blue 6.143631</span></span>
-<span><span class="co">## 2 t2     1   red 5.068725</span></span>
-<span><span class="co">## 3 t3     1  blue 9.061639</span></span>
-<span><span class="co">## 4 t4     1   red 5.469752</span></span>
-<span><span class="co">## 5 t5     0   red 5.410799</span></span>
-<span><span class="co">## 6 t6     1   red 5.495283</span></span></code></pre>
+<pre><code><span><span class="co">##   sp scent color      size</span></span>
+<span><span class="co">## 1 t1     1  blue  6.143631</span></span>
+<span><span class="co">## 2 t2     1   red  5.068725</span></span>
+<span><span class="co">## 3 t3     1  blue  9.061639</span></span>
+<span><span class="co">## 4 t4     0  blue 10.021362</span></span>
+<span><span class="co">## 5 t5     0   red  5.410799</span></span>
+<span><span class="co">## 6 t6     1   red  5.495283</span></span></code></pre>
 <p>And if we plot our data…</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tree</span>, show.tip.label <span class="op">=</span> <span class="cn">FALSE</span>, x.lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, no.margin <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -937,8 +937,8 @@ custom input model.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ou1_fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Fit</span></span>
-<span><span class="co">##      lnLTot lnLDisc    lnLCont       AIC      AICc       BIC nTaxa nPars</span></span>
-<span><span class="co">##  -308280181 -115.64 -308280062 616560370 616560371 616560379    64     4</span></span>
+<span><span class="co">##      lnLTot   lnLDisc    lnLCont       AIC      AICc       BIC nTaxa nPars</span></span>
+<span><span class="co">##  -321715468 -115.9272 -321715348 643430945 643430945 643430953    64     4</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Legend</span></span>
 <span><span class="co">##        1        2        3        4 </span></span>
@@ -1071,10 +1071,10 @@ model was.</p>
 <span><span class="co">## Warning in max(x$index.mat, na.rm = TRUE): no non-missing arguments to max;</span></span>
 <span><span class="co">## returning -Inf</span></span></code></pre>
 <pre><code><span><span class="co">##       np nRateCat         lnLik          AIC         dAIC AICwt</span></span>
-<span><span class="co">## ou1 -Inf        1 -3.082802e+08 6.165604e+08 6.165538e+08     0</span></span>
-<span><span class="co">## m1  -Inf        1 -4.894668e+03 9.799336e+03 3.191443e+03     0</span></span>
-<span><span class="co">## m2  -Inf        1 -3.298947e+03 6.607893e+03 0.000000e+00     1</span></span>
-<span><span class="co">## m3  -Inf        1 -9.892739e+07 1.978548e+08 1.978482e+08     0</span></span></code></pre>
+<span><span class="co">## ou1 -Inf        1 -3.217155e+08 6.434309e+08 6.434267e+08     0</span></span>
+<span><span class="co">## m1  -Inf        1 -2.939912e+03 5.889824e+03 1.621685e+03     0</span></span>
+<span><span class="co">## m2  -Inf        1 -2.129069e+03 4.268139e+03 0.000000e+00     1</span></span>
+<span><span class="co">## m3  -Inf        1 -1.870188e+07 3.740378e+07 3.739951e+07     0</span></span></code></pre>
 <p>So based on these results we could conclude fairly substantial
 evidence for model 2 which suggested that the optimum of flower size is
 correlated with flower color. Obviously, for a real analysis we would

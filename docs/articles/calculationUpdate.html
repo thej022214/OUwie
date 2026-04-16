@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
       </span>
     </div>
 
@@ -129,9 +129,8 @@ below but still worth noting.</p>
 <div class="section level3">
 <h3 id="variance-covariance-matrix-calculation-error-in-ouwie">Variance-covariance matrix calculation error in OUwie<a class="anchor" aria-label="anchor" href="#variance-covariance-matrix-calculation-error-in-ouwie"></a>
 </h3>
-<p>More importantly for model inference the way <code>OUwie</code>
-calculated the variance-covariance matrix under the OU model with
-multiple
+<p>For model inference the way <code>OUwie</code> calculated the
+variance-covariance matrix under the OU model with multiple
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
 parameters was indeed incorrect. In an Ornstein–Uhlenbeck process,
 shared variance decays through time as a function of the
@@ -141,28 +140,17 @@ parameter: higher values of
 cause trait values to lose memory of their shared history more rapidly,
 making the optima toward which lineages are pulled more important than
 their ancestral states.</p>
-<p>The derivation presented in Beaulieu et al. (2012) is correct;
-however, the appendix does not explicitly describe how the exponential
-decay term should accumulate when
+<p>The key issue is how variance decay is handled. The recursive
+approach of Lau et al. (In review) builds variance step-by-step along
+each branch, correctly applying decay at each stage. In contrast, Eq. 13
+on page 2371 gives a closed-form expression, but does not fully account
+for how decay accumulates across segments when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-varies across regimes. In this situation, the decay of shared
-evolutionary history must accumulate along lineage segments using the
+varies. As a result, it is not equivalent in the general
+multi-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+case, although the two agree when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-associated with each regime. For developers, the decay factor is
-computed as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>−</mi><msub><mo>∑</mo><mi>γ</mi></msub><msub><mi>α</mi><mi>γ</mi></msub><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>γ</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp\left(-\sum_{\gamma} \alpha_\gamma \Delta t_\gamma\right)</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>γ</mi></msub></mrow><annotation encoding="application/x-tex">\Delta t_\gamma</annotation></semantics></math>
-is the duration of regime
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
-along the lineage. Earlier versions of <code>OUwie</code> effectively
-applied a single
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-when calculating this decay while traversing the tree. As a result, the
-variance-covariance matrix and weight vectors were calculated
-incorrectly for models that allow multiple
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-parameters (i.e., OUMA and OUMVA models).</p>
+is constant (i.e., the BM1, BMS, OU1, OUM, and OUMV cases).</p>
 <p>Adopting the corrections proposed by Priscilla Lau and colleagues, we
 have updated the code in <code>OUwie</code> version 3.01 (released March
 6, 2026) to correctly calculate the variance-covariance matrix under the
@@ -181,11 +169,6 @@ solution.</p>
 values, and the data. In some cases it could be substantial. There is no
 predicted effect of whether this makes OUMVA or OUMA models seem to fit
 better or worse than they should otherwise.</p>
-<p><strong>Are the equations in the Beaulieu et al. (2012) paper
-correct?</strong></p>
-<p>Other than the one noted above, yes. So other software that
-implemented the equations correctly should be fine, this is just an
-issue with how <code>OUwie</code> implemented the calculations.</p>
 <p><strong>Can I verify how this affects my analyses?</strong></p>
 <p>Yes, with OUwie() and similar functions we have added a
 <code>revert.old</code> argument that defaults to <code>FALSE</code>. If
@@ -200,31 +183,27 @@ transparent and reproducible.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
 models only, and corrected in the same way.</p>
 <p><strong>Can I see more details on the changes?</strong></p>
-<p>Yes, compare, for example, the code around <a href="https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L58" class="external-link">line
-58</a> of weight.mat.R with the code around <a href="https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L174" class="external-link">line
-174</a> of the original calculation for trees with stochastic maps</p>
+<p>Yes, compare, for example, the code around <a href="https://github.com/thej022214/OUwie/blob/master/R/varcov.ou.R#L56" class="external-link">line
+56</a> of varcov.ou.R with the code around <a href="https://github.com/thej022214/OUwie/blob/master/R/varcov.ou.R#L166" class="external-link">line
+166</a> of the original calculation for trees with stochastic maps</p>
 <pre><code><span><span class="kw">for</span><span class="op">(</span><span class="va">regimeindex</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">regimenumber</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">phy</span><span class="op">$</span><span class="va">mapped.edge</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">)</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span></span>
-<span>    <span class="va">nodevar.root.tot</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar.root.tot</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="va">a</span> <span class="op">*</span> <span class="va">dt</span></span>
-<span>    <span class="kw">if</span><span class="op">(</span><span class="va">regimenumber</span> <span class="op">==</span> <span class="va">j</span><span class="op">)</span><span class="op">{</span></span>
-<span>        <span class="va">nodevar.k</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar.k</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Acur</span> <span class="op">+</span> <span class="va">a</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Acur</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">}</span></span>
+<span>    <span class="va">s2</span> <span class="op">&lt;-</span> <span class="va">sigma</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span></span>
+<span>    <span class="va">nodevar1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">a</span> <span class="op">*</span> <span class="va">dt</span></span>
+<span>    <span class="va">nodevar2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">s2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">Acur</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">a</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">a</span><span class="op">)</span></span>
 <span>    <span class="va">Acur</span> <span class="op">&lt;-</span> <span class="va">Acur</span> <span class="op">+</span> <span class="va">a</span> <span class="op">*</span> <span class="va">dt</span></span>
-<span><span class="op">}</span></span></code></pre>
+<span><span class="op">}</span></span>
+<span><span class="va">Ato</span><span class="op">[</span><span class="va">desc</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">Acur</span></span></code></pre>
 <pre><code><span><span class="kw">for</span> <span class="op">(</span><span class="va">regimeindex</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="va">regimeduration</span> <span class="op">&lt;-</span> <span class="va">currentmap</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span></span>
-<span>    <span class="va">newtime</span> <span class="op">&lt;-</span> <span class="va">oldtime</span> <span class="op">+</span> <span class="va">regimeduration</span></span>
-<span>    <span class="va">regimenumber</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">phy</span><span class="op">$</span><span class="va">mapped.edge</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">)</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span><span class="op">)</span></span>
-<span>    <span class="kw">if</span><span class="op">(</span><span class="va">regimenumber</span> <span class="op">==</span> <span class="va">j</span><span class="op">)</span><span class="op">{</span></span>
-<span>        <span class="va">nodevar.root.tot</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="va">newtime</span><span class="op">-</span><span class="va">oldtime</span><span class="op">)</span></span>
-<span>        <span class="va">nodevar.k</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="va">newtime</span><span class="op">)</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="va">oldtime</span><span class="op">)</span></span>
-<span>    <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
-<span>        <span class="va">nodevar.root.tot</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="va">newtime</span><span class="op">-</span><span class="va">oldtime</span><span class="op">)</span></span>
-<span>        <span class="va">nodevar.k</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar.k</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fl">0</span></span>
-<span>    <span class="op">}</span></span>
+<span>  <span class="va">regimeduration</span> <span class="op">&lt;-</span> <span class="va">currentmap</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span></span>
+<span>  <span class="va">newtime</span> <span class="op">&lt;-</span> <span class="va">oldtime</span><span class="op">+</span><span class="va">regimeduration</span></span>
+<span>  <span class="va">regimenumber</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">phy</span><span class="op">$</span><span class="va">mapped.edge</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">currentmap</span><span class="op">)</span><span class="op">[</span><span class="va">regimeindex</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">nodevar1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">+</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="va">newtime</span><span class="op">-</span><span class="va">oldtime</span><span class="op">)</span></span>
+<span>    <span class="va">nodevar2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nodevar2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">+</span><span class="va">sigma</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="va">newtime</span><span class="op">)</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">*</span><span class="va">oldtime</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">alpha</span><span class="op">[</span><span class="va">regimenumber</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="va">oldtime</span> <span class="op">&lt;-</span> <span class="va">newtime</span></span>
+<span>  <span class="va">newregime</span> <span class="op">&lt;-</span> <span class="va">regimenumber</span></span>
 <span><span class="op">}</span></span></code></pre>
 <p>Some of the variables have changed names, but a key change is in how
 the time accumulates along the tree, with it being scaled by alpha in
