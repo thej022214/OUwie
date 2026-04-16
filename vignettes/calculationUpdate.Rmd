@@ -41,9 +41,9 @@ as it is correctly written in Eq. A.26. This is unrelated to the issue below but
 
 ### Variance-covariance matrix calculation error in OUwie
 
-More importantly for model inference the way `OUwie` calculated the variance-covariance matrix under the OU model with multiple $\alpha$ parameters was indeed incorrect. In an Ornstein–Uhlenbeck process, shared variance decays through time as a function of the $\alpha$ parameter: higher values of $\alpha$ cause trait values to lose memory of their shared history more rapidly, making the optima toward which lineages are pulled more important than their ancestral states.
+For model inference the way `OUwie` calculated the variance-covariance matrix under the OU model with multiple $\alpha$ parameters was indeed incorrect. In an Ornstein–Uhlenbeck process, shared variance decays through time as a function of the $\alpha$ parameter: higher values of $\alpha$ cause trait values to lose memory of their shared history more rapidly, making the optima toward which lineages are pulled more important than their ancestral states.
 
-The derivation presented in Beaulieu et al. (2012) is correct; however, the appendix does not explicitly describe how the exponential decay term should accumulate when $\alpha$ varies across regimes. In this situation, the decay of shared evolutionary history must accumulate along lineage segments using the $\alpha$ associated with each regime. For developers, the decay factor is computed as $\exp\left(-\sum_{\gamma} \alpha_\gamma \Delta t_\gamma\right)$, where $\Delta t_\gamma$ is the duration of regime $\gamma$ along the lineage. Earlier versions of `OUwie` effectively applied a single $\alpha$ when calculating this decay while traversing the tree. As a result, the variance-covariance matrix and weight vectors were calculated incorrectly for models that allow multiple $\alpha$ parameters (i.e., OUMA and OUMVA models).
+The key issue is how variance decay is handled. The recursive approach of Lau et al. (In review) builds variance step-by-step along each branch, correctly applying decay at each stage. In contrast, Eq. 13 on page 2371 gives a closed-form expression, but does not fully account for how decay accumulates across segments when $\alpha$ varies. As a result, it is not equivalent in the general multi-$\alpha$ case, although the two agree when $\alpha$ is constant (i.e., the BM1, BMS, OU1, OUM, and OUMV cases).
 
 Adopting the corrections proposed by Priscilla Lau and colleagues, we have updated the code in `OUwie` version 3.01 (released March 6, 2026) to correctly calculate the variance-covariance matrix under the OU model with multiple $\alpha$ parameters. We thank Priscilla Lau, Bjørn Kopperud, and Sebastian Höhna for their careful work in identifying this issue and proposing a solution.
 
@@ -53,10 +53,6 @@ Adopting the corrections proposed by Priscilla Lau and colleagues, we have updat
 **How big of a difference does this make?**
 
 The exact impact will depend on the tree, the $\alpha$ values, and the data. In some cases it could be substantial. There is no predicted effect of whether this makes OUMVA or OUMA models seem to fit better or worse than they should otherwise.
-
-**Are the equations in the Beaulieu et al. (2012) paper correct?**
-
-Other than the one noted above, yes. So other software that implemented the equations correctly should be fine, this is just an issue with how `OUwie` implemented the calculations.
 
 **Can I verify how this affects my analyses?**
 
@@ -68,34 +64,30 @@ Yes, in the same way for the multiple $\alpha$ models only, and corrected in the
 
 **Can I see more details on the changes?**
 
-Yes, compare, for example, the code around [line 58](https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L58) of weight.mat.R with the code around [line 174](https://github.com/thej022214/OUwie/blob/master/R/weight.mat.R#L174) of the original calculation for trees with stochastic maps
+Yes, compare, for example, the code around [line 56](https://github.com/thej022214/OUwie/blob/master/R/varcov.ou.R#L56) of varcov.ou.R with the code around [line 166](https://github.com/thej022214/OUwie/blob/master/R/varcov.ou.R#L166) of the original calculation for trees with stochastic maps
 
 ```
 for(regimeindex in 1:length(currentmap)){
-	dt <- as.numeric(currentmap[regimeindex])
+  dt <- as.numeric(currentmap[regimeindex])
 	regimenumber <- which(colnames(phy$mapped.edge) == names(currentmap)[regimeindex])
 	a <- alpha[regimenumber]
-	nodevar.root.tot[i] <- nodevar.root.tot[i] - a * dt
-	if(regimenumber == j){
-		nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a * dt) - exp(Acur))
-	}
+	s2 <- sigma[regimenumber]
+	nodevar1[i] <- nodevar1[i] + a * dt
+	nodevar2[i] <- nodevar2[i] + s2 * exp(2 * Acur) * (exp(2 * a * dt) - 1) / (2 * a)
 	Acur <- Acur + a * dt
 }
+Ato[desc] <- Acur
 ```
 	
 ```
 for (regimeindex in 1:length(currentmap)){
-	regimeduration <- currentmap[regimeindex]
-	newtime <- oldtime + regimeduration
-	regimenumber <- which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
-	if(regimenumber == j){
-		nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
-		nodevar.k[i] <- exp(alpha[regimenumber]*newtime)-exp(alpha[regimenumber]*oldtime)
-	}else{
-		nodevar.root.tot[i] <- -alpha[regimenumber]*(newtime-oldtime)
-		nodevar.k[i] <- nodevar.k[i] + 0
-	}
+  regimeduration <- currentmap[regimeindex]
+  newtime <- oldtime+regimeduration
+  regimenumber <- which(colnames(phy$mapped.edge)==names(currentmap)[regimeindex])
+	nodevar1[i] <- nodevar1[i]+alpha[regimenumber]*(newtime-oldtime)
+	nodevar2[i] <- nodevar2[i]+sigma[regimenumber]*((exp(2*alpha[regimenumber]*newtime)-exp(2*alpha[regimenumber]*oldtime))/(2*alpha[regimenumber]))
 	oldtime <- newtime
+  newregime <- regimenumber
 }
 ```
 
