@@ -85,7 +85,7 @@
 Bjørn Kopperud, Sebastian Höhna, Jeremy M. Beaulieu, and Brian C.
 O’Meara</h4>
             
-            <h4 data-toc-skip class="date">03/27/2026</h4>
+            <h4 data-toc-skip class="date">04/21/2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/thej022214/OUwie/blob/HEAD/vignettes/calculationUpdate.Rmd" class="external-link"><code>vignettes/calculationUpdate.Rmd</code></a></small>
       <div class="hidden name"><code>calculationUpdate.Rmd</code></div>
@@ -95,10 +95,12 @@ O’Meara</h4>
     
     
 <p>There was an issue in OUMA and OUMVA models in OUwie versions from
-its origin through 2.17. This has now been fixed. Details below:</p>
-<div class="section level3">
-<h3 id="timeline">Timeline<a class="anchor" aria-label="anchor" href="#timeline"></a>
-</h3>
+its origin through 2.17. This has now been fixed in OUwie versions 3.00
+and up. Jeremy and Brian deeply apologize for this error. Details
+below:</p>
+<div class="section level2">
+<h2 id="timeline">Timeline<a class="anchor" aria-label="anchor" href="#timeline"></a>
+</h2>
 <p>Priscilla Lau reached out to Jeremy Beaulieu in Aug, 2025, at a
 conference about an issue she and her collaborators (Bjørn Kopperud and
 Sebastian Höhna) found in how <code>OUwie</code> calculates the
@@ -112,11 +114,14 @@ the use of models with different
 in <code>OUwie</code> (on Sept. 6, 2025). A further email from Priscilla
 and colleagues had additional details on the issues.</p>
 <p>Brian spent some time trying to fix the code; Jeremy swooped in and
-<em>actually</em> fixed the code.</p>
+<em>actually</em> fixed the code using the approaches from Priscilla,
+Bjørn, and Sebastian.</p>
+<p>We are posting this vignette; we will soon reach out to
+<em>Evolution</em> for a correction to Beaulieu et al. (2012).</p>
 </div>
-<div class="section level3">
-<h3 id="rendered-equation-error-in-original-beaulieu-et-al--2012">Rendered equation error in original Beaulieu et al. (2012)<a class="anchor" aria-label="anchor" href="#rendered-equation-error-in-original-beaulieu-et-al--2012"></a>
-</h3>
+<div class="section level2">
+<h2 id="rendered-equation-error-in-original-beaulieu-et-al--2012">Rendered equation error in original Beaulieu et al. (2012)<a class="anchor" aria-label="anchor" href="#rendered-equation-error-in-original-beaulieu-et-al--2012"></a>
+</h2>
 <p>In the appendix on page 2383, when it describes the covariation under
 an OUMVA model, the right-most calculation in the final term is rendered
 as
@@ -126,9 +131,9 @@ when it should be
 as it is correctly written in Eq. A.26. This is unrelated to the issue
 below but still worth noting.</p>
 </div>
-<div class="section level3">
-<h3 id="variance-covariance-matrix-calculation-error-in-ouwie">Variance-covariance matrix calculation error in OUwie<a class="anchor" aria-label="anchor" href="#variance-covariance-matrix-calculation-error-in-ouwie"></a>
-</h3>
+<div class="section level2">
+<h2 id="variance-covariance-matrix-calculation-error-in-ouwie">Variance-covariance matrix calculation error in OUwie<a class="anchor" aria-label="anchor" href="#variance-covariance-matrix-calculation-error-in-ouwie"></a>
+</h2>
 <p>For model inference the way <code>OUwie</code> calculated the
 variance-covariance matrix under the OU model with multiple
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
@@ -141,10 +146,11 @@ cause trait values to lose memory of their shared history more rapidly,
 making the optima toward which lineages are pulled more important than
 their ancestral states.</p>
 <p>The key issue is how variance decay is handled. The recursive
-approach of Lau et al. (In review) builds variance step-by-step along
-each branch, correctly applying decay at each stage. In contrast, Eq. 13
-on page 2371 gives a closed-form expression, but does not fully account
-for how decay accumulates across segments when
+approach of Lau et al. (in review – we will update this vignette when it
+becomes available) builds variance step-by-step along each branch,
+correctly applying decay at each stage. In contrast, Eq. 13 on page 2371
+gives a closed-form expression, but does not fully account for how decay
+accumulates across segments when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
 varies. As a result, it is not equivalent in the general
 multi-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
@@ -160,9 +166,235 @@ parameters. We thank Priscilla Lau, Bjørn Kopperud, and Sebastian Höhna
 for their careful work in identifying this issue and proposing a
 solution.</p>
 </div>
+<div class="section level2">
+<h2 id="details-of-the-issue">Details of the issue<a class="anchor" aria-label="anchor" href="#details-of-the-issue"></a>
+</h2>
+<p>This part was written by Lau, Kopperud, and Höhna (though Beaulieu
+&amp; O’Meara agree with it – we just don’t want to take credit for the
+discovery).</p>
 <div class="section level3">
-<h3 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
+<h3 id="general-equations">General equations<a class="anchor" aria-label="anchor" href="#general-equations"></a>
 </h3>
+<div class="section level4">
+<h4 id="expectation-of-the-trait-value-for-species-i">Expectation of the trait value for species i<a class="anchor" aria-label="anchor" href="#expectation-of-the-trait-value-for-species-i"></a>
+</h4>
+<p>The expectation of the trait value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is a sum over the vector
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
+weighted by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">W_{ik}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">E</mtext><mo stretchy="false" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>r</mi></munderover><msub><mi>W</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>θ</mi><mi>k</mi></msub><mspace width="2.0em"></mspace><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+    \text{E}[y_i] = \sum_{k=0}^r W_{ik} \theta_k \qquad,
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\theta_0</annotation></semantics></math>
+is the parameter for the root value, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>θ</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi></mrow><annotation encoding="application/x-tex">\theta_1,\theta_2,\dots</annotation></semantics></math>
+are the state-dependent optima for regimes 1, 2, and so on. Thus, each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">W_{ik}</annotation></semantics></math>
+represents the relative contribution of either the root value or the
+optima on the expected value at the tip. As described in Beaulieu et
+al. (2012), the weights are as follows <span class="math display">$$\begin{equation}
+    \begin{aligned}
+        W_{i0} &amp;=
+e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma}
+- s_{i,\gamma - 1})\right)}\\
+        W_{ik}
+&amp;=  e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\sum_{k=1}^r\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma}
+- s_{i,\gamma - 1})} \times \sum_{\gamma=1}^{\kappa(i)}
+\beta_{ik,\gamma} \left( e^{\left(\sum_{k=1}^r \beta_{ik,\gamma}
+\Tilde{\alpha}_k\right) s_{i,\gamma}} - e^{\left(\sum_{k=1}^r
+\beta_{ik,\gamma} \Tilde{\alpha}_k\right) s_{i,\gamma-1}} \right) \quad
+.
+    \end{aligned}
+\end{equation}$$</span></p>
+<p>In the new (Lau et al.) derivation, the general equations are, <span class="math display">$$\begin{equation}
+    \begin{aligned}
+        W_{i0} &amp;=
+e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma}
+- s_{i,\gamma - 1})\right)}\\
+        W_{ik} &amp;= \sum_{\gamma=1}^{\kappa(i)} \Bigl[
+~\overbrace{e^{-\sum_{\gamma'&gt;\gamma} \left(\left(\sum_{k=1}^r
+\beta_{ik,\gamma'} \Tilde{\alpha}_k\right) (s_{i,\gamma'} -
+s_{i,\gamma'-1})\right)}}^{\displaystyle \text{decay of epoch } \gamma}
+\times \beta_{ik,\gamma} \left(1 - e^{(-\sum_{k=1}^r \beta_{ik,\gamma}
+\Tilde{\alpha}_k) (s_{i,\gamma} - s_{i,\gamma-1})}\right) \Bigr] \quad .
+    \end{aligned}
+\end{equation}$$</span> There are two differences in the way Beaulieu et
+al. (2012) construct
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">W_{ik}</annotation></semantics></math>
+when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+takes different values across epochs compared with the new derivation.
+First—in Beaulieu et al. (2012)’s derivation, the decay variable is
+outside of the summation function, and their summation function starts
+with epoch index
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\gamma=1</annotation></semantics></math>.
+This implies that the decay always starts from the root, regardless of
+when each epoch ends. However, the contribution of epoch
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+on the expected value should only begin decaying when the epoch
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+the ends. Therefore, in the new equations, the decay variable is inside
+the summation function, and is dependent on the time when each epoch
+ends (see the sum that iterates over all epochs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>γ</mi><mo>′</mo></msup><mo>&gt;</mo><mi>γ</mi></mrow><annotation encoding="application/x-tex">\gamma' &gt; \gamma</annotation></semantics></math>).</p>
+<p>The second factor of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">W_{ik}</annotation></semantics></math>
+in Beaulieu et al. (2012)’s derivation is also different. The factor is
+taken from Hansen (1997). However, Hansen (1997) assumes that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+takes the same value in all epochs, and the factor already incorporates
+how the weight of each epoch-specific optimum decays after the
+respective epoch. Since in Beaulieu et al. (2012)’s models
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+can take multiple values, the decay variable has to be extracted out of
+the factor.</p>
+<p>Furthermore, Hansen (1997) stated that the weights should sum to one,
+which is the case using our derivation. The extra step where “each row
+entry in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+is divided by the sum of its row to ensure that the weights for each
+species sum to 1” [Beaulieu et al. (2012)] is not required when the
+weights sum to one.</p>
+</div>
+<div class="section level4">
+<h4 id="covariance-between-species-i-and-j">Covariance between species i and j<a class="anchor" aria-label="anchor" href="#covariance-between-species-i-and-j"></a>
+</h4>
+<p>Here, we calculate the covariance between the trait value for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and the trait value for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
+i.e.,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Cov</mtext><mo stretchy="false" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo><mo>=</mo><msub><mi>V</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">\text{Cov}[y_i,y_j] = V_{ij}.</annotation></semantics></math>
+As described in Beaulieu et al. (2012),
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi mathvariant="normal">V</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="1.0em"></mspace><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{aligned}
+    \mathrm{V}_{ij} &amp;= e^{-\left( \sum_{\gamma=1}^{\kappa(i)} \alpha_{i,\gamma} (s_{i,\gamma} - s_{i, \gamma-1}) + \sum_{\gamma=1}^{\kappa(j)} \alpha_{j,\gamma} (s_{j,\gamma} - s_{j, \gamma-1}) \right)} \\
+    &amp; \times \left( \sum_{\gamma=1}^{\kappa(i,j)} \sigma^2_\gamma \frac{e^{2\alpha_\gamma s_{ij, \gamma}} - e^{2\alpha_\gamma s_{ij, \gamma-1}}}{2\alpha_\gamma}\right) \quad .
+\end{aligned}
+\end{equation}</annotation></semantics></math></p>
+<p>In our derivation, the general equations are
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi mathvariant="normal">V</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mrow><mo stretchy="true" form="prefix">(</mo><munderover><mo>∑</mo><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow></munderover><msubsup><mi>σ</mi><mi>γ</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>γ</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="1.0em"></mspace><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{aligned}
+    \mathrm{V}_{ij} &amp;= e^{-\left( \sum_{\gamma=\kappa(ij)}^{\kappa(i)} \alpha_{i,\gamma} (s_{i,\gamma} - s_{i, \gamma-1}) + \sum_{\gamma=\kappa(ij)}^{\kappa(j)} \alpha_{j,\gamma} (s_{j,\gamma} - s_{j, \gamma-1}) \right)} \\
+    &amp;\times \left( \sum_{\gamma=1}^{\kappa(i,j)} \sigma^2_\gamma \frac{e^{2\alpha_\gamma s_{ij, \gamma}} - e^{2\alpha_\gamma s_{ij, \gamma-1}}}{2\alpha_\gamma}\right) \quad .
+\end{aligned}
+\end{equation}</annotation></semantics></math> The difference lies in
+the first factor, which describes the exponential decay of the variance
+since the divergence of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
+In <span class="citation">@Beaulieu2012</span>’s derivation, the
+exponent in the first factor always calculates from the root
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\gamma=1</annotation></semantics></math>),
+which means the decay always begins at the root. In our derivation, the
+decay starts from the time when species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+diverge
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mi>j</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\gamma=\kappa(ij)</annotation></semantics></math>).</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="a-simple-example">A simple example<a class="anchor" aria-label="anchor" href="#a-simple-example"></a>
+</h3>
+<p>We use a simple character history of two species for demonstration.
+Epochs in black are in regime A and epochs in red are in regime B. Thus,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+lineage has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">\kappa(i) = 3</annotation></semantics></math>
+epochs,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+lineage has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\kappa(j) = 2</annotation></semantics></math>
+epochs, while the ancestral lineage
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>j</mi></mrow><annotation encoding="application/x-tex">ij</annotation></semantics></math>
+until the divergence has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>κ</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\kappa(ij) = 1</annotation></semantics></math>
+epoch. The time variable
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+is understood as “time elapsed since the root of the phylogeny”. For
+simplification, we also set each epoch in lineage
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to have equal lengths
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\Delta t</annotation></semantics></math>).</p>
+<p>Therefore,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>=</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>α</mi><mi>A</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>α</mi><mi>B</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msubsup><mi>σ</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow><mn>2</mn></msubsup></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{aligned}
+    \alpha_{ij=1} &amp;= \alpha_{i,1} = \alpha_{i,2} \\
+    &amp;= \alpha_{j,1} = \alpha_{j,2} \\
+    &amp;= \alpha_A \\
+    \alpha_{i,3} &amp;= \alpha_B \\
+    \sigma^2_{ij,1} &amp;= \sigma^2_A \\
+    s_{i,1} - s_{i,0} &amp;= s_{i,2} - s_{i,1} = s_{i,3} - s_{i,2} = \Delta t
+\end{aligned}
+\end{equation}</annotation></semantics></math></p>
+</div>
+<div class="section level3">
+<h3 id="expectation-of-the-trait-value-for-species-i-1">Expectation of the trait value for species i<a class="anchor" aria-label="anchor" href="#expectation-of-the-trait-value-for-species-i-1"></a>
+</h3>
+<p>The respective weights of the root value and state-dependent optima
+calculated using equations in Beaulieu et al. (2012) are
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mn>0</mn></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mi>A</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mrow><mo stretchy="true" form="prefix">[</mo><mo stretchy="false" form="prefix">(</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>A</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>A</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>A</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>A</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mi>−</mi><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mi>B</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>B</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>B</mi></msub><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>e</mi><mrow><mn>3</mn><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mspace width="2.0em"></mspace><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+    \begin{aligned}
+        W_{i0} &amp;= e^{-\left(\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,3} - s_{i,2}) \right)} \\
+        &amp;= e^{-  (2 \alpha_A + \alpha_B) \Delta t } \\
+        W_{iA} &amp;= e^{-\left( \alpha_A (s_{i,1} - s_{i,0}) + \alpha_A (s_{i,2} - s_{i,1}) + \alpha_B (s_{i,3} - s_{i,2}) \right)}&amp;&amp; \times \left[ (e^{\alpha_A s_{i,1}} - e^{\alpha_A s_{i,0}}) + (e^{\alpha_A s_{i,2}} - e^{\alpha_A s_{i,1}}) \right] \\
+        &amp;= e^{-(2 \alpha_A + \alpha_B) \Delta t} &amp;&amp; \times (e^{2 \alpha_A \Delta t} - 1) \\
+        &amp;= (1 - e^{-2 \alpha_A  \Delta t} ) \times e^{-\alpha_B \Delta t} \\
+        W_{iB} &amp;= e^{-\left( \alpha_A (s_{i,1} - s_{i,0}) + \alpha_A (s_{i,2} - s_{i,1}) + \alpha_B (s_{i,3} - s_{i,2}) \right)} &amp;&amp; \times \left( e^{\alpha_B s_{i,3}} - e^{\alpha_B s_{i,2}} \right) \\
+        &amp;= e^{-(2 \alpha_A + \alpha_B) \Delta t} &amp;&amp; \times (e^{3 \alpha_B \Delta t} - e^{2 \alpha_B \Delta t}) \\
+        &amp;= e^{(-2 \alpha_A + \alpha_B) \Delta t} &amp;&amp; \times ( e^{\alpha_B \Delta t} - 1) \qquad,
+    \end{aligned}
+\end{equation}</annotation></semantics></math> which do not sum to
+1.</p>
+<p>The weights using our equations are
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mn>0</mn></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mi>A</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mi>−</mi><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>W</mi><mrow><mi>i</mi><mi>B</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mspace width="2.0em"></mspace><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+    \begin{aligned}
+        W_{i0} &amp;= e^{-\left(\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,3} - s_{i,2}) \right)} \\
+        &amp;= e^{-(2 \alpha_A \Delta t + \alpha_B \Delta t)} \\
+        W_{iA} &amp;= (1 - e^{-\alpha_A(s_{i,2} - s_{i,0})}) \times e^{-(\alpha_B(s_{i,3} - s_{i,2}))} \\
+        &amp;= (1 - e^{-2\alpha_A \Delta t}) \times e^{-\alpha_B \Delta t} \\
+        W_{iB} &amp;= (1 - e^{- \alpha_B (s_{i,3} - s_{i,2}) }) \\
+        &amp;= 1 - e^{- \alpha_B \Delta t } \qquad,
+    \end{aligned}
+\end{equation}</annotation></semantics></math> which sum to 1.</p>
+</div>
+<div class="section level3">
+<h3 id="covariance-between-species-i-and-j-1">Covariance between species i and j<a class="anchor" aria-label="anchor" href="#covariance-between-species-i-and-j-1"></a>
+</h3>
+<p>Using equations in Beaulieu et al. (2012), the covariance between
+species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi mathvariant="normal">V</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>0</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><msubsup><mi>σ</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>0</mn></mrow></msub></mrow></msup></mrow><mrow><mn>2</mn><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>+</mo><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>+</mo><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>+</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>×</mo><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>5</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>×</mo><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub></mrow></mfrac></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{aligned}
+    \mathrm{V}_{ij} &amp;= e^{\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,2} - s_{i,3}) + \alpha_{j,1}(s_{j,1} - s_{j,0}) + \alpha_{j,2}(s_{j,2} - s_{j,1})} \\
+    &amp; \times \sigma^2_{ij,1} \frac{e^{2\alpha_{ij,1} s_{ij, 1}} - e^{2\alpha_{ij,1} s_{ij, 0}}}{2\alpha_{ij,1}} \\
+    &amp;= e^{\alpha_A \Delta t + \alpha_A \Delta t + \alpha_B \Delta t + \alpha_A \Delta t + 2 \alpha_A \Delta t } \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
+    &amp;= e^{(5 \alpha_A  + \alpha_B) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A}
+\end{aligned}
+\end{equation}</annotation></semantics></math></p>
+<p>Using the new equations, the covariance is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi mathvariant="normal">V</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>α</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>s</mi><mrow><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>×</mi><msubsup><mi>σ</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi><mo>,</mo><mn>1</mn></mrow></msub></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo>+</mo><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>×</mo><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msup><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>3</mn><msub><mi>α</mi><mi>A</mi></msub><mo>+</mo><msub><mi>α</mi><mi>B</mi></msub><mo stretchy="false" form="postfix">)</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>×</mo><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup><mfrac><mrow><msup><mi>e</mi><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow><mrow><mn>2</mn><msub><mi>α</mi><mi>A</mi></msub></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{aligned}
+    \mathrm{V}_{ij} &amp;= e^{\alpha_{i,2} (s_{i,2} - s_{i,1})+ \alpha_{i,3}(s_{i,3} - s_{i,2}) + \alpha_{j,2} (s_{j,2} - s_{j,1})} \\
+    &amp;\times \sigma^2_{ij,1} \frac{e^{2\alpha_{ij,1}s_{ij,1}}-1}{2\alpha_{ij,1}}\\
+    &amp;= e^{(\alpha_A + \alpha_B + 2 \alpha_A) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
+    &amp;= e^{(3\alpha_A + \alpha_B) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
+\end{aligned}
+\end{equation}</annotation></semantics></math></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
+</h2>
 <p><strong>How big of a difference does this make?</strong></p>
 <p>The exact impact will depend on the tree, the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
