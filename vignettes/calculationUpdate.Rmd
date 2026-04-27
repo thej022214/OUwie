@@ -59,26 +59,36 @@ This part was written by Lau, Kopperud, and Höhna (though Beaulieu & O'Meara ag
 ### Expectation of the trait value for species i
 
 The expectation of the trait value $y$ for species $i$ is a sum over the
-vector $\theta$, weighted by $W_{ik}$ $$\begin{equation}
+vector $\theta$, weighted by $W_{ik}$ 
+
+\begin{equation}
     \text{E}[y_i] = \sum_{k=0}^r W_{ik} \theta_k \qquad,
-\end{equation}$$ where $\theta_0$ is the parameter for the root value,
+\end{equation}
+
+where $\theta_0$ is the parameter for the root value,
 and $\theta_1,\theta_2,\dots$ are the state-dependent optima for regimes
 1, 2, and so on. Thus, each $W_{ik}$ represents the relative
 contribution of either the root value or the optima on the expected
 value at the tip. As described in Beaulieu et al. (2012), the weights are as
-follows $$\begin{equation}
-    \begin{aligned}
-        W_{i0} &= e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})\right)}\\
-        W_{ik} &=  e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\sum_{k=1}^r\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})} \times \sum_{\gamma=1}^{\kappa(i)} \beta_{ik,\gamma} \left( e^{\left(\sum_{k=1}^r \beta_{ik,\gamma} \Tilde{\alpha}_k\right) s_{i,\gamma}} - e^{\left(\sum_{k=1}^r \beta_{ik,\gamma} \Tilde{\alpha}_k\right) s_{i,\gamma-1}} \right) \quad .
-    \end{aligned}
-\end{equation}$$
+follows
 
-In the new (Lau et al.) derivation, the general equations are, $$\begin{equation}
-    \begin{aligned}
-        W_{i0} &= e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\Tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})\right)}\\
-        W_{ik} &= \sum_{\gamma=1}^{\kappa(i)} \Bigl[ ~\overbrace{e^{-\sum_{\gamma'>\gamma} \left(\left(\sum_{k=1}^r \beta_{ik,\gamma'} \Tilde{\alpha}_k\right) (s_{i,\gamma'} - s_{i,\gamma'-1})\right)}}^{\displaystyle \text{decay of epoch } \gamma} \times \beta_{ik,\gamma} \left(1 - e^{(-\sum_{k=1}^r \beta_{ik,\gamma} \Tilde{\alpha}_k) (s_{i,\gamma} - s_{i,\gamma-1})}\right) \Bigr] \quad .
+\begin{equation}
+  \begin{aligned}
+        W_{i0} &= \exp^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})\right)}\\
+        W_{ik} &=  e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\sum_{k=1}^r\beta_{ik,\gamma},\tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})} \times \sum_{\gamma=1}^{\kappa(i)} \beta_{ik,\gamma} \left( e^{\left(\sum_{k=1}^r \beta_{ik,\gamma} \tilde{\alpha}_k\right) s_{i,\gamma}} - e^{\left(\sum_{k=1}^r \beta_{ik,\gamma} \tilde{\alpha}_k\right) s_{i,\gamma-1}} \right) \quad .
     \end{aligned}
-\end{equation}$$ There are two differences in the way Beaulieu et al. (2012)
+\end{equation}
+
+In the new (Lau et al.) derivation, the general equations are, 
+
+\begin{equation}
+    \begin{aligned}
+        W_{i0} &= e^{-\sum_{\gamma=1}^{\kappa(i)}\left(\left(\sum_{k=1}^r(\beta_{ik,\gamma},\tilde{\alpha}_k\right)(s_{i,\gamma} - s_{i,\gamma - 1})\right)}\\
+        W_{ik} &= \sum_{\gamma=1}^{\kappa(i)} \Bigl[ ~\overbrace{e^{-\sum_{\gamma'>\gamma} \left(\left(\sum_{k=1}^r \beta_{ik,\gamma'} \tilde{\alpha}_k\right) (s_{i,\gamma'} - s_{i,\gamma'-1})\right)}}^{\displaystyle \text{decay of epoch } \gamma} \times \beta_{ik,\gamma} \left(1 - e^{(-\sum_{k=1}^r \beta_{ik,\gamma} \tilde{\alpha}_k) (s_{i,\gamma} - s_{i,\gamma-1})}\right) \Bigr] \quad .
+    \end{aligned}
+\end{equation}
+
+There are two differences in the way Beaulieu et al. (2012)
 construct $W_{ik}$ when $\alpha$ takes different values across epochs
 compared with the new derivation. First---in Beaulieu et al. (2012)'s derivation, the
 decay variable is outside of the summation function, and their summation
@@ -109,19 +119,24 @@ weights sum to one.
 Here, we calculate the covariance between the trait value for species
 $i$ and the trait value for species $j$, i.e.,
 $\text{Cov}[y_i,y_j] = V_{ij}.$ As described in Beaulieu et al. (2012),
-$$\begin{equation}
+
+\begin{equation}
 \begin{aligned}
     \mathrm{V}_{ij} &= e^{-\left( \sum_{\gamma=1}^{\kappa(i)} \alpha_{i,\gamma} (s_{i,\gamma} - s_{i, \gamma-1}) + \sum_{\gamma=1}^{\kappa(j)} \alpha_{j,\gamma} (s_{j,\gamma} - s_{j, \gamma-1}) \right)} \\
     & \times \left( \sum_{\gamma=1}^{\kappa(i,j)} \sigma^2_\gamma \frac{e^{2\alpha_\gamma s_{ij, \gamma}} - e^{2\alpha_\gamma s_{ij, \gamma-1}}}{2\alpha_\gamma}\right) \quad .
 \end{aligned}
-\end{equation}$$
+\end{equation}
 
-In our derivation, the general equations are $$\begin{equation}
+In our derivation, the general equations are 
+
+\begin{equation}
 \begin{aligned}
     \mathrm{V}_{ij} &= e^{-\left( \sum_{\gamma=\kappa(ij)}^{\kappa(i)} \alpha_{i,\gamma} (s_{i,\gamma} - s_{i, \gamma-1}) + \sum_{\gamma=\kappa(ij)}^{\kappa(j)} \alpha_{j,\gamma} (s_{j,\gamma} - s_{j, \gamma-1}) \right)} \\
     &\times \left( \sum_{\gamma=1}^{\kappa(i,j)} \sigma^2_\gamma \frac{e^{2\alpha_\gamma s_{ij, \gamma}} - e^{2\alpha_\gamma s_{ij, \gamma-1}}}{2\alpha_\gamma}\right) \quad .
 \end{aligned}
-\end{equation}$$ The difference lies in the first factor, which
+\end{equation}
+
+The difference lies in the first factor, which
 describes the exponential decay of the variance since the divergence of
 species $i$ and $j$. In @Beaulieu2012's derivation, the exponent in the
 first factor always calculates from the root ($\gamma=1$), which means
@@ -139,7 +154,9 @@ understood as "time elapsed since the root of the phylogeny". For
 simplification, we also set each epoch in lineage $i$ to have equal
 lengths ($\Delta t$).
 
-Therefore, $$\begin{equation}
+Therefore, 
+
+\begin{equation}
 \begin{aligned}
     \alpha_{ij=1} &= \alpha_{i,1} = \alpha_{i,2} \\
     &= \alpha_{j,1} = \alpha_{j,2} \\
@@ -148,12 +165,14 @@ Therefore, $$\begin{equation}
     \sigma^2_{ij,1} &= \sigma^2_A \\
     s_{i,1} - s_{i,0} &= s_{i,2} - s_{i,1} = s_{i,3} - s_{i,2} = \Delta t
 \end{aligned}
-\end{equation}$$
+\end{equation}
 
 ## Expectation of the trait value for species i
 
 The respective weights of the root value and state-dependent optima
-calculated using equations in Beaulieu et al. (2012) are $$\begin{equation}
+calculated using equations in Beaulieu et al. (2012) are 
+
+\begin{equation}
     \begin{aligned}
         W_{i0} &= e^{-\left(\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,3} - s_{i,2}) \right)} \\
         &= e^{-  (2 \alpha_A + \alpha_B) \Delta t } \\
@@ -164,9 +183,13 @@ calculated using equations in Beaulieu et al. (2012) are $$\begin{equation}
         &= e^{-(2 \alpha_A + \alpha_B) \Delta t} && \times (e^{3 \alpha_B \Delta t} - e^{2 \alpha_B \Delta t}) \\
         &= e^{(-2 \alpha_A + \alpha_B) \Delta t} && \times ( e^{\alpha_B \Delta t} - 1) \qquad,
     \end{aligned}
-\end{equation}$$ which do not sum to 1.
+\end{equation}
 
-The weights using our equations are $$\begin{equation}
+which do not sum to 1.
+
+The weights using our equations are 
+
+\begin{equation}
     \begin{aligned}
         W_{i0} &= e^{-\left(\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,3} - s_{i,2}) \right)} \\
         &= e^{-(2 \alpha_A \Delta t + \alpha_B \Delta t)} \\
@@ -175,29 +198,34 @@ The weights using our equations are $$\begin{equation}
         W_{iB} &= (1 - e^{- \alpha_B (s_{i,3} - s_{i,2}) }) \\
         &= 1 - e^{- \alpha_B \Delta t } \qquad,
     \end{aligned}
-\end{equation}$$ which sum to 1.
+\end{equation}
+
+which sum to 1.
 
 ## Covariance between species i and j
 
 Using equations in Beaulieu et al. (2012), the covariance between species $i$ and
-$j$ is $$\begin{equation}
+$j$ is 
+
+\begin{equation}
 \begin{aligned}
     \mathrm{V}_{ij} &= e^{\alpha_{i,1}(s_{i,1} - s_{i,0}) + \alpha_{i,2}(s_{i,2} - s_{i,1}) + \alpha_{i,3}(s_{i,2} - s_{i,3}) + \alpha_{j,1}(s_{j,1} - s_{j,0}) + \alpha_{j,2}(s_{j,2} - s_{j,1})} \\
     & \times \sigma^2_{ij,1} \frac{e^{2\alpha_{ij,1} s_{ij, 1}} - e^{2\alpha_{ij,1} s_{ij, 0}}}{2\alpha_{ij,1}} \\
     &= e^{\alpha_A \Delta t + \alpha_A \Delta t + \alpha_B \Delta t + \alpha_A \Delta t + 2 \alpha_A \Delta t } \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
     &= e^{(5 \alpha_A  + \alpha_B) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A}
 \end{aligned}
-\end{equation}$$
+\end{equation}
 
-Using the new equations, the covariance is $$\begin{equation}
+Using the new equations, the covariance is 
+
+\begin{equation}
 \begin{aligned}
     \mathrm{V}_{ij} &= e^{\alpha_{i,2} (s_{i,2} - s_{i,1})+ \alpha_{i,3}(s_{i,3} - s_{i,2}) + \alpha_{j,2} (s_{j,2} - s_{j,1})} \\
     &\times \sigma^2_{ij,1} \frac{e^{2\alpha_{ij,1}s_{ij,1}}-1}{2\alpha_{ij,1}}\\
     &= e^{(\alpha_A + \alpha_B + 2 \alpha_A) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
     &= e^{(3\alpha_A + \alpha_B) \Delta t} \times \sigma^2_A \frac{e^{2\alpha_A \Delta t} - 1}{2\alpha_A} \\
 \end{aligned}
-\end{equation}$$
-
+\end{equation}
 
 # FAQ
 
