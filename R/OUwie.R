@@ -13,7 +13,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	
 	if(model %in% c("OUMA", "OUMVA", "OUVA")) {
 		if(quiet == FALSE){
-			warning("From feedback from a user, we have concerns about the likelihood function for the OUMA and OUMVA models. As of Sept. 4, 2025, we recommend not using these models for now, but we expect the situation to be resolved soon (either with corrected likelihood functions or a definite proof that they are ok as is). That said, we leave these as options for reproducibility and debugging. If you do use them, be sure to note the package version and report this in your work.", call.=FALSE, immediate.=TRUE)
+			warning("Please cite Lau et al. (2026) for use of multiple alpha models. See Calculation Update vignette for details.", call.=FALSE, immediate.=TRUE)
 		}
 	}
 

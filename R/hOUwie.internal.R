@@ -328,6 +328,7 @@ replaceName <- function(edge, observed_traits){
   return(edge)
 }
 
+
 getEdgeLiks <- function(phy, data, n.traits, rate.cat, time_slice){
   edge_liks_list <- vector("list", dim(phy$edge)[1])
   nTip <- length(phy$tip.label)
@@ -349,6 +350,7 @@ getEdgeLiks <- function(phy, data, n.traits, rate.cat, time_slice){
   }
   return(edge_liks_list)
 }
+
 
 getConditionalInternodeLik <- function(phy, Q, edge_liks_list){
   nTip <- length(phy$tip.label)
@@ -401,6 +403,7 @@ getConditionalInternodeLik <- function(phy, Q, edge_liks_list){
   return(list(root_state = root_state,
               edge_liks_list = edge_liks_list))
 }
+
 
 getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim, check_vector=NULL, max.attempts){
   # set-up
@@ -496,6 +499,7 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
   return(state_samples)
 }
 
+
 # get path probability internal
 getPathStateProb <- function(path_states, p_mat){
   P <- vector("numeric", length(path_states)-1)
@@ -505,6 +509,7 @@ getPathStateProb <- function(path_states, p_mat){
   }
   return(sum(log(P)))
 }
+
 
 getStateSampleProb <- function(state_sample, Pij, root_liks, root_edges){
   path_probs <- numeric(length(state_sample))
@@ -554,6 +559,8 @@ getMapFromSubstHistory <- function(maps, phy){
   return(obj)
   
 }
+
+
 # a basic optimization for OUwie basic
 OUwie.basic.dev <- function(p, phy, data, tip.fog, index.cont, tip.paths=NULL){
   p <- exp(p)
@@ -569,7 +576,7 @@ OUwie.basic.dev <- function(p, phy, data, tip.fog, index.cont, tip.paths=NULL){
 
 
 # probability of the continuous parameter
-OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha, sigma.sq, theta, tip.fog="none", algorithm="three.point", tip.paths=NULL, return.expected.vals=FALSE){
+OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha, sigma.sq, theta, tip.fog="none", algorithm="three.point", tip.paths=NULL, return.expected.vals=FALSE){
   # organize tip states based on what the simmap suggests
   mapping <- unlist(lapply(phy$maps, function(x) names(x[length(x)])))
   nTip <- length(phy$tip.label)
@@ -680,6 +687,7 @@ OUwie.basic<-function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FA
     return(logl)
   }
 }
+
 
 # script for generating all the possible underlying mappings and looking at joint probablity. using this we can look at the bias produced by looking only at the discrete mappings.
 fixEdgeLiksLiks <- function(edge_liks_list, combo, phy, n_tips, n_nodes, n_internodes, nStates, rate.cat){
