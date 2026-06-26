@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/thej022214/OUwie.svg)](https://travis-ci.org/thej022214/OUwie)
+[![Build Status](https://www.travis-ci.com/thej022214/OUwie.svg)](https://www.travis-ci.com/thej022214/OUwie)
 
 OUwie is an R package for using Brownian motion and Ornstein-Uhlenbeck models for trait evolution.
 Its friendly webpage is at http://thej022214.github.io/OUwie/; its source code is at https://github.com/thej022214/OUwie/. 

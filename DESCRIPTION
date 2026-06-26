@@ -1,13 +1,21 @@
 Package: OUwie
-Version: 3.02
-Date: 2026-04-16
+Version: 3.0.2
+Date: 2026-06-26
 Title: Analysis of Evolutionary Rates in an OU Framework
-Author: Jeremy M. Beaulieu <jmbeauli@uark.edu>, Brian O'Meara <bomeara@utk.edu>
-Maintainer: Jeremy Beaulieu <jmbeauli@uark.edu>
+Authors@R: c(
+    person(given = c("Jeremy", "M."),
+           family = "Beaulieu",
+           role = c("aut", "cre"),
+           email = "jmbeauli@uark.edu"),
+    person(given = "Brian",
+           family = "O'Meara",
+           role = "aut",
+           email = "bomeara@utk.edu")
+    )
 Depends: R (>= 3.2.0), ape, corpcor, nloptr, geiger, RColorBrewer
 Suggests: testthat, knitr, rmarkdown
 Imports: igraph, numDeriv, phytools, paleotree, phangorn, stats, lhs, interp, grDevices, parallel, phylolm, GenSA, MASS, corHMM, data.table, expm, ggplot2, reshape2
-Description: Estimates rates for continuous character evolution under Brownian motion and a new set of Ornstein-Uhlenbeck based Hansen models that allow both the strength of the pull and stochastic motion to vary across selective regimes. Beaulieu et al (2012).
+Description: Estimates rates for continuous character evolution under Brownian motion and Ornstein-Uhlenbeck based Hansen models that allow both the strength of the pull and stochastic motion to vary across selective regimes. Beaulieu et al. (2012).
 URL: https://github.com/thej022214/OUwie
 License: GPL (>= 2)
 VignetteBuilder: knitr
