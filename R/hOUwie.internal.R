@@ -297,23 +297,52 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
 }
 
 # internal for houwie.thorough
+# model average the fitted parameter matrices of a set of models so that they can be
+# used as shared starting values. getModelAvgParams is reserved for tip averaging.
+getModelAvgStartingPars <- function(model.list, type="BIC", BM_alpha_treatment="zero"){
+  if(length(model.list) == 1){
+    AICwts <- 1
+  }else{
+    mods_table <- getModelTable(model.list, type=type)
+    AICwts <- mods_table[,grep("wt$", colnames(mods_table))]
+  }
+  solution_disc <- lapply(model.list, "[[", "solution.disc")
+  solution_cont <- lapply(model.list, "[[", "solution.cont")
+  # a transition disallowed by one model contributes nothing to the average, as does
+  # alpha for a BM model when it is treated as zero
+  disc_table <- do.call(rbind, lapply(solution_disc, c))
+  disc_table[is.na(disc_table)] <- 0
+  cont_table <- do.call(rbind, lapply(solution_cont, c))
+  if(BM_alpha_treatment == "zero"){
+    cont_table[is.na(cont_table)] <- 0
+  }
+  mod_avg_disc <- matrix(colSums(disc_table * AICwts), dim(solution_disc[[1]])[1], dim(solution_disc[[1]])[2],
+                         dimnames = dimnames(solution_disc[[1]]))
+  mod_avg_cont <- matrix(colSums(cont_table * AICwts), dim(solution_cont[[1]])[1], dim(solution_cont[[1]])[2],
+                         dimnames = dimnames(solution_cont[[1]]))
+  return(list(mod_avg_disc = mod_avg_disc, mod_avg_cont = mod_avg_cont))
+}
+
 runSingleThorough <- function(houwie_obj, new_maps, init_pars){
   hOUwie.dat <- houwie_obj$hOUwie.dat
   root.p <- houwie_obj$root.p
   tip.fog <- houwie_obj$tip.fog
   rate.cat <- houwie_obj$rate.cat
   index.disc <- houwie_obj$index.disc
-  n_p_trans <- max(index.disc, na.rm = TRUE)
-  p_disc <- na.omit(c(init_pars$mod_avg_disc))[1:n_p_trans]
   index.cont <- houwie_obj$index.cont
-  n_p_alpha <- length(unique(na.omit(index.cont[1,])))
-  n_p_sigma <- length(unique(na.omit(index.cont[2,])))
-  n_p_theta <- length(unique(na.omit(index.cont[3,])))
-  p_cont <- c(init_pars$mod_avg_cont[1,seq_len(n_p_alpha)],
-              init_pars$mod_avg_cont[2,seq_len(n_p_sigma)],
-              init_pars$mod_avg_cont[3,seq_len(n_p_theta)])
+  # the free parameters of each model are numbered 1:k within their index matrix, so an
+  # averaged parameter is the mean of the cells a particular model ties together
+  n_p_trans <- max(index.disc, na.rm = TRUE)
+  p_disc <- unlist(lapply(1:n_p_trans, function(x) mean(init_pars$mod_avg_disc[which(index.disc == x)])))
+  n_p_cont <- max(index.cont, na.rm = TRUE)
+  p_cont <- unlist(lapply(1:n_p_cont, function(x) mean(init_pars$mod_avg_cont[which(index.cont == x)])))
   ip <- c(p_disc, p_cont)
-  res <- hOUwie.fixed(simmaps = new_maps, data = hOUwie.dat$data.ou, rate.cat = rate.cat, discrete_model = index.disc, continuous_model = index.cont, adaptive_sampling = FALSE, make_numeric = FALSE, ip = ip)
+  # fall back on the default starting values if averaging produced something unusable
+  if(any(!is.finite(ip)) | any(ip <= 0)){
+    warning("Model averaged starting values were not usable for one of the models, default starting values were used instead.")
+    ip <- NULL
+  }
+  res <- hOUwie.fixed(simmaps = new_maps, data = hOUwie.dat$data.ou, rate.cat = rate.cat, discrete_model = index.disc, continuous_model = index.cont, root.p = root.p, tip.fog = tip.fog, adaptive_sampling = FALSE, make_numeric = FALSE, ip = ip)
   return(res)
 }
 

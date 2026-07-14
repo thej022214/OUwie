@@ -482,7 +482,9 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              sample_tips=sample_tips, split.liks=FALSE)
       multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x) x$objective))
-      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -log(mean(exp(multi_logliks))), sd_logliks = log(sd(exp(multi_logliks))))
+      # sd is undefined for a single start
+      sd_logliks <- if(length(multi_logliks) > 1) log(sd(exp(multi_logliks))) else 0
+      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -log(mean(exp(multi_logliks))), sd_logliks = sd_logliks)
       if(!quiet){
         cat("\nOptimization complete. Optimization summary:\n")
         print(search_summary)
@@ -499,7 +501,8 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              sample_tips=sample_tips, split.liks=FALSE)
       multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, diagn_msg=diagn_msg), global_liks_mat=global_liks_mat, mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x) x$value))
-      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -mean(multi_logliks), sd_logliks = sd(multi_logliks))
+      sd_logliks <- if(length(multi_logliks) > 1) sd(multi_logliks) else 0
+      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -mean(multi_logliks), sd_logliks = sd_logliks)
       if(!quiet){
         cat("Optimization complete. Optimization summary:")
         print(search_summary)
@@ -633,7 +636,23 @@ hOUwie.sim <- function(phy, Q, root.freqs, alpha, sigma.sq, theta0, theta){
 
 # rerun a set of completed models with the best current maps
 hOUwie.thorough <- function(model.list, ncores=1){
-  # seprate models by their rate class
+  if(!inherits(model.list, what="list")){
+    stop("Input object must be of class list with each element a separate hOUwie fit to the same dataset.", call.=FALSE)
+  }
+  is_houwie <- unlist(lapply(model.list, function(x) inherits(x, what="houwie")))
+  if(!all(is_houwie)){
+    warning("Some of the input models are not of class houwie, these have been removed.")
+    model.list <- model.list[is_houwie]
+  }
+  if(length(model.list) < 1){
+    stop("No models of class houwie were found in the input list.", call.=FALSE)
+  }
+  # models fit by hOUwie.fixed have no nSim and no sampled maps to draw from
+  has_maps <- unlist(lapply(model.list, function(x) !is.null(x$nSim) & !is.null(x$simmaps)))
+  if(!all(has_maps)){
+    stop("All input models must have been fit by hOUwie with a set of stochastic maps. Models fit by hOUwie.fixed cannot be used.", call.=FALSE)
+  }
+  # separate the models by their rate class
   rate_cat_vector <- unlist(lapply(model.list, "[[", "rate.cat"))
   nSim_vector <- unlist(lapply(model.list, "[[", "nSim"))
   if(length(unique(nSim_vector)) > 1){
@@ -642,12 +661,13 @@ hOUwie.thorough <- function(model.list, ncores=1){
     nSim <- unique(nSim_vector)
   }
   all_rate_cats <- unique(rate_cat_vector)
-  model_set_separated <- sapply(all_rate_cats, function(x) model.list[x == rate_cat_vector])
-  # for each rate class run hOUwie summarize the maps
-  model_avg_pars <- lapply(model_set_separated, getModelAvgParams)
-  new_res <- list()
+  # lapply (not sapply) so that equally sized rate classes are not simplified into a matrix
+  model_set_separated <- lapply(all_rate_cats, function(x) model.list[x == rate_cat_vector])
+  model_avg_pars <- lapply(model_set_separated, getModelAvgStartingPars)
+  # for each rate class rerun the models with the best maps found across that rate class
+  new_res <- vector("list", length(model_set_separated))
   for(i in 1:length(model_set_separated)){
-    cat("Preparing rate category", i, "for hOUwie thorough...\n")
+    cat("Preparing rate category", all_rate_cats[i], "for hOUwie thorough...\n")
     all_maps <- do.call(c, lapply(model_set_separated[[i]], "[[", "simmaps"))
     map_id_list <- unlist(lapply(all_maps, function(x) paste0(names(unlist(x$maps)), collapse = "")))
     map_lik_list <- unlist(lapply(model_set_separated[[i]], function(x) x$all_cont_liks + x$all_disc_liks))
@@ -655,10 +675,16 @@ hOUwie.thorough <- function(model.list, ncores=1){
     unique_map_lik_list <- map_lik_list[unique_map_index]
     uniqie_all_maps <- all_maps[unique_map_index]
     sorted_index <- sort(unique_map_lik_list, decreasing = TRUE, index.return = TRUE)$ix
-    new_maps <- uniqie_all_maps[sorted_index[1:nSim]]
+    # there may be fewer unique maps than nSim, in which case we use all of them
+    n_maps <- min(nSim, length(sorted_index))
+    new_maps <- uniqie_all_maps[sorted_index[1:n_maps]]
     new_res[[i]] <- mclapply(model_set_separated[[i]], function(x) runSingleThorough(x, new_maps, model_avg_pars[[i]]), mc.cores = ncores)
   }
-  out <- do.call(c, new_res)
+  # return the models in the order they were input rather than grouped by rate class
+  out <- vector("list", length(model.list))
+  for(i in 1:length(all_rate_cats)){
+    out[all_rate_cats[i] == rate_cat_vector] <- new_res[[i]]
+  }
   names(out) <- names(model.list)
   return(out)
 }
@@ -729,9 +755,10 @@ getModelTable <- function(model.list, type="BIC"){
 }
 
 getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC", force=TRUE){
-  if(any(unlist(lapply(model.list, class))!="houwie")){
+  is_houwie <- unlist(lapply(model.list, function(x) inherits(x, what="houwie")))
+  if(!all(is_houwie)){
     warning("Some of the input models are not of class houwie, these have been removed.")
-    model.list <- model.list[which(unlist(lapply(model.list, class))=="houwie")]
+    model.list <- model.list[is_houwie]
   }
   if(!inherits(model.list, what="list") | length(model.list) < 2){
   #if(class(model.list) != "list" | length(model.list) < 2){
@@ -751,7 +778,6 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
   
   # pull the aic weights
   mods_table <- getModelTable(model.list, type=type)
-  print(mods_table)
   if(diff(range(mods_table[,5])) > 1e5){
     if(!force){
       max_aic <- max(mods_table[,5])
@@ -762,12 +788,8 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
       warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e10. Set force=FALSE to automatically remove potentially failed runs.")
     }
   }
-  print(mods_table)
   AICwts <- mods_table[,7]
-  print(AICwts)
   tip_values_by_model <- lapply(model.list, get_tip_values)
-  print("here")
-  print(tip_values_by_model)
   for(i in 1:length(tip_values_by_model)){
     tip_values_by_model[[i]] <- tip_values_by_model[[i]] * AICwts[i]
   }
