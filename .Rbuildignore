@@ -1,0 +1,7 @@
+^docs$
+^_pkgdown\.yml$
+^\.github$
+^\.Rproj\.user$
+^.*\.Rproj$
+^\.DS_Store$
+^.*\.Rhistory$

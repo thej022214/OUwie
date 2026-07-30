@@ -596,6 +596,8 @@ plot.OUwie.dredge <- function(x, col.pal=c("Set1"), ...) {
     sigma.regimes <- truncated.regime.weight.mat[2,]
     theta.regimes <- truncated.regime.weight.mat[3,]
      
+    oldpar <- par(no.readonly=TRUE)
+    on.exit(par(oldpar), add=TRUE)
     par(mfcol=c(1,3))
     
     regime.lvls <- dim(truncated.regime.weight.mat)[2]

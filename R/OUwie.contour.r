@@ -153,6 +153,8 @@ plot.OUwie.contour <- function(x, mle.point=NULL, levels=c(0:20*0.1), xlab=NULL,
     interp.res <- interp(x=mydata$x, y=mydata$y, z=mydata$z, xo=seq(min(mydata$x), max(mydata$x),length = 400), yo=seq(min(mydata$y), max(mydata$y),length = 400), duplicate=FALSE)
     plot(NA,xlab="", ylab="", frame=FALSE, axes=FALSE, xaxs="i", yaxs="i", ylim=ylim[1:2], xlim=xlim[1:2], ...)
     .filled.contour(interp.res$x, interp.res$y, interp.res$z, levels=levels, col=col)
+    oldpar <- par(no.readonly=TRUE)
+    on.exit(par(oldpar), add=TRUE)
     par(tck=.01)
     axis(2, at = seq(ylim[1], ylim[2], by = ylim[3]), las=1, lwd=1, labels=TRUE, mgp=c(.75,.5,0))
     axis(1, at = seq(xlim[1], xlim[2], by = xlim[3]), las=1, lwd=1, labels=TRUE, mgp=c(.75,.5,0))

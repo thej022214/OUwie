@@ -160,7 +160,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   }else{
     max.its <- as.numeric(opts$maxeval)
   }
-  setDTthreads(threads=1)
+  old_dt_threads <- setDTthreads(threads=1)
+  on.exit(setDTthreads(threads=old_dt_threads), add=TRUE)
   tmp.df <- data.frame(matrix(c(0, rep(1e5, n_p)), byrow = TRUE, ncol = n_p+1, nrow = max.its))
   global_liks_mat <- as.data.table(tmp.df)
   
@@ -411,7 +412,8 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   }else{
     max.its <- as.numeric(opts$maxeval)
   }
-  setDTthreads(threads=1)
+  old_dt_threads <- setDTthreads(threads=1)
+  on.exit(setDTthreads(threads=old_dt_threads), add=TRUE)
   tmp.df <- data.frame(matrix(c(0, rep(1e5, n_p)), byrow = TRUE, ncol = n_p+1, nrow = max.its))
   global_liks_mat <- as.data.table(tmp.df)
   

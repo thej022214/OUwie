@@ -570,7 +570,7 @@ getMapProb <- function(simmap, Q, root_prior){
 
 # take substition histories and make them simmaps
 getMapFromSubstHistory <- function(maps, phy){
-  mapped.edge <- lapply(maps, function(x) corHMM:::convertSubHistoryToEdge(phy, x))
+  mapped.edge <- lapply(maps, function(x) convertSubHistoryToEdge(phy, x))
   obj <- vector("list", length(maps))
   for (i in 1:length(maps)){
     tree.simmap <- phy
@@ -1138,7 +1138,7 @@ organizeHOUwieDat <- function(data, tip.fog, collapse = TRUE){
   # return a list of corHMM data and OU data
   if(tip.fog=="known"){
     data.cor <- data[, 1:(dim(data)[2]-2)]
-    data.cor <- corHMM:::corProcessData(data.cor, collapse = collapse)
+    data.cor <- corProcessData(data.cor, collapse = collapse)
     data.ou <- data.frame(sp = data[,1], 
                           reg = data.cor$corData[,2], 
                           x = data[, dim(data)[2]-1],
@@ -1146,7 +1146,7 @@ organizeHOUwieDat <- function(data, tip.fog, collapse = TRUE){
   }
   if(tip.fog=="none"){
     data.cor <- data[, 1:(dim(data)[2]-1)]
-    data.cor <- corHMM:::corProcessData(data.cor)
+    data.cor <- corProcessData(data.cor)
     data.ou <- data.frame(sp = data[,1], 
                           reg = data.cor$corData[,2], 
                           x = data[, dim(data)[2]])
@@ -1608,3 +1608,83 @@ index_paramers_from_tip_states <- function(tip_states, rates, continuous_solutio
 #   return(list(discrete_fit, continuous_fit))
 # }
 
+
+## ---------------------------------------------------------------------------
+## Vendored from corHMM
+##
+## The two functions below are verbatim copies of corHMM's internal
+## convertSubHistoryToEdge() (R/makeSimmap.R) and corProcessData()
+## (R/corHMM.R), taken from corHMM 2.10.2 (definitions verified unchanged
+## through corHMM 2.10.5).
+##
+## They are copied rather than reached via corHMM::: because CRAN policy
+## disallows ::: access to another package's unexported objects. This is a
+## TEMPORARY measure: once corHMM exports them, delete these copies and call
+## corHMM::convertSubHistoryToEdge() / corHMM::corProcessData() instead.
+##
+## NOTE: corProcessData() encodes corHMM's data-format contract (the "&"
+## polymorphism syntax, "?" for unknown, and the ordering of PossibleTraits).
+## If corHMM changes that representation, these copies must be updated in
+## lockstep or hOUwie's discrete likelihood will be silently wrong.
+##
+## corProcessData() calls getRateCatMat(), which corHMM exports and OUwie
+## already imports (see NAMESPACE), so no further vendoring is required.
+## ---------------------------------------------------------------------------
+
+# convert a substitution history into a mapped edge
+convertSubHistoryToEdge <- function(phy, map){
+  Traits <- as.numeric(unique(names(unlist(map))))
+  RowNames <- apply(phy$edge, 1, function(x) paste(x[1], x[2], sep = ","))
+  obj <- do.call(rbind, lapply(map, function(x) sapply(Traits, function(y) sum(x[names(x) == y]))))
+  rownames(obj) <- RowNames
+  colnames(obj) <- Traits
+  return(obj)
+}
+
+corProcessData <- function(data, rate.mat=NULL, collapse=FALSE){
+  nCol <- dim(data)[2]
+  LevelList <- StateMats <- vector("list", nCol-1)
+  # detect the number of states in each column. & is treated as indicating polymorphism. ? is treated as unknown data.
+  for(i in 2:nCol){
+    data_tmp <- data[,i]
+    if(!is.factor(data_tmp)){
+      data_tmp <- as.factor(data_tmp)
+    }
+    States_i <- levels(data_tmp)
+    if(any(States_i == "?")){
+      States_i <- States_i[!States_i == "?"]
+    }
+    if(length(grep("&", States_i)) > 0){
+      States_i <- unique(unlist(strsplit(States_i, "&")))
+    }
+    StateMats[[i-1]] <- getRateCatMat(length(States_i))
+    LevelList[[i-1]] <- States_i
+  }
+  # identify the possible trait combinations
+  TraitList <- expand.grid(LevelList)
+  Traits <- apply(TraitList, 1, function(x) paste(c(x), collapse = "_"))
+  # convert each column into a numeric value associated with a member of the trait combinations. ? are associated with all values of that column, & indicates the combination of two or more
+  search.strings <- observed.traits_index <- combined.data <- c()
+  for(i in 1:dim(data)[1]){
+    data_rowi <- data[i,2:nCol]
+    # and symbolizes it can be any of the separated states
+    search.string_i <- paste("^",paste(sapply(data_rowi, function(x) paste("(", gsub("&", "|", x), ")", sep = "")),collapse = "_"), "$", sep="")
+    # ? means it can be any of the states in that character
+    search.string_i <- gsub("(?)", ".*", search.string_i, fixed=TRUE)
+    # if the data is polymorphic it will now have ands separating the corHMM states
+    combined.data[i] <- paste(grep(search.string_i, Traits), collapse="&")
+    observed.traits_index <- c(observed.traits_index, grep(search.string_i, Traits))
+    search.strings[i] <- search.string_i
+  }
+  ObservedTraits <- Traits[sort(unique(observed.traits_index))]
+  if(collapse){
+    corData <- data.frame(sp = data[,1], 
+                          d = sapply(search.strings, function(x) 
+                            paste(grep(x, ObservedTraits), collapse="&")))
+  }else{
+    corData <- data.frame(sp = data[, 1], 
+                          d = sapply(search.strings, function(x) 
+                            paste(grep(x, Traits),collapse = "&")))
+  }
+  return(list(StateMats = StateMats,  PossibleTraits = Traits, ObservedTraits = ObservedTraits, corData = corData))
+}
