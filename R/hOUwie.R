@@ -155,10 +155,14 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     }
   }
   # a global matrix to contain likelihoods so that identical parameters return identical likelihoods
-  if(is.null(opts$maxeval) | is.null(opts$max.call)){
-    max.its <- 1000
-  }else{
+  # one row is consumed per likelihood evaluation, so the table has to be sized by
+  # whichever evaluation cap the chosen optimizer uses (maxeval nlopt, max.call sann)
+  if(!is.null(opts$maxeval)){
     max.its <- as.numeric(opts$maxeval)
+  }else if(!is.null(opts$max.call)){
+    max.its <- as.numeric(opts$max.call)
+  }else{
+    max.its <- 1000
   }
   old_dt_threads <- setDTthreads(threads=1)
   on.exit(setDTthreads(threads=old_dt_threads), add=TRUE)
@@ -231,10 +235,19 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths,
       #              sample_tips=sample_tips, split.liks=FALSE)
       multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
-      multi_logliks <- unlist(lapply(multi_out, function(x) x$objective))
-      if(any(-multi_logliks > 1e10) | any(is.null(multi_logliks))){
+      # a start that failed returns the 1e10 penalty from hOUwie.dev, and a start whose
+      # fork died comes back from mclapply as a try-error with no $objective. NA keeps
+      # one entry per start so multi_logliks stays aligned with multi_out.
+      multi_logliks <- unlist(lapply(multi_out, function(x){
+        if(inherits(x, what="try-error") || is.null(x$objective)){
+          NA_real_
+        }else{
+          x$objective
+        }
+      }))
+      failed_optimizations <- which(!is.finite(multi_logliks) | multi_logliks >= 1e10)
+      if(length(failed_optimizations) > 0){
         cat("\nIt appears that an optimization failed. Removing failed optimizations from final output.\n")
-        failed_optimizations <- which(-multi_logliks > 1e10 | is.null(multi_logliks))
         multi_logliks <- multi_logliks[-failed_optimizations]
         multi_out <- multi_out[-failed_optimizations]
         if(length(multi_out) == 0){
@@ -371,11 +384,13 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
     ub_continuous_model=c(ub.alpha,ub.sigma,ub.optim)
   }
   if(is.null(lb_discrete_model)){
-    # the minimum dwell time is defined as 100 times the max tree height
-    lb_discrete_model = 1/(Tmax*100)
+    # the minimum dwell time is defined as 10000 times the max tree height
+    # these have to match the defaults in hOUwie, otherwise hOUwie.thorough refits
+    # inside tighter bounds than the fit it is polishing and can clamp a rate
+    lb_discrete_model = 1/(Tmax*10000)
   }
   if(is.null(ub_discrete_model)){
-    ub_discrete_model = 1/(Tmax*0.01)
+    ub_discrete_model = 1/(Tmax*0.0001)
   }
   #Ensures that weird root state probabilities that do not sum to 1 are input:
   if(!is.null(root.p)){
@@ -407,10 +422,14 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
     }
   }
   # a global matrix to contain likelihoods so that identical parameters return identical likelihoods
-  if(is.null(opts$maxeval) | is.null(opts$max.call)){
-    max.its <- 1000
-  }else{
+  # one row is consumed per likelihood evaluation, so the table has to be sized by
+  # whichever evaluation cap the chosen optimizer uses (maxeval nlopt, max.call sann)
+  if(!is.null(opts$maxeval)){
     max.its <- as.numeric(opts$maxeval)
+  }else if(!is.null(opts$max.call)){
+    max.its <- as.numeric(opts$max.call)
+  }else{
+    max.its <- 1000
   }
   old_dt_threads <- setDTthreads(threads=1)
   on.exit(setDTthreads(threads=old_dt_threads), add=TRUE)

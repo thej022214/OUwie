@@ -193,8 +193,12 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df))
   }
   if(!is.null(global_liks_mat)){
+    # no free row means the optimizer ran past the cap the table was sized for; the
+    # cache just stops growing rather than silently discarding the write
     new_row <- which(global_liks_mat$X1 == 0)[1]
-    set(global_liks_mat, as.integer(new_row), names(global_liks_mat), as.list(c(llik_houwie, p)))
+    if(!is.na(new_row)){
+      set(global_liks_mat, as.integer(new_row), names(global_liks_mat), as.list(c(llik_houwie, p)))
+    }
   }
   if(diagn_msg){
     print(c(round(llik_houwie, 2), round(llik_discrete_summed, 2), round(llik_continuous_summed, 2), round(p, 2)))
@@ -286,8 +290,12 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
   }
   if(!is.null(global_liks_mat)){
+    # no free row means the optimizer ran past the cap the table was sized for; the
+    # cache just stops growing rather than silently discarding the write
     new_row <- which(global_liks_mat$X1 == 0)[1]
-    set(global_liks_mat, as.integer(new_row), names(global_liks_mat), as.list(c(llik_houwie, p)))
+    if(!is.na(new_row)){
+      set(global_liks_mat, as.integer(new_row), names(global_liks_mat), as.list(c(llik_houwie, p)))
+    }
   }
   if(diagn_msg){
     print(c(round(llik_houwie, 2), round(llik_discrete_summed, 2), round(llik_continuous_summed, 2), round(p, 2)))
@@ -652,10 +660,9 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
     root.age <-  1
     phy$maps <- lapply(phy$maps, function(x) x/Tmax)
   }
-  edges <- edges[sort.list(edges[,3]),]
-  #Resort the edge matrix so that it looks like the original matrix order
-  edges <- edges[sort.list(edges[,1]),]
-  
+  # column 1 is 1:(n-1) in edge order, so sorting on it undoes the sort on column 3
+  # and leaves edges exactly as built. both sorts dropped; edges stays in edge order.
+
   if(algorithm == "three.point"){
     x <- data[,2]
     names(x) <- rownames(data)
