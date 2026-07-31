@@ -3,8 +3,12 @@
 #written by Jeremy M. Beaulieu
 
 weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, root.age = NULL, scaleHeight = FALSE, assume.station = TRUE, shift.point = 0.5){
-	age.table <- MakeAgeTable(phy, root.age = root.age)
-	Tmax <- max(age.table)
+	#Tmax is only read when the tree is being rescaled, and building the age table costs
+	#a node depth traversal on every call, so it is only built when it will be used
+	if(scaleHeight == TRUE){
+		age.table <- MakeAgeTable(phy, root.age = root.age)
+		Tmax <- max(age.table)
+	}
 	n <- max(phy$edge[, 1])
 	ntips <- length(phy$tip.label)
 	
@@ -26,7 +30,6 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	Ato <- numeric(max_node_id)
 	Ato[root_node] <- 0
 
-	nodevar.root.tot <- rep(0, max(edges[, 3]))
 	nodevar.k <- rep(0, max(edges[, 3]))
 
 	W <- matrix(0, ntips, k)
@@ -37,13 +40,12 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
 	edge.order <- edge.order[edge.order <= nrow(edges)]
 
-	#the regime and duration of each epoch, the Ato accumulation and nodevar.root.tot
-	#are all the same for every regime j, so they are built once here instead of being
-	#recomputed k times inside the loop below
+	#the regime and duration of each epoch and the Ato accumulation are all the same for
+	#every regime j, so they are built once here instead of being recomputed k times
+	#inside the loop below
 	seg.regime <- vector("list", nrow(edges))
 	seg.dt <- vector("list", nrow(edges))
 	Astart <- numeric(nrow(edges))
-	n.cov.root.tot <- matrix(0, n, 1)
 
 	for(i in edge.order){
 		anc <- edges[i, 2]
@@ -52,7 +54,6 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 		#cumulative A at start of the edge
 		Acur <- Ato[anc]
 		Astart[i] <- Acur
-		nodevar.root.tot[i] <- 0
 
 		if(simmap.tree == TRUE){
 			if(scaleHeight == TRUE) {
@@ -89,23 +90,24 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 
 		for(regimeindex in seq_along(dts)){
 			a <- alpha[regimes[regimeindex]]
-			nodevar.root.tot[i] <- nodevar.root.tot[i] - a * dts[regimeindex]
 			Acur <- Acur + a * dts[regimeindex]
 		}
 
 		seg.regime[[i]] <- regimes
 		seg.dt[[i]] <- dts
-		n.cov.root.tot[desc, ] <- nodevar.root.tot[i]
 
 		Ato[desc] <- Acur
 	}
 
-	w.root.tot <- mat.gen.diag(phy, n.cov.root.tot)
-	w_root <- exp(w.root.tot)
+	#the root to tip total is just the accumulated alpha time, which Ato already holds,
+	#so it needs no second traversal of its own
+	w_root <- exp(-Ato[1:ntips])
 
-	#only nodevar.k depends on the regime being weighted
+	#only nodevar.k depends on the regime being weighted. the root to tip sum of the
+	#per edge contributions is accumulated in the same cladewise pass that builds them.
+	cum.k <- numeric(max_node_id)
 	for(j in 1:k){
-		n.cov.k <- matrix(0, n, 1)
+		cum.k[] <- 0
 		for(i in edge.order){
 			Acur <- Astart[i]
 			nodevar.k[i] <- 0
@@ -118,9 +120,9 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 				}
 				Acur <- Acur + a * dts[regimeindex]
 			}
-			n.cov.k[edges[i, 3], ] <- nodevar.k[i]
+			cum.k[edges[i, 3]] <- cum.k[edges[i, 2]] + nodevar.k[i]
 		}
-		W[, j] <- w_root * mat.gen.diag(phy, n.cov.k)
+		W[, j] <- w_root * cum.k[1:ntips]
 	}
 
 	if (assume.station == TRUE) {

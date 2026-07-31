@@ -601,7 +601,10 @@ getMapProb <- function(simmap, Q, root_prior){
 
 # take substition histories and make them simmaps
 getMapFromSubstHistory <- function(maps, phy){
-  mapped.edge <- lapply(maps, function(x) convertSubHistoryToEdge(phy, x))
+  # the row names are a property of the tree, not of the map, so they are built once
+  # here rather than once per simmap
+  RowNames <- paste(phy$edge[,1], phy$edge[,2], sep = ",")
+  mapped.edge <- lapply(maps, function(x) convertSubHistoryToEdge(phy, x, RowNames))
   obj <- vector("list", length(maps))
   for (i in 1:length(maps)){
     tree.simmap <- phy
@@ -676,7 +679,15 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
   root.edge.index <- which(phy$edge[,1] == ntips+1)
   root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
   ##Begins the construction of the edges matrix -- similar to the ouch format##
-  edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
+  # columns 4 and 5 hold the start and end age of each branch, which weight.mat only
+  # reads on the non simmap path or when rescaling. hOUwie is always simmap and never
+  # rescales here, so building them would mean a node depth traversal per map per
+  # likelihood evaluation for columns nothing goes on to read.
+  if(simmap.tree == TRUE & scaleHeight == FALSE){
+    edges <- cbind(c(1:(n-1)),phy$edge,0,0)
+  }else{
+    edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
+  }
   if(scaleHeight == TRUE){
     Tmax <- max(MakeAgeTable(phy, root.age=root.age))
     edges[,4:5]<-edges[,4:5]/Tmax
@@ -1672,10 +1683,22 @@ index_paramers_from_tip_states <- function(tip_states, rates, continuous_solutio
 ## ---------------------------------------------------------------------------
 
 # convert a substitution history into a mapped edge
-convertSubHistoryToEdge <- function(phy, map){
+convertSubHistoryToEdge <- function(phy, map, RowNames=NULL){
   Traits <- as.numeric(unique(names(unlist(map))))
-  RowNames <- apply(phy$edge, 1, function(x) paste(x[1], x[2], sep = ","))
-  obj <- do.call(rbind, lapply(map, function(x) sapply(Traits, function(y) sum(x[names(x) == y]))))
+  if(is.null(RowNames)){
+    RowNames <- paste(phy$edge[,1], phy$edge[,2], sep = ",")
+  }
+  # accumulate each edge's segments into its trait column directly. building the row
+  # by row sums over every trait instead costs a closure per trait per edge, and this
+  # runs once per simmap for every likelihood evaluation.
+  obj <- matrix(0, length(map), length(Traits))
+  for(i in seq_along(map)){
+    x <- map[[i]]
+    col_i <- match(as.numeric(names(x)), Traits)
+    for(j in seq_along(x)){
+      obj[i, col_i[j]] <- obj[i, col_i[j]] + x[j]
+    }
+  }
   rownames(obj) <- RowNames
   colnames(obj) <- Traits
   return(obj)

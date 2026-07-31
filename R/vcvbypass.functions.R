@@ -111,6 +111,15 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 			DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
 		}
 	}
+	#the transformed edge lengths no longer agree with the regime painting, so maps and
+	#mapped.edge are dropped rather than carried along stale. this also keeps the tree a
+	#plain phylo: three.point.compute reorders what it is handed, and on a simmap that
+	#dispatches to reorderSimmap, which permutes those two elements for nothing.
+	phy$maps <- NULL
+	phy$mapped.edge <- NULL
+	attr(phy, "map.order") <- NULL
+	class(phy) <- "phylo"
+
 	obj <- list(tree = phy, diag = DiagWt)
 	return(obj)
 }
