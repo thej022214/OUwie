@@ -57,10 +57,13 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 	#phy must be of class simmap
 	nTip <- length(phy$tip.label)
 
-	#ensure we traverse edges from root toward tips so Ato[ancestor] is ready
-	phy <- ape::reorder.phylo(phy, "cladewise")
+	#Ato[ancestor] must be filled before the edge below it is visited, so edges are
+	#walked in cladewise order. map and tip.paths are indexed against the tree as the
+	#caller supplied it, so we permute rather than reorder phy and undo it below.
+	ord <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	edge <- phy$edge[ord, , drop = FALSE]
 
-	nEdge <- nrow(phy$edge)
+	nEdge <- nrow(edge)
 	nNodeTot <- nTip + phy$Nnode
 
 	Ato <- numeric(nNodeTot)
@@ -69,10 +72,10 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 	D <- V_Tilde <- numeric(nEdge)
 
 	for (i in 1:nEdge) {
-		anc <- phy$edge[i, 1]
-		des <- phy$edge[i, 2]
-		Map_i <- map[[i]]
-		Acur <- Ato[anc] 
+		anc <- edge[i, 1]
+		des <- edge[i, 2]
+		Map_i <- map[[ord[i]]]
+		Acur <- Ato[anc]
 		w <- 0
 		v <- 0
 		for (j in 1:length(Map_i)) {
@@ -90,8 +93,8 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 			v <- v + tmp.v
 			Acur <- Acur + Alpha_j * dt
 		}
-		V_Tilde[i] <- v
-		D[i] <- w
+		V_Tilde[ord[i]] <- v
+		D[ord[i]] <- w
 		Ato[des] <- Acur
 	}
 	phy$edge.length <- V_Tilde

@@ -32,13 +32,19 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 
 	W <- matrix(0, ntips, k)
 
+	#Ato[ancestor] must be filled before the edge below it is visited. edges and
+	#phy$maps share an index, so we visit that index in cladewise order. a NULL
+	#root.state drops a row from edges above, so bound the traversal by what is left.
+	edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	edge.order <- edge.order[edge.order <= nrow(edges)]
+
 	for(j in 1:k){
 		n.cov.root.tot <- matrix(0, n, 1)
 		n.cov.k <- matrix(0, n, 1)
 		Ato[] <- 0
 		Ato[root_node] <- 0
 
-		for(i in 1:nrow(edges)){
+		for(i in edge.order){
 			anc <- edges[i, 2]
 			desc <- edges[i, 3]
 
