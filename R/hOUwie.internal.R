@@ -469,12 +469,20 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
   sub_histories <- vector("list", nSim)
   root_edges <- which(phy$edge[,1] == nTip + 1)
   edge_index <- phy$edge
+  # the edges descending from each edge never change, so they are listed once here
+  # rather than being searched for again on every edge of every simulated history
+  child_edges <- vector("list", dim(edge_index)[1])
+  edges_by_anc <- split(1:dim(edge_index)[1], edge_index[,1])
+  anc_match <- match(edge_index[,2], as.numeric(names(edges_by_anc)))
+  for(i in 1:dim(edge_index)[1]){
+    child_edges[[i]] <- if(is.na(anc_match[i])) integer(0) else edges_by_anc[[anc_match[i]]]
+  }
   Map_i <- mapply(function(x, y) rep(x, y), x=reduced_edge_length/2, y=number_of_edges_per_edge*2, SIMPLIFY = FALSE)
   if(!is.null(check_vector)){
     state_samples <- vector("list", nSim)
     sim_counter <- 0
     while(!(sim_counter >= nSim | current.attempts >= max.attempts)){
-      state_sample <- try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge), silent = TRUE)
+      state_sample <- try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges), silent = TRUE)
       if(inherits(state_sample, "try-error")){
         current.attempts <- current.attempts + 1
       }else{
@@ -489,7 +497,7 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
       }
     }
   }else{
-    state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge), silent = TRUE))
+    state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges), silent = TRUE))
     state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
@@ -510,7 +518,7 @@ getMapFromStateSample <- function(map, state_sample){
   return(map)
 }
 
-getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge){
+getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges=NULL){
   # each map will have edges split into equal time portions
   state_samples <- lapply(number_of_nodes_per_edge, function(x) numeric(x))
   root_sample <- sample(1:nStates, 1, prob = root_state)
@@ -527,8 +535,11 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
       from <- state_samples[[edge_i]][count] <- to
       count <- count + 1
     }
-    ancestor_to_add <- edge_index[edge_i,2]
-    anc_edge <- which(ancestor_to_add == edge_index[,1])
+    if(is.null(child_edges)){
+      anc_edge <- which(edge_index[edge_i,2] == edge_index[,1])
+    }else{
+      anc_edge <- child_edges[[edge_i]]
+    }
     for(i in anc_edge){
       state_samples[[i]][1] <- to
     }
