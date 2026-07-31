@@ -264,8 +264,24 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       #              index.disc=index.disc, index.cont=index.cont, root.p=root.p,
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, 
       #              sample_tips=sample_tips, split.liks=FALSE)
-      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.dev, lower=lower, upper=upper, control=opts, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE), global_liks_mat=global_liks_mat, diagn_msg=diagn_msg, mc.cores = ncores)
-      multi_logliks <- unlist(lapply(multi_out, function(x) x$value))
+      # global_liks_mat and diagn_msg belong to GenSA's ... , not to mclapply's
+      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.dev, lower=lower, upper=upper, control=opts, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
+      multi_logliks <- unlist(lapply(multi_out, function(x){
+        if(inherits(x, what="try-error") || is.null(x$value)){
+          NA_real_
+        }else{
+          x$value
+        }
+      }))
+      failed_optimizations <- which(!is.finite(multi_logliks) | multi_logliks >= 1e10)
+      if(length(failed_optimizations) > 0){
+        cat("\nIt appears that an optimization failed. Removing failed optimizations from final output.\n")
+        multi_logliks <- multi_logliks[-failed_optimizations]
+        multi_out <- multi_out[-failed_optimizations]
+        if(length(multi_out) == 0){
+          return(NULL)
+        }
+      }
       out <- multi_out[[which.min(multi_logliks)]]
       pars <- out$par
     }
@@ -502,10 +518,30 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths,
       #              sample_tips=sample_tips, split.liks=FALSE)
       multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
-      multi_logliks <- unlist(lapply(multi_out, function(x) x$objective))
-      # sd is undefined for a single start
-      sd_logliks <- if(length(multi_logliks) > 1) log(sd(exp(multi_logliks))) else 0
-      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -log(mean(exp(multi_logliks))), sd_logliks = sd_logliks)
+      # a start that failed returns the 1e10 penalty from hOUwie.fixed.dev, and a start
+      # whose fork died comes back from mclapply as a try-error with no $objective. NA
+      # keeps one entry per start so multi_logliks stays aligned with multi_out.
+      multi_logliks <- unlist(lapply(multi_out, function(x){
+        if(inherits(x, what="try-error") || is.null(x$objective)){
+          NA_real_
+        }else{
+          x$objective
+        }
+      }))
+      failed_optimizations <- which(!is.finite(multi_logliks) | multi_logliks >= 1e10)
+      if(length(failed_optimizations) > 0){
+        cat("\nIt appears that an optimization failed. Removing failed optimizations from final output.\n")
+        multi_logliks <- multi_logliks[-failed_optimizations]
+        multi_out <- multi_out[-failed_optimizations]
+        if(length(multi_out) == 0){
+          return(NULL)
+        }
+      }
+      # sd is undefined for a single start. these are negative log likelihoods, so the
+      # summary is taken on that scale directly - exponentiating overflows to Inf on
+      # anything but a very small tree.
+      sd_logliks <- if(length(multi_logliks) > 1) sd(multi_logliks) else 0
+      search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -mean(multi_logliks), sd_logliks = sd_logliks)
       if(!quiet){
         cat("\nOptimization complete. Optimization summary:\n")
         print(search_summary)
@@ -520,8 +556,20 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              index.disc=index.disc, index.cont=index.cont, root.p=root.p,
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, 
       #              sample_tips=sample_tips, split.liks=FALSE)
-      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, diagn_msg=diagn_msg), global_liks_mat=global_liks_mat, mc.cores = ncores)
-      multi_logliks <- unlist(lapply(multi_out, function(x) x$value))
+      # global_liks_mat belongs to GenSA's ... , not to mclapply's
+      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, diagn_msg=diagn_msg, global_liks_mat=global_liks_mat), mc.cores = ncores)
+      multi_logliks <- unlist(lapply(multi_out, function(x){
+        if(inherits(x, what="try-error") || is.null(x$value)){
+          NA_real_
+        }else{
+          x$value
+        }
+      }))
+      multi_out <- multi_out[is.finite(multi_logliks)]
+      multi_logliks <- multi_logliks[is.finite(multi_logliks)]
+      if(length(multi_out) == 0){
+        return(NULL)
+      }
       sd_logliks <- if(length(multi_logliks) > 1) sd(multi_logliks) else 0
       search_summary <- c(best_loglik = -min(multi_logliks), mean_loglik = -mean(multi_logliks), sd_logliks = sd_logliks)
       if(!quiet){
@@ -573,6 +621,16 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
   sample_nodes <- houwie_obj$sample_nodes
   adaptive_sampling <- houwie_obj$adaptive_sampling
   nSim <- houwie_obj$nSim
+  # the optimizer works on log(p), so a trait with negative values was fit against a
+  # trait mean and thetas shifted right by 50. both are reported on the original scale,
+  # and both have to be put back on the fitted scale together before the likelihood is
+  # recomputed here - otherwise log() of a negative theta is NaN and every node comes
+  # back with a flat reconstruction.
+  if(isTRUE(houwie_obj$negative_values)){
+    n_theta <- length(unique(index.cont[3,]))
+    p[(length(p) - n_theta + 1):length(p)] <- p[(length(p) - n_theta + 1):length(p)] + 50
+    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] + 50
+  }
   # organize the data
   phy <- reorder.phylo(phy, "pruningwise")
   nTip <- length(phy$tip.label)

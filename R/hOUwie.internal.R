@@ -4,26 +4,30 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        edge_liks_list, nSim, all.paths=NULL, 
                        sample_tips=FALSE, sample_nodes=FALSE,
                        adaptive_sampling=FALSE, split.liks=FALSE, 
-                       global_liks_mat=global_liks_mat, diagn_msg=FALSE){
+                       global_liks_mat=NULL, diagn_msg=FALSE){
   tip.paths <- all.paths[1:length(phy$tip.label)]
   p <- exp(p)
   # check if these parameters exist in the global matrix
   # set(global_liks_mat, i = as.integer(1),  j = 1:4, value=as.list(c(0, p)))
   if(!is.null(global_liks_mat)){
-    liks_match_vector <- colSums(t(global_liks_mat[,-1]) - p) == 0
-    llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
+    # a row matches only when every parameter matches. summing the signed differences
+    # instead would call two different parameter vectors identical whenever their
+    # deviations happen to cancel, and hand back the wrong cached likelihood.
+    liks_match_vector <- colSums(t(global_liks_mat[,-1]) != p) == 0
+    match_row <- which(liks_match_vector)[1]
+    cached_llik_houwie <- if(is.na(match_row)) NA_real_ else as.numeric(global_liks_mat[match_row, 1])
     if(!split.liks){
-      if(any(liks_match_vector, na.rm = TRUE)){
-        # print(llik_houwie)
+      if(!is.na(match_row)){
+        # print(cached_llik_houwie)
         # print(p)
-        return(-llik_houwie)
+        return(-cached_llik_houwie)
       }
     }
   }
-  
+
   k <- max(index.disc, na.rm = TRUE)
   p.mk <- p[1:k]
-  p.ou <- p[(k+1):length(p)] 
+  p.ou <- p[(k+1):length(p)]
   Rate.mat <- matrix(1, 3, dim(index.disc)[2])
   alpha.na <- is.na(index.cont[1,])
   index.cont[is.na(index.cont)] <- max(index.cont, na.rm = TRUE) + 1
@@ -187,8 +191,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
-    if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
-      llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
+    # report the value the optimizer actually saw at this point rather than a fresh
+    # draw over a new set of maps, which would not generally reproduce it
+    if(!is.null(global_liks_mat) && !is.na(cached_llik_houwie)){
+      llik_houwie <- cached_llik_houwie
     }
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df))
   }
@@ -212,23 +218,27 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
                              edge_liks_list, all.paths=NULL, 
                              sample_tips=FALSE, sample_nodes=FALSE,
                              split.liks=FALSE, adaptive_sampling=FALSE,
-                             global_liks_mat=global_liks_mat, diagn_msg=FALSE){
+                             global_liks_mat=NULL, diagn_msg=FALSE){
   tip.paths <- all.paths[1:length(simmaps[[1]]$tip.label)]
   p <- exp(p)
   # check if these parameters exist in the global matrix
   # set(global_liks_mat, i = as.integer(1),  j = 1:4, value=as.list(c(0, p)))
   if(!is.null(global_liks_mat)){
-    liks_match_vector <- colSums(t(global_liks_mat[,-1]) - p) == 0
-    llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
+    # a row matches only when every parameter matches. summing the signed differences
+    # instead would call two different parameter vectors identical whenever their
+    # deviations happen to cancel, and hand back the wrong cached likelihood.
+    liks_match_vector <- colSums(t(global_liks_mat[,-1]) != p) == 0
+    match_row <- which(liks_match_vector)[1]
+    cached_llik_houwie <- if(is.na(match_row)) NA_real_ else as.numeric(global_liks_mat[match_row, 1])
     if(!split.liks){
-      if(any(liks_match_vector, na.rm = TRUE)){
-        # print(llik_houwie)
+      if(!is.na(match_row)){
+        # print(cached_llik_houwie)
         # print(p)
-        return(-llik_houwie)
+        return(-cached_llik_houwie)
       }
     }
   }
-  
+
   k <- max(index.disc, na.rm = TRUE)
   p.mk <- p[1:k]
   p.ou <- p[(k+1):length(p)] 
@@ -284,8 +294,10 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
-    if(!is.na(as.numeric(global_liks_mat[which(liks_match_vector), 1]))){
-      llik_houwie <- as.numeric(global_liks_mat[which(liks_match_vector), 1])
+    # report the value the optimizer actually saw at this point rather than a fresh
+    # draw over a new set of maps, which would not generally reproduce it
+    if(!is.null(global_liks_mat) && !is.na(cached_llik_houwie)){
+      llik_houwie <- cached_llik_houwie
     }
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
   }
@@ -1289,6 +1301,10 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
       data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] - 50
       solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
     }
+    # the trait column of data.ou has to come back with the thetas. hOUwie.recon and
+    # hOUwie.thorough both pair the returned p against this table, and a theta shifted
+    # back by 50 against a trait that was not describes a different model entirely.
+    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] - 50
   }
   obj <- list(
     loglik = liks_houwie$TotalLik,
@@ -1322,11 +1338,12 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
     ub_discrete_model=ub_discrete_model,
     lb_continuous_model=lb_continuous_model, 
     ub_continuous_model=ub_continuous_model,
-    p=pars, 
+    p=pars,
     ip=ip,
-    nSim=nSim, 
+    nSim=nSim,
     opts=opts,
-    quiet=quiet
+    quiet=quiet,
+    negative_values=negative_values
   )
   class(obj) <- "houwie"
   return(obj)
@@ -1377,6 +1394,11 @@ correct_map_edges <- function(simmap){
 }
 
 correct_edge <- function(edge){
+  # a branch with no state change on it has one segment and nothing to merge. without
+  # this 2:length(edge) counts backwards and compares against a name past the end.
+  if(length(edge) < 2){
+    return(edge)
+  }
   edge_names <- names(edge)
   count <- 1
   edge_merge <- numeric(length(edge))
