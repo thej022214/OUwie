@@ -19,7 +19,6 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 		mm <- dim(edges)
 		k <- length(6:mm[2])
 	}
-	pp <- prop.part(phy)
 	alpha <- Rate.mat[1, ]
 
 	root_node <- setdiff(unique(edges[, 2]), unique(edges[, 3]))[1]
@@ -115,12 +114,12 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 
 			Ato[desc] <- Acur
 		}
-		w.k <- mat.gen(phy, n.cov.k, pp)
-		w.root.tot <- mat.gen(phy, n.cov.root.tot, pp)
-		W[, j] <- exp(diag(w.root.tot)) * diag(w.k)
+		w.k <- mat.gen.diag(phy, n.cov.k)
+		w.root.tot <- mat.gen.diag(phy, n.cov.root.tot)
+		W[, j] <- exp(w.root.tot) * w.k
 	}
-	w.root.tot <- mat.gen(phy, n.cov.root.tot, pp)
-	w_root <- exp(diag(w.root.tot))
+	w.root.tot <- mat.gen.diag(phy, n.cov.root.tot)
+	w_root <- exp(w.root.tot)
 
 	if (assume.station == TRUE) {
 		W[, root.state] <- W[, root.state] + w_root

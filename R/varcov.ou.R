@@ -285,8 +285,28 @@ mat.gen <- function(phy,piece.wise,pp){
 	}
 	diag.elts <- 1 + 0:(n - 1)*(n + 1)
 	mat[diag.elts] <- comp[1:n]
-	
+
 	mat
+}
+
+
+##Just the diagonal of mat.gen, which is the root to tip cumulative sum of
+##piece.wise. weight.mat only ever uses diag(mat.gen(...)), and the off diagonals
+##cost an n by n matrix plus the prop.part call that fills them.
+mat.gen.diag <- function(phy,piece.wise){
+	phy <- reorder(phy, "pruningwise")
+	n <- length(phy$tip.label)
+	anc <- phy$edge[,1]
+	des <- phy$edge[,2]
+	ep <- piece.wise[,1]
+	comp <- numeric(n + phy$Nnode)
+
+	for (i in length(anc):1) {
+		focal <- comp[anc[i]]
+		comp[des[i]] <- focal + ep[des[i]]
+	}
+
+	comp[1:n]
 }
 
 
