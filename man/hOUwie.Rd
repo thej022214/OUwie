@@ -133,6 +133,44 @@ A named list with the following elements:
 \item{simmaps}{\code{nSim} stochastic maps from the best fitting hOUwie parameters (to be removed).}
 \item{run_time}{Time to complete the model fit.}
 }
+\examples{
+\dontrun{
+data(tworegime)
+
+# The data are a phylogeny with two painted selective regimes and a data frame
+# whose columns are species, the discrete state, and the continuous trait value.
+head(trait)
+
+# A character dependent model, in which the optimum of the continuous trait
+# depends on the state of the discrete character. nSim sets how many stochastic
+# maps are evaluated per iteration of the likelihood search. These fits take a
+# long time, which is why the examples here are not run automatically.
+cd_model <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                   continuous_model = "OUM", nSim = 25)
+cd_model
+
+# A character independent model with rate heterogeneity. Here the continuous
+# parameters are tied to a hidden state rather than to the observed one.
+ci_model <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER",
+                   continuous_model = "OUM", null.model = TRUE, nSim = 25)
+
+# getModelTable summarises the relative fit of a set of models.
+getModelTable(list(CD = cd_model, CID = ci_model))
+
+# Supplying p evaluates the likelihood at a fixed set of parameters rather than
+# searching for them. Parameters follow c(p_trans, p_alpha, p_sigma.squared,
+# p_theta).
+p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093)
+fixed_fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                    continuous_model = "OUM", nSim = 25, p = p)
+
+# recon returns marginal reconstructions of the discrete state. Rows are nodes
+# and columns are states, so each row sums to one.
+recon_fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                    continuous_model = "OUM", nSim = 25, p = p, recon = TRUE)
+head(recon_fit$recon)
+}
+}
 \references{
 Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.
 
