@@ -23,6 +23,67 @@ makeCommonRandomObjective <- function(objective, seed){
   }
 }
 
+# A sampled history is a list of state sequences, one per edge. Separating both
+# states and edges avoids collisions once state identifiers have more than one digit.
+stateSampleId <- function(state.sample){
+  if(length(state.sample) == 0L){
+    return("")
+  }
+  paste(paste(lengths(state.sample), collapse = ","),
+        paste(unlist(state.sample, use.names = FALSE), collapse = ","),
+        sep = "|")
+}
+
+# Compile topology and discretisation metadata that is constant across every
+# likelihood evaluation in one hOUwie fit. Paths are built in one cladewise
+# traversal instead of searching the edge matrix once per node.
+getHOUwieTreePlan <- function(phy, edge_liks_list, all.paths = NULL){
+  nTip <- length(phy$tip.label)
+  nEdge <- nrow(phy$edge)
+  cladewise.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+
+  if(is.null(all.paths)){
+    all.paths <- vector("list", nTip + phy$Nnode)
+    root <- nTip + 1L
+    all.paths[[root]] <- integer(0)
+    for(edge.i in cladewise.order){
+      ancestor <- phy$edge[edge.i, 1]
+      descendant <- phy$edge[edge.i, 2]
+      all.paths[[descendant]] <- c(edge.i, all.paths[[ancestor]])
+    }
+  }
+
+  edges.by.ancestor <- split(seq_len(nEdge), phy$edge[, 1])
+  ancestor.match <- match(phy$edge[, 2], as.numeric(names(edges.by.ancestor)))
+  child.edges <- lapply(ancestor.match, function(i){
+    if(is.na(i)) integer(0) else edges.by.ancestor[[i]]
+  })
+
+  number.of.nodes.per.edge <- vapply(edge_liks_list, nrow, integer(1))
+  number.of.edges.per.edge <- number.of.nodes.per.edge - 1L
+  reduced.edge.length <- phy$edge.length / number.of.edges.per.edge
+
+  list(
+    all.paths = all.paths,
+    tip.paths = all.paths[seq_len(nTip)],
+    cladewise.order = cladewise.order,
+    rev.pruning.order = rev(ape::reorder.phylo(phy, "pruningwise",
+                                               index.only = TRUE)),
+    root.edges = which(phy$edge[, 1] == nTip + 1L),
+    child.edges = child.edges,
+    edge.index = phy$edge,
+    number.of.nodes.per.edge = number.of.nodes.per.edge,
+    number.of.edges.per.edge = number.of.edges.per.edge,
+    reduced.edge.length = reduced.edge.length,
+    map.template = mapply(function(length, segments)
+                            rep(length, segments),
+                          length = reduced.edge.length / 2,
+                          segments = number.of.edges.per.edge * 2,
+                          SIMPLIFY = FALSE),
+    basic.edges = cbind(seq_len(nEdge), phy$edge, 0, 0)
+  )
+}
+
 # hOUwie.dev draws its own maps, so a draw that leaves no usable map is recoverable: the
 # optimizer only needs a finite penalty to be able to move away from the point. split.liks
 # is the reporting call, and its result is handed to getHouwieObj, which indexes it as a
@@ -39,8 +100,13 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        edge_liks_list, nSim, all.paths=NULL, 
                        sample_tips=FALSE, sample_nodes=FALSE,
                        adaptive_sampling=FALSE, split.liks=FALSE, 
-                       global_liks_mat=NULL, diagn_msg=FALSE){
-  tip.paths <- all.paths[1:length(phy$tip.label)]
+                       global_liks_mat=NULL, diagn_msg=FALSE,
+                       tree.plan=NULL){
+  if(is.null(tree.plan)){
+    tree.plan <- getHOUwieTreePlan(phy, edge_liks_list, all.paths)
+  }
+  all.paths <- tree.plan$all.paths
+  tip.paths <- tree.plan$tip.paths
   p <- exp(p)
   # check if these parameters exist in the global matrix
   # set(global_liks_mat, i = as.integer(1),  j = 1:4, value=as.list(c(0, p)))
@@ -119,17 +185,17 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   }
   # initial sample
   # sample mappings based on the conditional probabilites (also calculating some time saving probabilities from transitions to and from particular states)
-  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2)
+  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2, tree.plan=tree.plan)
   internode_maps <- internode_maps_and_discrete_probs$maps
   internode_samples <- internode_maps_and_discrete_probs$state_samples
-  check_vector <- unlist(lapply(internode_samples, function(x) paste0(unlist(x), collapse="")))
+  check_vector <- vapply(internode_samples, stateSampleId, character(1))
   # if additional samples are needed (didn't reach nSim), they are taken ~randomly
   if(length(internode_samples) < nSim){
     additional_sims <- nSim - length(internode_samples)
-    random_internode_maps_and_discrete_probs <- getInternodeMap(phy, Q * 100, edge_liks_list_init, conditional_probs$root_state, root_liks, additional_sims, check_vector = check_vector, max.attempts=nSim*10)
+    random_internode_maps_and_discrete_probs <- getInternodeMap(phy, Q * 100, edge_liks_list_init, conditional_probs$root_state, root_liks, additional_sims, check_vector = check_vector, max.attempts=nSim*10, tree.plan=tree.plan)
     internode_maps <- c(internode_maps, random_internode_maps_and_discrete_probs$maps)
     internode_samples <- c(internode_samples, random_internode_maps_and_discrete_probs$state_samples)
-    check_vector <- unlist(lapply(internode_samples, function(x) paste0(unlist(x), collapse="")))
+    check_vector <- vapply(internode_samples, stateSampleId, character(1))
   }
   # calculte the discrete probabilities based on the given Q matrix (Pij already calculated)
   discrete_probs <- lapply(internode_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
@@ -139,16 +205,23 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   if(length(llik_discrete) == 0){
     return(houwieDevFailure(split.liks, "every sampled map has probability zero under the discrete model"))
   }
-  # generate maps
-  simmaps <- getMapFromSubstHistory(internode_maps[!failed_maps], phy)
-  # simmaps <- lapply(simmaps, correct_map_edges)
+  # Keep histories as compact edge-segment lists while evaluating the objective.
+  # Full simmap trees and mapped.edge matrices are only needed by downstream output.
+  compact.maps <- internode_maps[!failed_maps]
+  continuous.lik <- function(current.map){
+    OUwie.basic(phy, data, simmap.tree=TRUE, scaleHeight=FALSE,
+                alpha=alpha, sigma.sq=sigma.sq, theta=theta,
+                algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,
+                map=current.map, tree.plan=tree.plan)
+  }
+  simmaps <- if(adaptive_sampling) getMapFromSubstHistory(compact.maps, phy) else NULL
   # if there is no character dependence the map has no influence on continuous likleihood
   character_dependence_check <- all(apply(index.cont, 1, function(x) length(unique(x)) == 1))
   if(character_dependence_check){
-    llik_continuous <- OUwie.basic(simmaps[[1]], data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)
-    llik_continuous <- rep(llik_continuous, length(simmaps))
+    llik_continuous <- continuous.lik(compact.maps[[1]])
+    llik_continuous <- rep(llik_continuous, length(compact.maps))
   }else{
-    llik_continuous <- unlist(lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog)))
+    llik_continuous <- unlist(lapply(compact.maps, continuous.lik))
   }
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
@@ -180,14 +253,16 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
         next
       }
       # generate a new set of unique mappings based on the new conditional probabilities
-      internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*2)
+      internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*2, tree.plan=tree.plan)
       if(length(internode_maps_and_discrete_probs$maps) == 0){
         # if no new maps were generated: generate the maps randomly
-        internode_maps_and_discrete_probs <- getInternodeMap(phy, Q*100, edge_liks_list_init, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*10)
+        internode_maps_and_discrete_probs <- getInternodeMap(phy, Q*100, edge_liks_list_init, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*10, tree.plan=tree.plan)
       }
-      check_vector <- c(check_vector, unlist(lapply(internode_maps_and_discrete_probs$state_samples, function(x) paste0(unlist(x), collapse=""))))
+      check_vector <- c(check_vector, vapply(internode_maps_and_discrete_probs$state_samples,
+                                             stateSampleId, character(1)))
       if(length(internode_maps_and_discrete_probs$maps) > 0){
         new_simmaps <- getMapFromSubstHistory(internode_maps_and_discrete_probs$maps, phy)
+        compact.maps <- c(compact.maps, internode_maps_and_discrete_probs$maps)
         # getMapFromSubstHistory returns a bare list for one map and a multiSimmap for
         # several, so c() would dispatch on class and either splice a simmap's own
         # components in as elements or nest the two sets. stripping the classes first
@@ -195,7 +270,8 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
         simmaps <- c(unclass(simmaps), unclass(new_simmaps))
         # evaluate the new mappings' joint likelhood
         discrete_probs <- lapply(internode_maps_and_discrete_probs$state_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
-        continuous_probs <- lapply(new_simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog))
+        continuous_probs <- lapply(internode_maps_and_discrete_probs$maps,
+                                   continuous.lik)
         new_liks <- unlist(continuous_probs) + unlist(discrete_probs)
         adaptive_criteria <- max(llik_houwies) > max(new_liks)
         llik_continuous <- c(llik_continuous, unlist(continuous_probs))
@@ -213,12 +289,19 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   llik_houwies <- llik_houwies[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
   llik_discrete <- llik_discrete[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
   llik_continuous <- llik_continuous[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
-  simmaps <- simmaps[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
+  selected.map.index <- c(na.omit(sorted_likelihoods$ix[1:nSim]))
+  compact.maps <- compact.maps[selected.map.index]
+  if(adaptive_sampling){
+    simmaps <- simmaps[selected.map.index]
+  }
   # get the summed probabilities using tricks to prevent underflow
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
   if(split.liks){
+    if(is.null(simmaps)){
+      simmaps <- getMapFromSubstHistory(compact.maps, phy)
+    }
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
     # report the value the optimizer actually saw at this point rather than a fresh
@@ -518,7 +601,8 @@ getConditionalInternodeLik <- function(phy, Q, edge_liks_list){
 }
 
 
-getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim, check_vector=NULL, max.attempts){
+getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
+                           check_vector=NULL, max.attempts, tree.plan=NULL){
   # set-up
   current.attempts <- 0
   nStates <- dim(Q)[1]
@@ -526,9 +610,12 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
   # a potential speedup is to calculate all Pij (bollback eq.3) for all branches first
   Pij <- array(0, c(dim(Q)[1], dim(Q)[2], length(phy$edge.length)))
   # reduced edge.lengths since we are including internodes
-  number_of_nodes_per_edge <- unlist(lapply(edge_liks_list, function(x) dim(x)[1]))
-  number_of_edges_per_edge <- number_of_nodes_per_edge - 1
-  reduced_edge_length <- phy$edge.length/number_of_edges_per_edge
+  if(is.null(tree.plan)){
+    tree.plan <- getHOUwieTreePlan(phy, edge_liks_list)
+  }
+  number_of_nodes_per_edge <- tree.plan$number.of.nodes.per.edge
+  number_of_edges_per_edge <- tree.plan$number.of.edges.per.edge
+  reduced_edge_length <- tree.plan$reduced.edge.length
   for(i in 1:length(phy$edge.length)){
     Pij[,,i] <- expm(Q * reduced_edge_length[i])
   }
@@ -541,19 +628,14 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     }
   }
   # simulate nSim substitution histories
-  rev.pruning.order <- rev(reorder.phylo(phy, "pruningwise", index.only = TRUE))
+  rev.pruning.order <- tree.plan$rev.pruning.order
   sub_histories <- vector("list", nSim)
-  root_edges <- which(phy$edge[,1] == nTip + 1)
-  edge_index <- phy$edge
+  root_edges <- tree.plan$root.edges
+  edge_index <- tree.plan$edge.index
   # the edges descending from each edge never change, so they are listed once here
   # rather than being searched for again on every edge of every simulated history
-  child_edges <- vector("list", dim(edge_index)[1])
-  edges_by_anc <- split(1:dim(edge_index)[1], edge_index[,1])
-  anc_match <- match(edge_index[,2], as.numeric(names(edges_by_anc)))
-  for(i in 1:dim(edge_index)[1]){
-    child_edges[[i]] <- if(is.na(anc_match[i])) integer(0) else edges_by_anc[[anc_match[i]]]
-  }
-  Map_i <- mapply(function(x, y) rep(x, y), x=reduced_edge_length/2, y=number_of_edges_per_edge*2, SIMPLIFY = FALSE)
+  child_edges <- tree.plan$child.edges
+  Map_i <- tree.plan$map.template
   if(!is.null(check_vector)){
     state_samples <- vector("list", nSim)
     sim_counter <- 0
@@ -562,7 +644,7 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
       if(inherits(state_sample, "try-error")){
         current.attempts <- current.attempts + 1
       }else{
-        current_mapping_id <- paste0(unlist(state_sample), collapse="")
+        current_mapping_id <- stateSampleId(state_sample)
         if(!current_mapping_id %in% check_vector){
           sim_counter <- sim_counter + 1
           state_samples[[sim_counter]] <- state_sample
@@ -576,9 +658,9 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges), silent = TRUE))
     state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
-  mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
+  mapping_ids <- vapply(state_samples, stateSampleId, character(1))
   state_samples <- state_samples[!duplicated(mapping_ids)]
-  mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
+  mapping_ids <- vapply(state_samples, stateSampleId, character(1))
   state_samples <- state_samples[!mapping_ids == ""]
   maps <- lapply(state_samples, function(x) getMapFromStateSample(Map_i, x))
   return(list(state_samples=state_samples, maps = maps, root_edges=root_edges,
@@ -703,12 +785,24 @@ OUwie.basic.dev <- function(p, phy, data, tip.fog, index.cont, tip.paths=NULL){
 
 
 # probability of the continuous parameter
-OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=FALSE, root.station=FALSE, get.root.theta=FALSE, shift.point=0.5, alpha, sigma.sq, theta, tip.fog="none", algorithm="three.point", tip.paths=NULL, return.expected.vals=FALSE){
+OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL,
+                        scaleHeight=FALSE, root.station=FALSE,
+                        get.root.theta=FALSE, shift.point=0.5, alpha,
+                        sigma.sq, theta, tip.fog="none",
+                        algorithm="three.point", tip.paths=NULL,
+                        return.expected.vals=FALSE, map=NULL,
+                        map.states=NULL, tree.plan=NULL){
+  compact.map <- !is.null(map)
+  if(!compact.map){
+    map <- phy$maps
+  }
   # organize tip states based on what the simmap suggests
-  mapping <- unlist(lapply(phy$maps, function(x) names(x[length(x)])))
   nTip <- length(phy$tip.label)
-  TipStates <- mapping[match(match(data[,1], phy$tip.label), phy$edge[,2])]
-  data[,2] <- TipStates
+  if(!compact.map){
+    mapping <- unlist(lapply(map, function(x) names(x[length(x)])))
+    TipStates <- mapping[match(match(data[,1], phy$tip.label), phy$edge[,2])]
+    data[,2] <- TipStates
+  }
   
   #Makes sure the data is in the same order as the tip labels
   if(tip.fog=="none"){
@@ -735,20 +829,31 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
   ntips <- length(phy$tip.label)
   
   # setup values when simmap (always simmap for hOUwie)
-  k <- length(colnames(phy$mapped.edge))
-  tot.states <- factor(colnames(phy$mapped.edge))
+  if(is.null(map.states)){
+    if(compact.map){
+      map.states <- unique(unlist(lapply(map, names), use.names = FALSE))
+    }else{
+      map.states <- colnames(phy$mapped.edge)
+    }
+  }
+  k <- length(map.states)
+  tot.states <- factor(map.states)
   tip.states <- factor(data[,1])
   data[,1] <- as.numeric(tip.states)
   #Obtains the state at the root
   root.edge.index <- which(phy$edge[,1] == ntips+1)
-  root.state <- which(colnames(phy$mapped.edge)==names(phy$maps[[root.edge.index[2]]][1]))
+  root.state <- which(map.states == names(map[[root.edge.index[2]]][1]))
   ##Begins the construction of the edges matrix -- similar to the ouch format##
   # columns 4 and 5 hold the start and end age of each branch, which weight.mat only
   # reads on the non simmap path or when rescaling. hOUwie is always simmap and never
   # rescales here, so building them would mean a node depth traversal per map per
   # likelihood evaluation for columns nothing goes on to read.
   if(simmap.tree == TRUE & scaleHeight == FALSE){
-    edges <- cbind(c(1:(n-1)),phy$edge,0,0)
+    if(!is.null(tree.plan)){
+      edges <- tree.plan$basic.edges
+    }else{
+      edges <- cbind(c(1:(n-1)),phy$edge,0,0)
+    }
   }else{
     edges <- cbind(c(1:(n-1)),phy$edge,MakeAgeTable(phy, root.age=root.age))
   }
@@ -756,7 +861,7 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
     Tmax <- max(MakeAgeTable(phy, root.age=root.age))
     edges[,4:5]<-edges[,4:5]/Tmax
     root.age <-  1
-    phy$maps <- lapply(phy$maps, function(x) x/Tmax)
+    map <- lapply(map, function(x) x/Tmax)
   }
   # column 1 is 1:(n-1) in edge order, so sorting on it undoes the sort on column 3
   # and leaves edges exactly as built. both sorts dropped; edges stays in edge order.
@@ -773,20 +878,39 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
     Tmax <- 1
   }
   
-  map <- phy$maps
-  
   Rate.mat <- rbind(alpha, sigma.sq, theta)
   pars <- matrix(c(theta, sigma.sq, alpha), length(theta), 3, dimnames = list(1:length(sigma.sq), c("opt", "sig", "alp")))
   # if the simmap did not simulate every possible state in a given hmm
-  if(dim(phy$mapped.edge)[2] != dim(Rate.mat)[2]){
-    Rate.mat <- Rate.mat[,as.numeric(colnames(phy$mapped.edge))]
-    pars <- pars[as.numeric(colnames(phy$mapped.edge)), ]
+  if(length(map.states) != dim(Rate.mat)[2]){
+    Rate.mat <- Rate.mat[,as.numeric(map.states), drop=FALSE]
+    pars <- pars[as.numeric(map.states), , drop=FALSE]
   }
   
-  if(get.root.theta == TRUE){
-    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=FALSE, shift.point=shift.point)
+  # The dynamic hOUwie path can compute the optimum weights, transformed branch
+  # variances, and tip diagonal together while it traverses the map once.
+  continuous.moments <- NULL
+  if(simmap.tree == TRUE && scaleHeight == FALSE){
+    continuous.moments <- continuousMapMoments(
+      phy, Rate.mat, pars, root.state = root.state,
+      assume.station = !get.root.theta, map = map,
+      state.names = map.states,
+      edge.order = if(is.null(tree.plan)) NULL else tree.plan$cladewise.order
+    )
+    W <- continuous.moments$W
+  }else if(get.root.theta == TRUE){
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state,
+                    simmap.tree=simmap.tree, root.age=root.age,
+                    scaleHeight=scaleHeight, assume.station=FALSE,
+                    shift.point=shift.point, map=map,
+                    state.names=map.states,
+                    edge.order=if(is.null(tree.plan)) NULL else tree.plan$cladewise.order)
   }else{
-    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state, simmap.tree=simmap.tree, root.age=root.age, scaleHeight=scaleHeight, assume.station=TRUE, shift.point=shift.point)
+    W <- weight.mat(phy, edges, Rate.mat, root.state=root.state,
+                    simmap.tree=simmap.tree, root.age=root.age,
+                    scaleHeight=scaleHeight, assume.station=TRUE,
+                    shift.point=shift.point, map=map,
+                    state.names=map.states,
+                    edge.order=if(is.null(tree.plan)) NULL else tree.plan$cladewise.order)
   }
   
   #Likelihood function for estimating model parameters
@@ -794,7 +918,7 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
     # maps run root to tip, so only the first name on the root edge is the root state.
     # taking every name would make theta0 as long as that edge has segments and silently
     # recycle the weight matrix against a too long vector of optima.
-    root_index <- as.numeric(names(phy$maps[[which.min(phy$edge[,1])[1]]])[1])
+    root_index <- as.numeric(names(map[[which.min(phy$edge[,1])[1]]])[1])
     theta0 <- theta[root_index]
     expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
     names(expected.vals) <- phy$tip.label
@@ -805,7 +929,14 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
   if(return.expected.vals){
     return(expected.vals)
   }
-  transformed.tree <- transformPhy(phy, map, pars, tip.paths)
+  if(is.null(continuous.moments)){
+    transformed.tree <- transformPhy(
+      phy, map, pars, tip.paths,
+      edge.order=if(is.null(tree.plan)) NULL else tree.plan$cladewise.order
+    )
+  }else{
+    transformed.tree <- continuous.moments[c("tree", "diag")]
+  }
   # generate a map from node based reconstructions
   if(tip.fog=="known"){
     TIPS <- transformed.tree$tree$edge[,2] <= length(transformed.tree$tree$tip.label)

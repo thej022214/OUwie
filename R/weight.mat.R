@@ -2,7 +2,10 @@
  
 #written by Jeremy M. Beaulieu
 
-weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, root.age = NULL, scaleHeight = FALSE, assume.station = TRUE, shift.point = 0.5){
+weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE,
+	root.age = NULL, scaleHeight = FALSE, assume.station = TRUE,
+	shift.point = 0.5, map = NULL, state.names = NULL,
+	edge.order = NULL){
 	#Tmax is only read when the tree is being rescaled, and building the age table costs
 	#a node depth traversal on every call, so it is only built when it will be used
 	if(scaleHeight == TRUE){
@@ -18,7 +21,9 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	}
 
 	if(simmap.tree == TRUE) {
-		k <- length(colnames(phy$mapped.edge))
+		if(is.null(map)) map <- phy$maps
+		if(is.null(state.names)) state.names <- colnames(phy$mapped.edge)
+		k <- length(state.names)
 	}else{
 		mm <- dim(edges)
 		k <- length(6:mm[2])
@@ -37,7 +42,9 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	#Ato[ancestor] must be filled before the edge below it is visited. edges and
 	#phy$maps share an index, so we visit that index in cladewise order. a NULL
 	#root.state drops a row from edges above, so bound the traversal by what is left.
-	edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	if(is.null(edge.order)){
+		edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	}
 	edge.order <- edge.order[edge.order <= nrow(edges)]
 
 	#the regime and duration of each epoch and the Ato accumulation are all the same for
@@ -57,15 +64,15 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 
 		if(simmap.tree == TRUE){
 			if(scaleHeight == TRUE) {
-				currentmap <- phy$maps[[i]] / Tmax
+				currentmap <- map[[i]] / Tmax
 			}else{
-				currentmap <- phy$maps[[i]]
+				currentmap <- map[[i]]
 			}
 			regimes <- numeric(length(currentmap))
 			dts <- numeric(length(currentmap))
 			for(regimeindex in 1:length(currentmap)){
 				dts[regimeindex] <- as.numeric(currentmap[regimeindex])
-				regimes[regimeindex] <- which(colnames(phy$mapped.edge) == names(currentmap)[regimeindex])
+				regimes[regimeindex] <- which(state.names == names(currentmap)[regimeindex])
 			}
 		}else{
 			oldtime <- edges[i, 4]
@@ -283,4 +290,3 @@ mat.gen<-function(phy,piece.wise,pp){
 	
 	mat
 }
-

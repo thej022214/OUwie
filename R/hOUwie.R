@@ -66,7 +66,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
 
   nCol <- dim(data)[2] - ifelse(tip.fog == "none", 2, 3)
   Tmax <- max(branching.times(phy))
-  all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
+  all.paths <- NULL
   
   if(inherits(discrete_model[1], what="character")){
   #if(class(discrete_model)[1] == "character"){
@@ -146,6 +146,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
 
   # an internal data structure (internodes liks matrix) for the dev function
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
+  tree.plan <- getHOUwieTreePlan(phy, edge_liks_list)
+  all.paths <- tree.plan$all.paths
   
   # default MLE search options
   if(is.null(opts)){
@@ -251,7 +253,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           global_liks_mat
         }
         objective <- function(p){
-          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg)
+          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan)
         }
         if(common_random_numbers){
           objective <- makeCommonRandomObjective(objective, crn_seeds[start_index])
@@ -304,7 +306,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           global_liks_mat
         }
         objective <- function(p){
-          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg)
+          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan)
         }
         if(common_random_numbers){
           objective <- makeCommonRandomObjective(objective, crn_seeds[start_index])
@@ -342,7 +344,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   }
   # preparing output
   final_objective <- function(p){
-    hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE)
+    hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE, tree.plan=tree.plan)
   }
   if(common_random_numbers){
     final_objective <- makeCommonRandomObjective(final_objective, selected_crn_seed)
@@ -834,7 +836,8 @@ hOUwie.thorough <- function(model.list, ncores=1){
   for(i in 1:length(model_set_separated)){
     cat("Preparing rate category", all_rate_cats[i], "for hOUwie thorough...\n")
     all_maps <- do.call(c, lapply(model_set_separated[[i]], "[[", "simmaps"))
-    map_id_list <- unlist(lapply(all_maps, function(x) paste0(names(unlist(x$maps)), collapse = "")))
+    map_id_list <- vapply(all_maps, function(x)
+      stateSampleId(lapply(x$maps, names)), character(1))
     map_lik_list <- unlist(lapply(model_set_separated[[i]], function(x) x$all_cont_liks + x$all_disc_liks))
     unique_map_index <- !duplicated(map_id_list)
     unique_map_lik_list <- map_lik_list[unique_map_index]
