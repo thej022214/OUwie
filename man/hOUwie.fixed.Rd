@@ -56,8 +56,8 @@ hOUwie.fixed(simmaps,
 \item{ub_discrete_model}{A single value for the upper bound of discrete character evolution during the ML search. The default is \code{1/(Tmax*0.0001)}.} 
 \item{lb_continuous_model}{Three values specifying the lower bound of continuous character evolution during the ML search. Should be provided in the order of lower.bound for alpha, sigma squared, theta. The default is \code{c(1e-10, 1e-10, smallest_continuous_value/10)}.} 
 \item{ub_continuous_model}{Three values specifying the upper bound of continuous character evolution during the ML search. Should be provided in the order of upper.bound for alpha, sigma squared, theta. The default is \code{c(log(2)/(0.01 * Tmax), log(2)/(0.01 * Tmax), largest_continuous_value*10)}.} 
-\item{recon}{A boolean indicating whether marginal ancestral state reconstruction should take place following the ML search.}
-\item{nodes}{If \code{recon=TRUE}, a character or vector indicating which nodes should have their discrete ancestral state characters estimated. If a vector, nodes specified will be reconstructed with 1:Ntip representing tip reconstructions and Ntip+1 representing the root. A user can also indicate "all", "internal", or "external" to reconstruct all nodes, ancestral nodes, or extant nodes respectively. Reconstructing tip states ("external") is only useful if hidden states are included in the model.}
+\item{recon}{Retained for compatibility with \code{hOUwie}, but marginal ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps. Setting \code{recon=TRUE} produces a warning and leaves \code{recon} in the returned object as \code{NULL}. Use \code{hOUwie} if ancestral states are needed.}
+\item{nodes}{Retained for compatibility with \code{hOUwie} and unused here, since ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps.}
 \item{p}{A numeric vector of fixed parameters to be optimized. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}}
 \item{ip}{A numeric vector indicating initial parameters to start the ML search. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}.}
 \item{optimizer}{One of "nlopt_ln", "nlopt_gn", or "sann" for a local search of parameter space, global search of paramater space, or simmulated annealing. The default is "nlopt_ln".}
@@ -89,7 +89,7 @@ A named list with the following elements:
 \item{param.count}{Number of parameters in the model.}
 \item{solution.disc}{The maximum likelihood estiamte of the transition rate matrix.}
 \item{solution.cont}{The maximum likelihood estimate of parameters which describe continuous evolution. Each column corresponds to a discrete state and each row is a different continuous model parameter. Estimated continuous parameters include alpha, sigma.squared, and theta.}
-\item{recon}{A data.frame of marginal probabilities of ancestral states given the best fitting model. If ancestral state reconstruction was not specified then \code{NULL}.}
+\item{recon}{Always \code{NULL}. Ancestral state reconstruction requires regimes to be resampled under a node constraint, which a fit conditioned on a fixed set of stochastic maps cannot do. See \code{hOUwie}.}
 \item{index.disc}{An index matrix specifying which discrete model parameters are estimated.}
 \item{index.cont}{An index matrix specifying which continuous model parameters are estimated.}
 \item{phy}{User provided phylogenetic tree.}

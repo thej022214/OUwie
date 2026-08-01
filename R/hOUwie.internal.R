@@ -23,6 +23,17 @@ makeCommonRandomObjective <- function(objective, seed){
   }
 }
 
+# hOUwie.dev draws its own maps, so a draw that leaves no usable map is recoverable: the
+# optimizer only needs a finite penalty to be able to move away from the point. split.liks
+# is the reporting call, and its result is handed to getHouwieObj, which indexes it as a
+# list, so there is no scalar it can be given and no likelihood to report.
+houwieDevFailure <- function(split.liks, reason){
+  if(split.liks){
+    stop(paste0("The hOUwie likelihood cannot be reported at these parameters because ", reason, ". Check root.p and the discrete model against the states present in your data."), call. = FALSE)
+  }
+  return(1e10)
+}
+
 hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        index.disc, index.cont, root.p,
                        edge_liks_list, nSim, all.paths=NULL, 
@@ -53,7 +64,6 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   p.mk <- p[1:k]
   p.ou <- p[(k+1):length(p)]
   Rate.mat <- matrix(1, 3, dim(index.disc)[2])
-  alpha.na <- is.na(index.cont[1,])
   index.cont[is.na(index.cont)] <- max(index.cont, na.rm = TRUE) + 1
   Rate.mat[] <- c(p.ou, 1e-10)[index.cont]
   alpha = Rate.mat[1,]
@@ -70,19 +80,32 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     edge_liks_list <- try(getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths))
     if(inherits(edge_liks_list, what="try-error")){
     #if(class(edge_liks_list) == "try-error"){
-      return(1e10)
+      return(houwieDevFailure(split.liks, "the joint conditional probabilities of the cherries could not be computed"))
     }
   }
   # a way to alter the conditional values of the tips based on current parameeter values (only meaningful if there are multiple rate cats)
   if(rate.cat > 1 & sample_tips){
     normal.params <- rbind(theta, sigma.sq)
     sample.tip.probs <- apply(normal.params, 2, function(x) dnorm(data[,3], x[1], sqrt(x[2])))
-    for(i in 1:length(phy$tip.label)){
-      if(all(sample.tip.probs[i,] == 0)){
-        sample.tip.probs[i,] <- rep(1, length(sample.tip.probs[i,]))
+    nTip <- length(phy$tip.label)
+    # phy is pruningwise, so edge i is not the branch leading to tip i, and the density
+    # rows follow the order of data rather than the order of the tips. both the branch
+    # and the observation therefore have to be resolved by species name.
+    for(edge_i in 1:dim(phy$edge)[1]){
+      if(phy$edge[edge_i,2] > nTip){
+        next
       }
-      sample_tip_i <- edge_liks_list[[i]][1,] * sample.tip.probs[i,]
-      edge_liks_list[[i]][1,] <- sample_tip_i/sum(sample_tip_i)
+      species_i <- phy$tip.label[phy$edge[edge_i,2]]
+      data_i <- match(species_i, data[,1])
+      if(is.na(data_i)){
+        next
+      }
+      tip_probs_i <- sample.tip.probs[data_i,]
+      if(all(tip_probs_i == 0)){
+        tip_probs_i <- rep(1, length(tip_probs_i))
+      }
+      sample_tip_i <- edge_liks_list[[edge_i]][1,] * tip_probs_i
+      edge_liks_list[[edge_i]][1,] <- sample_tip_i/sum(sample_tip_i)
     }
   }
   # get the condtional probabilities based on the discrete values
@@ -92,7 +115,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   conditional_probs <- getConditionalInternodeLik(phy, Q, edge_liks_list)
   root_liks <- getRootLiks(conditional_probs, Q, root.p)
   if(is.null(root_liks)){
-    return(1e10)
+    return(houwieDevFailure(split.liks, "no state at the root has a defined conditional probability"))
   }
   # initial sample
   # sample mappings based on the conditional probabilites (also calculating some time saving probabilities from transitions to and from particular states)
@@ -114,7 +137,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   failed_maps <- discrete_probs == -Inf
   llik_discrete <- llik_discrete[!failed_maps]
   if(length(llik_discrete) == 0){
-    return(1e10)
+    return(houwieDevFailure(split.liks, "every sampled map has probability zero under the discrete model"))
   }
   # generate maps
   simmaps <- getMapFromSubstHistory(internode_maps[!failed_maps], phy)
@@ -129,17 +152,6 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   }
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
-  llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
-  if(!is.null(global_liks_mat)){
-    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-      return(1e10)
-    }
-    if(diff(abs(c(max(llik_discrete), max(llik_continuous))))  > 1e10){
-      # another likely optimization error if the difference between the best map for discrete and continuous are over 100 orders of magnitude
-      return(1e10)
-    }
-  }
   # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
   if(adaptive_sampling & !character_dependence_check){
     adaptive_criteria <- FALSE
@@ -176,11 +188,11 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
       check_vector <- c(check_vector, unlist(lapply(internode_maps_and_discrete_probs$state_samples, function(x) paste0(unlist(x), collapse=""))))
       if(length(internode_maps_and_discrete_probs$maps) > 0){
         new_simmaps <- getMapFromSubstHistory(internode_maps_and_discrete_probs$maps, phy)
-        if(length(new_simmaps) == 1){
-          simmaps <- c(simmaps, new_simmaps[[1]])
-        }else{
-          simmaps <- c(simmaps, new_simmaps)
-        }
+        # getMapFromSubstHistory returns a bare list for one map and a multiSimmap for
+        # several, so c() would dispatch on class and either splice a simmap's own
+        # components in as elements or nest the two sets. stripping the classes first
+        # keeps one map per element, which is what the likelihoods are sorted alongside.
+        simmaps <- c(unclass(simmaps), unclass(new_simmaps))
         # evaluate the new mappings' joint likelhood
         discrete_probs <- lapply(internode_maps_and_discrete_probs$state_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
         continuous_probs <- lapply(new_simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog))
@@ -206,12 +218,6 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
-  if(!is.null(global_liks_mat)){
-    if(diff(abs(c(llik_houwie,as.numeric(global_liks_mat[1,1])))) > 1e10){
-      # houwie sometimes gets stuck optimizing models which have likely failed. so a quick LRT to check is implemented here
-      return(1e10)
-    }
-  }
   if(split.liks){
     # expected_vals <- lapply(simmaps, function(x) OUwie.basic(x, data, simmap.tree=TRUE, scaleHeight=FALSE, alpha=alpha, sigma.sq=sigma.sq, theta=theta, algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,return.expected.vals=TRUE))
     # expected_vals <- colSums(do.call(rbind, expected_vals) * exp(llik_houwies - max(llik_houwies))/sum(exp(llik_houwies - max(llik_houwies))))
@@ -221,6 +227,14 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
       llik_houwie <- cached_llik_houwie
     }
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df))
+  }
+  # every map underflowing leaves max() + log(sum(exp())) as NaN, which the optimizer
+  # cannot order against anything. a failed evaluation has to leave here as the same
+  # finite penalty every other failure returns. the sentinel is a scalar, so it can only
+  # be returned on the optimizer's path - split.liks callers hand the result to
+  # getHouwieObj, which indexes it as a list
+  if(!is.finite(llik_houwie)){
+    return(1e10)
   }
   if(!is.null(global_liks_mat)){
     # no free row means the optimizer ran past the cap the table was sized for; the
@@ -267,7 +281,6 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
   p.mk <- p[1:k]
   p.ou <- p[(k+1):length(p)] 
   Rate.mat <- matrix(1, 3, dim(index.disc)[2])
-  alpha.na <- is.na(index.cont[1,])
   index.cont[is.na(index.cont)] <- max(index.cont, na.rm = TRUE) + 1
   Rate.mat[] <- c(p.ou, 1e-10)[index.cont]
   alpha = Rate.mat[1,]
@@ -296,8 +309,13 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
   llik_discrete <- unlist(discrete_probs)
   failed_maps <- discrete_probs == -Inf
   llik_discrete <- llik_discrete[!failed_maps]
+  # the maps are supplied by the caller and are never resampled, so every one of them
+  # having probability zero is a property of the model rather than of the point being
+  # evaluated. no parameter value recovers it, and neither caller can be given a number:
+  # split.liks hands the result to getHouwieObj, which indexes it as a list, and the
+  # optimizer would search a surface that is flat everywhere.
   if(length(llik_discrete) == 0){
-    return(1e10)
+    stop("Every supplied stochastic map has probability zero under this model, so the hOUwie likelihood is undefined. Either root.p gives zero probability to the state the maps have at the root, or the discrete model disallows a transition that the maps contain.", call. = FALSE)
   }
   # if there is no character dependence the map has no influence on continuous likleihood
   character_dependence_check <- all(apply(index.cont, 1, function(x) length(unique(x)) == 1))
@@ -324,6 +342,14 @@ hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
       llik_houwie <- cached_llik_houwie
     }
     return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps))
+  }
+  # every map underflowing leaves max() + log(sum(exp())) as NaN, which the optimizer
+  # cannot order against anything. a failed evaluation has to leave here as the same
+  # finite penalty every other failure returns. the sentinel is a scalar, so it can only
+  # be returned on the optimizer's path - split.liks callers hand the result to
+  # getHouwieObj, which indexes it as a list
+  if(!is.finite(llik_houwie)){
+    return(1e10)
   }
   if(!is.null(global_liks_mat)){
     # no free row means the optimizer ran past the cap the table was sized for; the
@@ -381,8 +407,22 @@ runSingleThorough <- function(houwie_obj, new_maps, init_pars){
   n_p_cont <- max(index.cont, na.rm = TRUE)
   p_cont <- unlist(lapply(1:n_p_cont, function(x) mean(init_pars$mod_avg_cont[which(index.cont == x)])))
   ip <- c(p_disc, p_cont)
+  # every start is searched on the log scale, so each has to be strictly positive on the
+  # scale it is finally logged on. thetas are averaged on the original trait scale, and
+  # hOUwie.fixed shifts a negative trait right and carries the theta block of ip along with
+  # it, so a theta is judged after that same shift while the rates, alphas and sigmas - which
+  # are never shifted - are judged as they stand. testing thetas before the shift would
+  # discard the averaging for any negative trait; exempting them would let a theta that stays
+  # non-positive through to log(), which only warns.
+  n_p_theta <- length(unique(na.omit(index.cont[3,])))
+  trait_column <- ifelse(tip.fog == "none", dim(hOUwie.dat$data.ou)[2], dim(hOUwie.dat$data.ou)[2] - 1)
+  shifted_ip <- ip
+  if(n_p_theta > 0){
+    theta_index <- (length(ip) - n_p_theta + 1):length(ip)
+    shifted_ip[theta_index] <- shifted_ip[theta_index] + getTraitShift(hOUwie.dat$data.ou[,trait_column])
+  }
   # fall back on the default starting values if averaging produced something unusable
-  if(any(!is.finite(ip)) | any(ip <= 0)){
+  if(any(!is.finite(ip)) | any(shifted_ip <= 0)){
     warning("Model averaged starting values were not usable for one of the models, default starting values were used instead.")
     ip <- NULL
   }
@@ -537,7 +577,7 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
-  state_samples <- state_samples[!duplicated(mapping_ids, nmax = 1)]
+  state_samples <- state_samples[!duplicated(mapping_ids)]
   mapping_ids <- unlist(lapply(state_samples, function(x) paste0(unlist(x), collapse="")))
   state_samples <- state_samples[!mapping_ids == ""]
   maps <- lapply(state_samples, function(x) getMapFromStateSample(Map_i, x))
@@ -751,7 +791,10 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL, scaleHeight=
   
   #Likelihood function for estimating model parameters
   if(get.root.theta == TRUE){
-    root_index <- as.numeric(names(phy$maps[[which.min(phy$edge[,1])[1]]]))
+    # maps run root to tip, so only the first name on the root edge is the root state.
+    # taking every name would make theta0 as long as that edge has segments and silently
+    # recycle the weight matrix against a too long vector of optima.
+    root_index <- as.numeric(names(phy$maps[[which.min(phy$edge[,1])[1]]])[1])
     theta0 <- theta[root_index]
     expected.vals <- colSums(t(W) * c(theta0, pars[,1]))
     names(expected.vals) <- phy$tip.label
@@ -829,7 +872,7 @@ fixEdgeLiksLiks <- function(edge_liks_list, combo, phy, n_tips, n_nodes, n_inter
 getAllJointProbs<- function(phy, data, rate.cat, time_slice, Q, alpha, sigma.sq, theta, quiet=TRUE){
   # prerequisites
   hOUwie.dat <- organizeHOUwieDat(data, "none", TRUE)
-  nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
+  nStates <- getNumberOfStates(hOUwie.dat$data.cor[,2])
   tip.paths <- lapply(1:length(phy$tip.label), function(x) getPathToRoot(phy, x))
   # generate the edge_liks_list
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
@@ -1313,8 +1356,41 @@ simCharacterHistory <- function(phy, Q, root.freqs, Q2 = NA, NoI = NA){
   return(res)
   #return(CharacterHistory)
 }
+# how far a trait has to move right before it can be optimized. the search is over log(p),
+# so every parameter it touches - the OU optima included - must be strictly positive, and
+# the bounds handed to it are min(trait)/10 and max(trait)*10. landing the shifted minimum
+# exactly on zero is therefore no better than leaving it negative, since log(0) is -Inf; it
+# has to clear zero by a margin. the margin is a tenth of the trait's own spread rather than
+# a tenth of its magnitude because theta is resolved on the log scale: a magnitude-based
+# offset would push a tightly clustered trait far from the origin, where neighbouring values
+# differ by too little of their log to separate.
+getTraitShift <- function(x){
+  min_x <- min(x)
+  if(min_x >= 0){
+    return(0)
+  }
+  spread <- max(x) - min_x
+  # an invariant trait offers no spread to scale the margin by, so use its magnitude, which
+  # is nonzero whenever the minimum is negative
+  if(spread <= 0){
+    spread <- abs(min_x)
+  }
+  return((0.1 * spread) - min_x)
+}
+# recover the shift a fit was made under. fits made before the shift was derived from the
+# data record only the logical flag, and 50 is the constant they were fit with, so it is the
+# only value that puts them back on their original scale
+getObjTraitShift <- function(houwie_obj){
+  if(!isTRUE(houwie_obj$negative_values)){
+    return(0)
+  }
+  if(is.null(houwie_obj$trait_shift)){
+    return(50)
+  }
+  return(houwie_obj$trait_shift)
+}
 # organize the houwie output
-getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip.fog, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values){
+getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip.fog, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values, trait_shift=0){
   param.count <- max(index.disc, na.rm = TRUE) + max(index.cont, na.rm = TRUE)
   nb.tip <- length(phy$tip.label)
   solution <- organizeHOUwiePars(pars=pars, index.disc=index.disc, index.cont=index.cont)
@@ -1327,19 +1403,23 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
   colnames(solution$solution.ou) <- StateNames
   names(hOUwie.dat$ObservedTraits) <- 1:length(hOUwie.dat$ObservedTraits)
   if(negative_values){
-    n_theta <- length(unique(index.cont[3,]))
-    pars[(length(pars) - n_theta + 1):length(pars)] <- pars[(length(pars) - n_theta + 1):length(pars)]- 50
+    # the thetas occupy the tail of pars, so the count of them has to match the count the
+    # caller built pars with - free parameters only, ignoring the cells a model leaves NA
+    n_theta <- length(unique(na.omit(index.cont[3,])))
+    if(n_theta > 0){
+      pars[(length(pars) - n_theta + 1):length(pars)] <- pars[(length(pars) - n_theta + 1):length(pars)] - trait_shift
+    }
     if(tip.fog == "none"){
-      data[,dim(data)[2]] <- data[,dim(data)[2]] - 50
-      solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
+      data[,dim(data)[2]] <- data[,dim(data)[2]] - trait_shift
+      solution$solution.ou[3,] <- solution$solution.ou[3,] - trait_shift
     }else{
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] - 50
-      solution$solution.ou[3,] <- solution$solution.ou[3,] - 50
+      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] - trait_shift
+      solution$solution.ou[3,] <- solution$solution.ou[3,] - trait_shift
     }
     # the trait column of data.ou has to come back with the thetas. hOUwie.recon and
     # hOUwie.thorough both pair the returned p against this table, and a theta shifted
-    # back by 50 against a trait that was not describes a different model entirely.
-    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] - 50
+    # back against a trait that was not describes a different model entirely.
+    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] - trait_shift
   }
   obj <- list(
     loglik = liks_houwie$TotalLik,
@@ -1378,7 +1458,8 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
     nSim=nSim,
     opts=opts,
     quiet=quiet,
-    negative_values=negative_values
+    negative_values=negative_values,
+    trait_shift=trait_shift
   )
   class(obj) <- "houwie"
   return(obj)

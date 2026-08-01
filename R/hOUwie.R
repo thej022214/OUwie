@@ -10,6 +10,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   start_time <- Sys.time()
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
+  trait_shift <- 0
   if(any(phy$edge.length < 0)){
     stop("Your phylogeny has negative edge lengths. I don't know what can cause this, but I know it's not good.")
   }
@@ -21,26 +22,28 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     phy$edge.length[phy$edge.length == 0] <- 1e-5
     warning("Your phylogeny edge lengths of 0. Adding 1e-5")
   }
+  data <- matchTipsAndData(phy$tip.label, data)
   if(tip.fog == "none"){
     cor_dat <- data[,c(1:(dim(data)[2]-1))]
     if(any(data[,dim(data)[2]] < 0)){
+      trait_shift <- getTraitShift(data[,dim(data)[2]])
       if(!quiet){
-        cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+        cat("Negative values detected... adding", trait_shift, "to the trait mean for optimization purposes\n")
       }
       negative_values <- TRUE
-      data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
+      data[,dim(data)[2]] <- data[,dim(data)[2]] + trait_shift
     }
   }else{
     cor_dat <- data[,c(1:(dim(data)[2]-2))]
     if(any(data[,dim(data)[2]-1] < 0)){
+      trait_shift <- getTraitShift(data[,dim(data)[2]-1])
       if(!quiet){
-        cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+        cat("Negative values detected... adding", trait_shift, "to the trait mean for optimization purposes\n")
       }
       negative_values <- TRUE
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
+      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + trait_shift
     }
   }
-  # check that tips and data match
   # check for invariance of tip states and not that non-invariance isn't just ambiguity
   if(!is.null(phy$node.label)){
     if(!quiet){
@@ -59,14 +62,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   phy <- reorder.phylo(phy, "pruningwise")
   hOUwie.dat <- organizeHOUwieDat(data, tip.fog, collapse)
   
-  if(length(grep("&", hOUwie.dat$data.cor[,2])) > 0){
-    non_and_chars <- as.numeric(hOUwie.dat$data.cor[,2][-grep("&", hOUwie.dat$data.cor[,2])])
-    and_chars <- as.numeric(unlist(strsplit(hOUwie.dat$data.cor[,2][grep("&", hOUwie.dat$data.cor[,2])], "&")))
-    nStates <- max(c(non_and_chars, and_chars))
-  }else{
-    nStates <- max(as.numeric(hOUwie.dat$data.cor[,2]))
-  }
-  
+  nStates <- getNumberOfStates(hOUwie.dat$data.cor[,2])
+
   nCol <- dim(data)[2] - ifelse(tip.fog == "none", 2, 3)
   Tmax <- max(branching.times(phy))
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
@@ -141,7 +138,12 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   n_p_sigma <- length(unique(na.omit(index.cont[2,])))
   n_p_theta <- length(unique(na.omit(index.cont[3,])))
   n_p <- n_p_trans + n_p_alpha + n_p_sigma + n_p_theta
-  
+  # a trait with negative values has its thetas shifted below by indexing the theta
+  # block of p and of ip. that assignment pads a short vector with NA out to exactly the
+  # required length, so both have to be measured before anything is allowed to touch them
+  checkParameterLength(p, index.disc, index.cont, "p")
+  checkParameterLength(ip, index.disc, index.cont, "ip")
+
   # an internal data structure (internodes liks matrix) for the dev function
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
   
@@ -182,16 +184,12 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       crn_seeds <- sample.int(.Machine$integer.max, 1)
       selected_crn_seed <- crn_seeds[1]
     }
-    if(negative_values){
-      p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + 50 
+    if(negative_values && n_p_theta > 0){
+      p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + trait_shift
     }
     if(!quiet){
       cat("Calculating likelihood from a set of fixed parameters.\n")
       print(p)
-    }
-    if(max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE) != length(p)){
-      message <- paste0("The number of parameters does not match the number required by the model structure. You have supplied ", length(p), ", but the model structure requires ", max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE), ".")
-      stop(message, call. = FALSE)
     }
     out<-NULL
     pars <- out$solution <- log(p)
@@ -211,7 +209,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     if(is.null(ip)){
       if(rate.cat > 1){
         bin_index <- cut(hOUwie.dat$data.ou[,3], rate.cat, labels = FALSE)
-        combos <- expand.grid(1:max(hOUwie.dat$data.cor[,2]), 1:rate.cat)
+        combos <- expand.grid(1:getNumberOfStates(hOUwie.dat$data.cor[,2]), 1:rate.cat)
         disc_tips <- vector("numeric", length(phy$tip.label))
         for(i in 1:dim(combos)[1]){
           disc_tips[hOUwie.dat$data.cor[,2] == combos[i,1] & bin_index == combos[i,2]] <- i
@@ -227,8 +225,8 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
       starts <- starts.basic
     }else{
-      if(negative_values){
-        ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + 50 
+      if(negative_values && n_p_theta > 0){
+        ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + trait_shift
       }
       starts <- ip
     }
@@ -350,7 +348,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     final_objective <- makeCommonRandomObjective(final_objective, selected_crn_seed)
   }
   liks_houwie <- final_objective(pars)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
   houwie_obj$common_random_numbers <- common_random_numbers
   houwie_obj$crn_seeds <- if(common_random_numbers) crn_seeds else NULL
   houwie_obj$crn_seed <- if(common_random_numbers) selected_crn_seed else NULL
@@ -380,19 +378,23 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
 
 hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, diagn_msg=FALSE, make_numeric = TRUE, n_starts = 1, ncores = 1){
   start_time <- Sys.time()
+  data <- matchTipsAndData(simmaps[[1]]$tip.label, data)
   # if the data has negative values, shift it right - we will shift it back later
   negative_values <- FALSE
+  trait_shift <- 0
   if(tip.fog == "none"){
     if(any(data[,dim(data)[2]] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      trait_shift <- getTraitShift(data[,dim(data)[2]])
+      cat("Negative values detected... adding", trait_shift, "to the trait mean for optimization purposes\n")
       negative_values <- TRUE
-      data[,dim(data)[2]] <- data[,dim(data)[2]] + 50
+      data[,dim(data)[2]] <- data[,dim(data)[2]] + trait_shift
     }
   }else{
     if(any(data[,dim(data)[2]-1] < 0)){
-      cat("Negative values detected... adding 50 to the trait mean for optimization purposes\n")
+      trait_shift <- getTraitShift(data[,dim(data)[2]-1])
+      cat("Negative values detected... adding", trait_shift, "to the trait mean for optimization purposes\n")
       negative_values <- TRUE
-      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + 50
+      data[,dim(data)[2]-1] <- data[,dim(data)[2]-1] + trait_shift
     }
   }
   if(ncores > n_starts){
@@ -409,7 +411,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   if(make_numeric){
     simmaps <- lapply(simmaps, function(x) makeMapEdgesNumeric(x, observed_traits))
   }
-  nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
+  nStates <- getNumberOfStates(hOUwie.dat$data.cor[,2])
   nCol <- dim(data)[2] - ifelse(tip.fog == "none", 2, 3)
   Tmax <- max(branching.times(simmaps[[1]]))
   all.paths <- lapply(1:(Nnode(simmaps[[1]]) + Ntip(simmaps[[1]])), function(x) getPathToRoot(simmaps[[1]], x))
@@ -486,7 +488,12 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   n_p_sigma <- length(unique(na.omit(index.cont[2,])))
   n_p_theta <- length(unique(na.omit(index.cont[3,])))
   n_p <- n_p_trans + n_p_alpha + n_p_sigma + n_p_theta
-  
+  # a trait with negative values has its thetas shifted below by indexing the theta
+  # block of p and of ip. that assignment pads a short vector with NA out to exactly the
+  # required length, so both have to be measured before anything is allowed to touch them
+  checkParameterLength(p, index.disc, index.cont, "p")
+  checkParameterLength(ip, index.disc, index.cont, "ip")
+
   # an internal data structure (internodes liks matrix) for the dev function
   edge_liks_list <- getEdgeLiks(simmaps[[1]], hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
   
@@ -521,16 +528,12 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   # organized as c(trans.rt, alpha, sigma.sq, theta)
   # evaluate likelihood
   if(!is.null(p)){
-    if(negative_values){
-      p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + 50 
+    if(negative_values && n_p_theta > 0){
+      p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- p[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + trait_shift
     }
     if(!quiet){
       cat("Calculating likelihood from a set of fixed parameters.\n")
       print(p)
-    }
-    if(max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE) != length(p)){
-      message <- paste0("The number of parameters does not match the number required by the model structure. You have supplied ", length(p), ", but the model structure requires ", max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE), ".")
-      stop(message, call. = FALSE)
     }
     out<-NULL
     pars <- out$solution <- log(p)
@@ -550,7 +553,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
     if(is.null(ip)){
       if(rate.cat > 1){
         bin_index <- cut(hOUwie.dat$data.ou[,3], rate.cat, labels = FALSE)
-        combos <- expand.grid(1:max(hOUwie.dat$data.cor[,2]), 1:rate.cat)
+        combos <- expand.grid(1:getNumberOfStates(hOUwie.dat$data.cor[,2]), 1:rate.cat)
         disc_tips <- vector("numeric", length(simmaps[[1]]$tip.label))
         for(i in 1:dim(combos)[1]){
           disc_tips[hOUwie.dat$data.cor[,2] == combos[i,1] & bin_index == combos[i,2]] <- i
@@ -566,8 +569,8 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
       starts <- starts.basic
     }else{
-      if(negative_values){
-        ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + 50 
+      if(negative_values && n_p_theta > 0){
+        ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] <- ip[(n_p_trans + n_p_alpha + n_p_sigma + 1):n_p] + trait_shift
       }
       starts <- ip
     }
@@ -647,16 +650,17 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
   }
   # preparing output
   liks_houwie <- hOUwie.fixed.dev(p = pars, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
   # adding independent model if included
   # if(is.null(p)){
   #   liks_indep <- hOUwie.dev(p = log(starts), phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, sample_tips=sample_tips, split.liks=TRUE)
   #   houwie_obj$init_model <- getHouwieObj(liks_indep, pars=starts, phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet)
   # }
-  # conducting ancestra state resconstruction
+  # ancestral state reconstruction fixes a node to a state and resimulates maps under
+  # that constraint. this fit conditions on the maps that were supplied, so the constraint
+  # would have nothing to act on and the optimization is worth keeping regardless
   if(recon){
-    houwie_recon <- hOUwie.recon(houwie_obj, nodes)
-    houwie_obj$recon <- houwie_recon
+    warning("Ancestral state reconstruction is unavailable for a model fit by hOUwie.fixed, which conditions on a fixed set of stochastic maps rather than sampling them. Use hOUwie to fit a model whose ancestral states can be reconstructed. The recon element of this fit is NULL.", call. = FALSE)
   }
   houwie_obj$all_disc_liks <- liks_houwie$llik_discrete
   houwie_obj$all_cont_liks <- liks_houwie$llik_continuous
@@ -686,21 +690,31 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
   sample_nodes <- houwie_obj$sample_nodes
   adaptive_sampling <- houwie_obj$adaptive_sampling
   nSim <- houwie_obj$nSim
+  # the reconstruction below fixes a node to a state through edge_liks_list and then
+  # calls hOUwie.dev, which resimulates nSim maps under that constraint. hOUwie.fixed
+  # conditions on maps the user supplied, stores no nSim, and its likelihood ignores
+  # edge_liks_list entirely, so there is nothing here for a fixed fit to condition on.
+  if(is.null(nSim)){
+    stop("This model was fit by hOUwie.fixed, which conditions on a fixed set of stochastic maps rather than sampling them. Ancestral state reconstruction requires a model fit by hOUwie.", call. = FALSE)
+  }
   # the optimizer works on log(p), so a trait with negative values was fit against a
-  # trait mean and thetas shifted right by 50. both are reported on the original scale,
-  # and both have to be put back on the fitted scale together before the likelihood is
-  # recomputed here - otherwise log() of a negative theta is NaN and every node comes
-  # back with a flat reconstruction.
-  if(isTRUE(houwie_obj$negative_values)){
-    n_theta <- length(unique(index.cont[3,]))
-    p[(length(p) - n_theta + 1):length(p)] <- p[(length(p) - n_theta + 1):length(p)] + 50
-    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] + 50
+  # trait mean and thetas shifted right by the amount the fit recorded. both are reported
+  # on the original scale, and both have to be put back on the fitted scale together
+  # before the likelihood is recomputed here - otherwise log() of a negative theta is NaN
+  # and every node comes back with a flat reconstruction.
+  trait_shift <- getObjTraitShift(houwie_obj)
+  if(trait_shift != 0){
+    n_theta <- length(unique(na.omit(index.cont[3,])))
+    if(n_theta > 0){
+      p[(length(p) - n_theta + 1):length(p)] <- p[(length(p) - n_theta + 1):length(p)] + trait_shift
+    }
+    hOUwie.dat$data.ou[,3] <- hOUwie.dat$data.ou[,3] + trait_shift
   }
   # organize the data
   phy <- reorder.phylo(phy, "pruningwise")
   nTip <- length(phy$tip.label)
   Tmax <- max(branching.times(phy))
-  nStates <- as.numeric(max(hOUwie.dat$data.cor[,2]))
+  nStates <- getNumberOfStates(hOUwie.dat$data.cor[,2])
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   # an internal data structure (internodes liks matrix) for the dev function
   edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
@@ -866,7 +880,21 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
   n_p_theta <- length(unique(na.omit(index.cont[3,])))
   names(best_par) <- c(paste0("rate", "_", 1:n_p_trans), paste0("alpha", "_", 1:n_p_alpha), paste0("sigma2", "_", 1:n_p_sigma), paste0("theta", "_", 1:n_p_theta))
   best_neglnL <- -houwie_obj$loglik
-  
+  # dent_propose rejects a proposal when any parameter is outside the bounds, not just the
+  # one it perturbed, so a scalar lower bound of zero is also applied to the thetas.
+  # houwie_obj$p reports thetas on the original trait scale, and a fit made on a negative
+  # trait was optimized after shifting that trait right, so the constraint it was actually
+  # made under is theta >= lower_bound - trait_shift. bounds are compared elementwise, so
+  # an unshifted fit is left with exactly the scalar bound it would have been given.
+  trait_shift <- getObjTraitShift(houwie_obj)
+  lower_bound <- rep(lower_bound, length.out = length(best_par))
+  upper_bound <- rep(upper_bound, length.out = length(best_par))
+  if(n_p_theta > 0){
+    theta_index <- (length(best_par) - n_p_theta + 1):length(best_par)
+    lower_bound[theta_index] <- lower_bound[theta_index] - trait_shift
+    upper_bound[theta_index] <- upper_bound[theta_index] - trait_shift
+  }
+
   houwie_to_run <- function(par){
     evaluate_par <- function(){
       hOUwie(p = par, phy=phy, data=houwie_obj$data, rate.cat=rate.cat, tip.fog=tip.fog, discrete_model = index.disc, continuous_model = index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, common_random_numbers=common_random_numbers, quiet = TRUE)$loglik
@@ -945,7 +973,7 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
       mods_table <- getModelTable(model.list, type=type)
       mod_names <- names(model.list)
     }else{
-      warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e10. Set force=FALSE to automatically remove potentially failed runs.")
+      warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e5. Set force=FALSE to automatically remove potentially failed runs.")
     }
   }
   AICwts <- mods_table[,7]
@@ -965,9 +993,10 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
 getExpectedValues <- function(model, return_anc = FALSE){
   all_joint_liks <- model$all_cont_liks + model$all_disc_liks
   sclaed_p <- exp(all_joint_liks - max(all_joint_liks))/sum(exp(all_joint_liks - max(all_joint_liks)))
-  scaled_p <- 0.999
   prec_index <- sclaed_p > 0.0099
-  if(!prec_index[2]){
+  # the threshold can leave a single map carrying all of the weight, so a second map is
+  # kept alongside it. a model that retained only one map has no second map to keep.
+  if(length(prec_index) > 1 && !prec_index[2]){
     prec_index[2] <- TRUE
   }
   sclaed_p <- sclaed_p[prec_index]
@@ -985,6 +1014,58 @@ getExpectedValues <- function(model, return_anc = FALSE){
     out <- full_df
   }
   return(out)
+}
+
+# p and ip both have to hold one value per free parameter of the two index matrices.
+# this has to be checked before the theta block of either is indexed for the negative
+# trait shift, because assigning into that block extends a short vector with NA until it
+# is exactly long enough to satisfy the check.
+checkParameterLength <- function(pars, index.disc, index.cont, pars_name){
+  if(is.null(pars)){
+    return(invisible(NULL))
+  }
+  n_required <- max(index.cont, na.rm = TRUE) + max(index.disc, na.rm = TRUE)
+  if(length(pars) != n_required){
+    message <- paste0("The number of parameters does not match the number required by the model structure. You have supplied ", length(pars), " in ", pars_name, ", but the model structure requires ", n_required, ".")
+    stop(message, call. = FALSE)
+  }
+  return(invisible(NULL))
+}
+
+# getEdgeLiks leaves a tip it cannot find in the data flat rather than failing, which
+# makes the continuous likelihood NaN and looks like a failed optimization rather than a
+# mismatched dataset. rows without a tip are dropped instead, since OUwie and
+# OUwie.basic both reorder against phy$tip.label and so discard them anyway, but the
+# drop is announced so that a misspelled name does not pass unnoticed.
+matchTipsAndData <- function(tip_labels, data){
+  species <- as.character(data[,1])
+  missing_from_data <- setdiff(tip_labels, species)
+  if(length(missing_from_data) > 0){
+    stop(paste0("Some tips in your phylogeny have no matching row in your data: ", paste(missing_from_data, collapse=", "), "."), call. = FALSE)
+  }
+  missing_from_phy <- setdiff(species, tip_labels)
+  if(length(missing_from_phy) > 0){
+    warning(paste0("Some rows in your data have no matching tip in your phylogeny, these have been removed: ", paste(missing_from_phy, collapse=", "), "."), call. = FALSE)
+    data <- data[species %in% tip_labels, , drop=FALSE]
+  }
+  return(data)
+}
+
+# corProcessData returns the discrete states as character codes, and a polymorphic tip
+# as its codes joined by "&". the number of states therefore has to come from the
+# numeric codes themselves - a max() over the character column orders lexicographically
+# ("9" beats "12") and is NA the moment any tip is polymorphic.
+getNumberOfStates <- function(cor_states){
+  cor_states <- as.character(cor_states)
+  and_index <- grep("&", cor_states)
+  if(length(and_index) > 0){
+    # every tip may be polymorphic, in which case the non-polymorphic set is empty
+    numeric_states <- c(as.numeric(cor_states[-and_index]),
+                        as.numeric(unlist(strsplit(cor_states[and_index], "&"))))
+  }else{
+    numeric_states <- as.numeric(cor_states)
+  }
+  return(max(numeric_states))
 }
 
 # different OU models have different parameter structures. This will evaluate the appropriate one.
