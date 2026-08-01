@@ -33,6 +33,7 @@ hOUwie(phy,
        sample_tips         = FALSE, 
        sample_nodes        = FALSE, 
        adaptive_sampling   = FALSE, 
+       common_random_numbers = TRUE,
        diagn_msg           = FALSE,
        n_starts            = 1, 
        ncores              = 1)
@@ -65,6 +66,7 @@ hOUwie(phy,
 \item{sample_tips}{A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).}
 \item{sample_nodes}{A boolean indicating whether or not to sample node probabilities when generating underlying regimes. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.}
 \item{adaptive_sampling}{A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.}
+\item{common_random_numbers}{A boolean indicating whether likelihood evaluations within an optimizer start should reuse the same underlying random-number stream. This is enabled by default; set it to \code{FALSE} to draw a new stream for each evaluation. The stochastic maps are still regenerated and evaluated using the current discrete and continuous parameters. Each optimizer start receives a different stream. Use \code{set.seed()} before calling \code{hOUwie} for reproducibility.}
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
 \item{ncores}{An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.}
@@ -119,6 +121,9 @@ A named list with the following elements:
 \item{sample_tips}{A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).}
 \item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
 \item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
+\item{common_random_numbers}{Whether common random numbers were enabled for the fit.}
+\item{crn_seeds}{The random-number seed assigned to each optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
+\item{crn_seed}{The random-number seed associated with the selected optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
 \item{lb_discrete_model}{A vector of lower bounds on discrete character evolution.}
 \item{ub_discrete_model}{A vector of upper bounds on discrete character evolution.}
 \item{lb_continuous_model}{A vector of lower bounds of alpha, sigma square, and theta.}
@@ -153,6 +158,15 @@ cd_model
 # parameters are tied to a hidden state rather than to the observed one.
 ci_model <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER",
                    continuous_model = "OUM", null.model = TRUE, nSim = 25)
+
+# Common random numbers are enabled by default, making likelihood comparisons
+# within each optimizer start share an underlying random stream. Mappings still
+# respond to the current parameter values. set.seed() makes the assigned streams
+# repeatable. Set common_random_numbers = FALSE to restore independent draws at
+# every likelihood evaluation.
+set.seed(1)
+ci_model_crn <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER",
+                       continuous_model = "OUM", null.model = TRUE, nSim = 25)
 
 # getModelTable summarises the relative fit of a set of models.
 getModelTable(list(CD = cd_model, CID = ci_model))

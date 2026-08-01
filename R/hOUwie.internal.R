@@ -1,4 +1,28 @@
 ##### Main internal functions ##### 
+withHOUwieSeed <- function(seed, code){
+  had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+  if(had_seed){
+    previous_seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+  }
+  on.exit({
+    if(had_seed){
+      assign(".Random.seed", previous_seed, envir = .GlobalEnv)
+    }else if(exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)){
+      rm(".Random.seed", envir = .GlobalEnv)
+    }
+  }, add = TRUE)
+  set.seed(seed)
+  force(code)
+}
+
+makeCommonRandomObjective <- function(objective, seed){
+  force(objective)
+  force(seed)
+  function(p){
+    withHOUwieSeed(seed, objective(p))
+  }
+}
+
 hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        index.disc, index.cont, root.p,
                        edge_liks_list, nSim, all.paths=NULL, 
