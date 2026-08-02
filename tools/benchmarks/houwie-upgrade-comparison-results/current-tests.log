@@ -1,0 +1,81 @@
+ℹ Testing OUwie
+Registered S3 methods overwritten by 'OUwie':
+  method        from  
+  plot.dentist  corHMM
+  print.dentist corHMM
+anc-state: 
+test-anc-state.R: Initializing... 
+Finished. Begin thorough search... 
+Finished. Summarizing results. 
+[1] "Doing reconstructions"
+Working on node  1  of  62 Working on node  2  of  62 Working on node  3  of  62 Working on node  4  of  62 Working on node  5  of  62 Working on node  6  of  62 Working on node  7  of  62 Working on node  8  of  62 Working on node  9  of  62 Working on node  10  of  62 Working on node  11  of  62 Working on node  12  of  62 Working on node  13  of  62 Working on node  14  of  62 Working on node  15  of  62 Working on node  16  of  62 Working on node  17  of  62 Working on node  18  of  62 Working on node  19  of  62 Working on node  20  of  62 Working on node  21  of  62 Working on node  22  of  62 Working on node  23  of  62 Working on node  24  of  62 Working on node  25  of  62 Working on node  26  of  62 Working on node  27  of  62 Working on node  28  of  62 Working on node  29  of  62 Working on node  30  of  62 Working on node  31  of  62 Working on node  32  of  62 Working on node  33  of  62 Working on node  34  of  62 Working on node  35  of  62 Working on node  36  of  62 Working on node  37  of  62 Working on node  38  of  62 Working on node  39  of  62 Working on node  40  of  62 Working on node  41  of  62 Working on node  42  of  62 Working on node  43  of  62 Working on node  44  of  62 Working on node  45  of  62 Working on node  46  of  62 Working on node  47  of  62 Working on node  48  of  62 Working on node  49  of  62 Working on node  50  of  62 Working on node  51  of  62 Working on node  52  of  62 Working on node  53  of  62 Working on node  54  of  62 Working on node  55  of  62 Working on node  56  of  62 Working on node  57  of  62 Working on node  58  of  62 Working on node  59  of  62 Working on node  60  of  62 Working on node  61  of  62 Working on node  62  of  62 [1] "Done reconstructions"
+.
+edge-order: 
+test-edge-order.R: ......
+houwie-guards: 
+test-houwie-guards.R: .................Negative values detected... adding 0.7334708 to the trait mean for optimization purposes
+
+Using the following legend:
+  1   2 
+"1" "2" 
+...
+houwie-sampling: 
+test-houwie-sampling.R: ..............
+houwie-shift: 
+test-houwie-shift.R: .................State reconstruction for node 1 of 9 ...State reconstruction for node 2 of 9 ...State reconstruction for node 3 of 9 ...State reconstruction for node 4 of 9 ...State reconstruction for node 5 of 9 ...State reconstruction for node 6 of 9 ...State reconstruction for node 7 of 9 ...State reconstruction for node 8 of 9 ...State reconstruction for node 9 of 9 ...State reconstruction for node 1 of 9 ...State reconstruction for node 2 of 9 ...State reconstruction for node 3 of 9 ...State reconstruction for node 4 of 9 ...State reconstruction for node 5 of 9 ...State reconstruction for node 6 of 9 ...State reconstruction for node 7 of 9 ...State reconstruction for node 8 of 9 ...State reconstruction for node 9 of 9 .........................State reconstruction for node 1 of 9 ...State reconstruction for node 2 of 9 ...State reconstruction for node 3 of 9 ...State reconstruction for node 4 of 9 ...State reconstruction for node 5 of 9 ...State reconstruction for node 6 of 9 ...State reconstruction for node 7 of 9 ...State reconstruction for node 8 of 9 ...State reconstruction for node 9 of 9 ...State reconstruction for node 1 of 9 ...State reconstruction for node 2 of 9 ...State reconstruction for node 3 of 9 ...State reconstruction for node 4 of 9 ...State reconstruction for node 5 of 9 ...State reconstruction for node 6 of 9 ...State reconstruction for node 7 of 9 ...State reconstruction for node 8 of 9 ...State reconstruction for node 9 of 9 .....
+houwie-thorough: 
+test-houwie-thorough.R: .................................
+houwie-tree-plan: 
+test-houwie-tree-plan.R: ................
+houwie-validation: 
+test-houwie-validation.R: .....State reconstruction for node 1 of 1 .....
+Using the following legend:
+   1    2    3    4    5    6    7    8    9   10   11   12 
+ "1" "10" "11" "12"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9" 
+.......Negative values detected... adding 0.7334708 to the trait mean for optimization purposes
+
+Using the following legend:
+  1   2 
+"1" "2" 
+..Negative values detected... adding 0.7334708 to the trait mean for optimization purposes
+
+Using the following legend:
+  1   2 
+"1" "2" 
+......................
+houwie-walk: 
+test-houwie-walk.R: ....[1] "increasing proposal width for all parameters"
+[1] "increasing proposal width for all parameters"
+[1] "increasing proposal width for some parameters"
+........[1] "increasing proposal width for all parameters"
+[1] "increasing proposal width for all parameters"
+[1] "increasing proposal width for all parameters"
+..
+houwie: 
+test-houwie.R: ...........................
+likelihood: 
+test-likelihood.R: .........Calculating likelihood using fixed parameter values: 0.4669113 0.4669113 
+Calculating likelihood using fixed parameter values: 0.4669113 0.4669113 1.326483 
+.Calculating likelihood using fixed parameter values: 0.2424788 0.7007112 
+Calculating likelihood using fixed parameter values: 0.2424788 0.7007112 1.471938 
+.Calculating likelihood using fixed parameter values: 0.358939 0.3589399 0.5197486 0.5197486 1.330145 1.330145 
+Calculating likelihood using fixed parameter values: 0.358939 0.3589399 0.5197486 0.5197486 1.330145 1.330145 
+.Calculating likelihood using fixed parameter values: 1.391659 1.391659 0.6545502 0.6545502 1.675133 0.4424138 
+Calculating likelihood using fixed parameter values: 1.391659 1.391659 0.6545502 0.6545502 1.675133 0.4424138 
+.Calculating likelihood using fixed parameter values: 1.711082 1.711082 0.3517019 1.076479 1.676894 0.5563541 
+Calculating likelihood using fixed parameter values: 1.711082 1.711082 0.3517019 1.076479 1.676894 0.5563541 
+.Calculating likelihood using fixed parameter values: 1.650182 1.029449 0.7082462 0.7082462 1.676572 0.1516105 
+Calculating likelihood using fixed parameter values: 1.650182 1.029449 0.7082462 0.7082462 1.676572 0.1516105 
+.Calculating likelihood using fixed parameter values: 3.079319 0.6060786 0.4735485 1.70491 1.68189 -1.032546 
+Calculating likelihood using fixed parameter values: 3.079319 0.6060786 0.4735485 1.70491 1.68189 -1.032546 
+.........
+restart: 
+test-restart.R: Initializing... 
+Finished. Begin thorough search... 
+Finished. Summarizing results. 
+Initializing... 
+Finished. Begin thorough search... 
+Finished. Summarizing results. 
+.
+
+══ DONE ════════════════════════════════════════════════════════════════════════
