@@ -36,7 +36,12 @@ hOUwie(phy,
        common_random_numbers = TRUE,
        diagn_msg           = FALSE,
        n_starts            = 1, 
-       ncores              = 1)
+       ncores              = 1,
+       algorithm           = c("sampling", "pruning"),
+       legacy              = NULL,
+       resolution          = 1,
+       max_components      = NULL,
+       tolerance           = 0)
 }       
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
@@ -70,6 +75,16 @@ hOUwie(phy,
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
 \item{ncores}{An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.}
+
+\item{algorithm}{How the sum over regime histories is evaluated. \code{"sampling"}, the default, is the estimator of Boyko et al. (2023): it draws \code{nSim} histories and adds their terms. \code{"pruning"} instead sums over histories exactly by propagating a Gaussian mixture up the tree, which is deterministic and removes the parameter-dependent bias the sampled sum carries. \code{"pruning"} does not produce stochastic maps, so \code{recon} is unavailable with it, and \code{sample_tips}, \code{sample_nodes} and \code{adaptive_sampling} have no effect.}
+
+\item{legacy}{An optional boolean giving the same choice as \code{algorithm}: \code{TRUE} selects \code{"sampling"} and \code{FALSE} selects \code{"pruning"}. When supplied it overrides \code{algorithm}.}
+
+\item{resolution}{Used only when \code{algorithm = "pruning"}. The number of regime points placed along each edge. \code{1} is the history model the sampling path uses, in which an edge whose endpoints occupy different regimes switches at its midpoint. Larger values refine towards the continuous-time regime process, first order in the step, at a cost linear in \code{resolution}.}
+
+\item{max_components}{Used only when \code{algorithm = "pruning"}. A ceiling on the number of Gaussian components carried per node and regime, bounding the cost by merging the most similar components. \code{Inf} performs no merging and is exact for the stated \code{resolution}, but the mixture grows with tree size and is affordable only on small trees. The default, \code{NULL}, chooses from the data: 32 when any tip is ambiguous about its regime, as under \code{rate.cat > 1} or ambiguous coding, and 16 otherwise. Those hold the error near the optimum to roughly \code{1e-3} log units, which is the quantity that matters for both the location of the optimum and for AIC; the error further down the surface is far larger but is negative, so it only makes an already poor region look poorer. Note that the approximation is not bounded: on a tree a component carrying little weight in one message can dominate after being multiplied by its sibling, so a likelihood that is stable across several values of \code{max_components} is not thereby converged.}
+
+\item{tolerance}{Used only when \code{algorithm = "pruning"}. If positive, components are merged only while the cheapest available merge costs less than this, in the sense of Runnalls (2007). \code{max_components} still applies as a ceiling.}
 }
 \details{
 This model is composed of two processes: one that describes the evolution of a discrete character and the other describes the evolution of a continuous character. To model the evolution of a single continuous character we use an Ornstein-Uhlenbeck (OU) model (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ane 2014a). This model combines the stochastic evolution of a trait through time with a deterministic component which models the tendency for a trait to evolve towards an optimum. In this model, the value of a trait, \code{X_t}, is pulled towards an optimum, \code{theta}, at a rate scaled by the parameter \code{alpha}. The optimum, \code{theta}, is a piecewise constant on intervals and takes values in a finite set \code{theta}. This can represent the set of "selective regimes", "regimes", or Simpson's "adaptive zones" (Cressler et al. 2015), though it is consistent with a variety of true underlying microevolutionary models (Hansen 2014). Additionally, random deviations are introduced by Gaussian white noise dB(t), which is distributed as a normal random variable with mean zero and variance equal to \code{sigma^2}. Thus, \code{sigma^2} is a constant describing the rate of stochastic evolution around the optimum. We use the set of extensions introduced by Beaulieu et al. (2012). This allows for multiple primary optima \code{theta} in which both the pull strength (\code{alpha}) and the rate of stochastic evolution (\code{sigma^2}) can vary across the phylogeny. 
@@ -122,6 +137,8 @@ A named list with the following elements:
 \item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
 \item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
 \item{common_random_numbers}{Whether common random numbers were enabled for the fit.}
+
+\item{algorithm}{The history-summation algorithm used, \code{"sampling"} or \code{"pruning"}.}
 \item{crn_seeds}{The random-number seed assigned to each optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
 \item{crn_seed}{The random-number seed associated with the selected optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
 \item{lb_discrete_model}{A vector of lower bounds on discrete character evolution.}

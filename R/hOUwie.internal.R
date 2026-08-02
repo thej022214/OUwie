@@ -101,7 +101,8 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        sample_tips=FALSE, sample_nodes=FALSE,
                        adaptive_sampling=FALSE, split.liks=FALSE, 
                        global_liks_mat=NULL, diagn_msg=FALSE,
-                       tree.plan=NULL){
+                       tree.plan=NULL, algorithm="sampling",
+                       resolution=1L, max_components=Inf, tolerance=0){
   if(is.null(tree.plan)){
     tree.plan <- getHOUwieTreePlan(phy, edge_liks_list, all.paths)
   }
@@ -141,6 +142,44 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   Q[] <- c(p.mk, 0)[rate]
   diag(Q) <- -rowSums(Q)
   edge_liks_list_init <- edge_liks_list
+  if(algorithm == "pruning"){
+    # The pruning path sums over regime histories exactly rather than sampling
+    # them, so none of the proposal machinery below applies. Tip constraints are
+    # read off edge_liks_list so ambiguous coding and hidden states behave the
+    # same way they do on the sampling path.
+    tip_values <- data[match(phy$tip.label, data[,1]), 3]
+    llik_pruned <- try(houwiePruningLik(
+      phy = phy,
+      tip_state_sets = getTipStateSets(phy, edge_liks_list_init,
+                                       dim(index.disc)[2]),
+      tip_values = tip_values, Q = Q, alpha = alpha, sigma.sq = sigma.sq,
+      theta = theta, root.p = root.p, resolution = resolution,
+      max_components = max_components, tolerance = tolerance), silent = TRUE)
+    if(inherits(llik_pruned, what="try-error") || !is.finite(llik_pruned)){
+      return(houwieDevFailure(split.liks, "the pruned likelihood could not be computed"))
+    }
+    llik_pruned <- as.numeric(llik_pruned)
+    if(split.liks){
+      # the discrete marginal is available exactly from the same Q, so it is
+      # reported rather than approximated; the continuous part is not separable
+      # once the history has been integrated out, so it is not invented
+      return(list(TotalLik = llik_pruned, DiscLik = NA_real_,
+                  ContLik = NA_real_, llik_discrete = numeric(0),
+                  llik_continuous = numeric(0), simmaps = NULL,
+                  unsorted_lliks_df = NULL))
+    }
+    if(!is.null(global_liks_mat)){
+      new_row <- which(global_liks_mat$X1 == 0)[1]
+      if(!is.na(new_row)){
+        set(global_liks_mat, as.integer(new_row), names(global_liks_mat),
+            as.list(c(llik_pruned, p)))
+      }
+    }
+    if(diagn_msg){
+      print(c(round(llik_pruned, 2), round(p, 2)))
+    }
+    return(-llik_pruned)
+  }
   # altering the conditional probabilities based on jointly sampled decendent species
   if(sample_nodes){
     edge_liks_list <- try(getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths))
@@ -834,6 +873,15 @@ OUwie.basic <- function(phy, data, simmap.tree=TRUE, root.age=NULL,
       map.states <- unique(unlist(lapply(map, names), use.names = FALSE))
     }else{
       map.states <- colnames(phy$mapped.edge)
+    }
+    # both sources list the regimes in the order the map happens to mention
+    # them, but alpha, sigma.sq and theta arrive indexed by regime number. left
+    # in encounter order they line up only when the first edge starts in regime
+    # 1, so half of the sampled histories would be scored with the regimes'
+    # parameters permuted.
+    state.order <- suppressWarnings(as.numeric(map.states))
+    if(!anyNA(state.order)){
+      map.states <- map.states[order(state.order)]
     }
   }
   k <- length(map.states)
