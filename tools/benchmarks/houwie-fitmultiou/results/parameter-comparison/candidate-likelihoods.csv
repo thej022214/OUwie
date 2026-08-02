@@ -1,0 +1,34 @@
+"task_id","method","candidate","repetition","run_seed","resolution","elapsed_seconds","loglik","discrete_loglik","continuous_loglik","error"
+"houwie-generating-parameters-rep1","hOUwie","Generating parameters",1,90001,100,1.549,-993.240112044411,-227.664494940721,-741.00767968877,NA
+"houwie-fitmultiou-estimate-from-post-rep1","hOUwie","fitmultiOU estimate from post",1,90001,100,1.83,-1051.92913250848,-235.190446993959,-795.691248878007,NA
+"houwie-houwie-estimate-from-post-rep1","hOUwie","hOUwie estimate from post",1,90001,100,1.661,-571.408407531312,-213.970176608537,-353.606392244391,NA
+"houwie-generating-parameters-rep2","hOUwie","Generating parameters",2,90002,100,1.607,-940.190475348493,-227.919083702573,-700.772842641085,NA
+"houwie-fitmultiou-estimate-from-post-rep2","hOUwie","fitmultiOU estimate from post",2,90002,100,1.58,-967.133917013378,-232.590483467983,-721.953486674225,NA
+"houwie-houwie-estimate-from-post-rep2","hOUwie","hOUwie estimate from post",2,90002,100,1.782,-574.121519295254,-214.123410342891,-353.506715140528,NA
+"houwie-generating-parameters-rep3","hOUwie","Generating parameters",3,90003,100,1.839,-928.837866937779,-230.128599057737,-678.839462005975,NA
+"houwie-fitmultiou-estimate-from-post-rep3","hOUwie","fitmultiOU estimate from post",3,90003,100,1.633,-1027.51208773895,-236.579053675298,-775.559746610054,NA
+"houwie-houwie-estimate-from-post-rep3","hOUwie","hOUwie estimate from post",3,90003,100,1.663,-575.792280167696,-215.787476818688,-355.439484005493,NA
+"houwie-generating-parameters-rep4","hOUwie","Generating parameters",4,90004,100,1.573,-963.067940327817,-229.979912129638,-711.444017519647,NA
+"houwie-fitmultiou-estimate-from-post-rep4","hOUwie","fitmultiOU estimate from post",4,90004,100,1.743,-981.416023363493,-236.254613434934,-711.374488215326,NA
+"houwie-houwie-estimate-from-post-rep4","hOUwie","hOUwie estimate from post",4,90004,100,1.665,-571.763725974125,-214.623735863944,-353.384481616353,NA
+"houwie-generating-parameters-rep5","hOUwie","Generating parameters",5,90005,100,1.647,-1022.23381277977,-226.128236305763,-787.495666233358,NA
+"houwie-fitmultiou-estimate-from-post-rep5","hOUwie","fitmultiOU estimate from post",5,90005,100,1.634,-1046.75559403362,-234.993950006907,-805.169743744594,NA
+"houwie-houwie-estimate-from-post-rep5","hOUwie","hOUwie estimate from post",5,90005,100,1.695,-568.427322199931,-209.585116985013,-353.131492882952,NA
+"houwie-generating-parameters-rep6","hOUwie","Generating parameters",6,90006,100,1.65,-992.074172996294,-221.039632380452,-741.7734141063,NA
+"houwie-fitmultiou-estimate-from-post-rep6","hOUwie","fitmultiOU estimate from post",6,90006,100,1.663,-1066.20179781772,-233.985596231708,-811.276713458799,NA
+"houwie-houwie-estimate-from-post-rep6","hOUwie","hOUwie estimate from post",6,90006,100,1.586,-567.919796581893,-214.042482369892,-352.479133052439,NA
+"houwie-generating-parameters-rep7","hOUwie","Generating parameters",7,90007,100,1.793,-917.217843918935,-231.57450712243,-677.711685963628,NA
+"houwie-fitmultiou-estimate-from-post-rep7","hOUwie","fitmultiOU estimate from post",7,90007,100,1.69,-1003.21352166981,-235.15210376474,-758.294077206607,NA
+"houwie-houwie-estimate-from-post-rep7","hOUwie","hOUwie estimate from post",7,90007,100,1.615,-574.815639953567,-214.831185024322,-353.654205769368,NA
+"houwie-generating-parameters-rep8","hOUwie","Generating parameters",8,90008,100,1.712,-962.143187174191,-226.296631769396,-718.175136359376,NA
+"houwie-fitmultiou-estimate-from-post-rep8","hOUwie","fitmultiOU estimate from post",8,90008,100,1.67299999999999,-1038.01320165464,-234.844421097557,-787.87288322723,NA
+"houwie-houwie-estimate-from-post-rep8","hOUwie","hOUwie estimate from post",8,90008,100,1.596,-573.80301489094,-214.181307246646,-353.572627710243,NA
+"houwie-generating-parameters-rep9","hOUwie","Generating parameters",9,90009,100,1.824,-1049.96398843007,-227.408998171875,-815.6610331533,NA
+"houwie-fitmultiou-estimate-from-post-rep9","hOUwie","fitmultiOU estimate from post",9,90009,100,1.85599999999999,-1078.00183694236,-233.925459985879,-835.831249162531,NA
+"houwie-houwie-estimate-from-post-rep9","hOUwie","hOUwie estimate from post",9,90009,100,1.656,-573.709059912828,-214.837873650687,-353.944803958597,NA
+"houwie-generating-parameters-rep10","hOUwie","Generating parameters",10,90010,100,1.711,-996.248820424646,-226.286575220347,-755.835380360985,NA
+"houwie-fitmultiou-estimate-from-post-rep10","hOUwie","fitmultiOU estimate from post",10,90010,100,1.592,-942.108780137847,-236.15548952423,-700.448718161951,NA
+"houwie-houwie-estimate-from-post-rep10","hOUwie","hOUwie estimate from post",10,90010,100,1.754,-575.69232387104,-215.682802769734,-353.404939645458,NA
+"fitmultiou-generating-parameters","fitmultiOU","Generating parameters",1,NA,100,8.884,-438.555272766581,NA,NA,NA
+"fitmultiou-fitmultiou-estimate-from-post","fitmultiOU","fitmultiOU estimate from post",1,NA,100,2.943,-437.589217804302,NA,NA,NA
+"fitmultiou-houwie-estimate-from-post","fitmultiOU","hOUwie estimate from post",1,NA,100,2.956,-551.763384251905,NA,NA,NA

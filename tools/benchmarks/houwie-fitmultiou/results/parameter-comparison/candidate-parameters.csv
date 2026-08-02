@@ -1,0 +1,4 @@
+"candidate","theta_a","theta_b","alpha","sigma_sq","q"
+"Generating parameters",5,10,0.5,0.2,0.3
+"fitmultiOU estimate from post",5.0209,10.1985,0.4919,0.1839,0.347199
+"hOUwie estimate from post",4.4566072,88.5531307,0.0123027,0.7764039,0.1187636

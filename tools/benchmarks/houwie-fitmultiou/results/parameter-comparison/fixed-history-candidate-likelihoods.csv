@@ -1,0 +1,10 @@
+"bank_source","candidate","resolution","loglik","discrete_loglik","continuous_loglik","error"
+"Generating parameters","Generating parameters",100,-989.490669921772,-230.032869599745,-739.177535689435,NA
+"Generating parameters","fitmultiOU estimate from post",100,-1065.4836016926,-232.215741435744,-814.959676056563,NA
+"Generating parameters","hOUwie estimate from post",100,-603.443151559165,-242.905447414328,-355.816200446678,NA
+"fitmultiOU estimate from post","Generating parameters",100,-1004.88984260438,-234.234454625358,-752.808801082176,NA
+"fitmultiOU estimate from post","fitmultiOU estimate from post",100,-1069.42694519349,-235.551089569698,-817.287918416461,NA
+"fitmultiOU estimate from post","hOUwie estimate from post",100,-611.793057036934,-252.30307298735,-356.187409697149,NA
+"hOUwie estimate from post","Generating parameters",100,-1044.70766960675,-213.260272638069,-821.708166934671,NA
+"hOUwie estimate from post","fitmultiOU estimate from post",100,-1112.80806679129,-217.164761000832,-886.131720125433,NA
+"hOUwie estimate from post","hOUwie estimate from post",100,-572.849376926176,-213.96354848287,-354.862892544935,NA

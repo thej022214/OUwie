@@ -1,0 +1,271 @@
+"task_id","n_sim","repetition","seed","candidate","retained_histories","sampled_loglik","exact_midpoint_loglik","error_from_exact","error"
+"small-tree-5-generating-parameters-1",5,1,102001,"Generating parameters",5,-9.95320037790753,-9.38109517548463,-0.572105202422897,NA
+"small-tree-5-fitmultiou-estimate-from-post-1",5,1,102001,"fitmultiOU estimate from post",5,-41.6481512513935,-9.40980835036494,-32.2383429010286,NA
+"small-tree-5-houwie-estimate-from-post-1",5,1,102001,"hOUwie estimate from post",5,-15.7990481052425,-15.3278877618974,-0.471160343345087,NA
+"small-tree-5-generating-parameters-2",5,2,102002,"Generating parameters",5,-9.95320037791573,-9.38109517548463,-0.572105202431102,NA
+"small-tree-5-fitmultiou-estimate-from-post-2",5,2,102002,"fitmultiOU estimate from post",5,-10.2582879127439,-9.40980835036494,-0.848479562378923,NA
+"small-tree-5-houwie-estimate-from-post-2",5,2,102002,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-tree-5-generating-parameters-3",5,3,102003,"Generating parameters",5,-9.9532003779082,-9.38109517548463,-0.572105202423568,NA
+"small-tree-5-fitmultiou-estimate-from-post-3",5,3,102003,"fitmultiOU estimate from post",5,-10.2582879127438,-9.40980835036494,-0.8484795623789,NA
+"small-tree-5-houwie-estimate-from-post-3",5,3,102003,"hOUwie estimate from post",5,-17.6509664752379,-15.3278877618974,-2.32307871334048,NA
+"small-tree-5-generating-parameters-4",5,4,102004,"Generating parameters",5,-9.95030897626837,-9.38109517548463,-0.569213800783741,NA
+"small-tree-5-fitmultiou-estimate-from-post-4",5,4,102004,"fitmultiOU estimate from post",5,-10.2567113435914,-9.40980835036494,-0.8469029932265,NA
+"small-tree-5-houwie-estimate-from-post-4",5,4,102004,"hOUwie estimate from post",5,-16.1287280479894,-15.3278877618974,-0.800840286091955,NA
+"small-tree-5-generating-parameters-5",5,5,102005,"Generating parameters",5,-10.2175809522098,-9.38109517548463,-0.836485776725214,NA
+"small-tree-5-fitmultiou-estimate-from-post-5",5,5,102005,"fitmultiOU estimate from post",5,-9.96994913405674,-9.40980835036494,-0.560140783691804,NA
+"small-tree-5-houwie-estimate-from-post-5",5,5,102005,"hOUwie estimate from post",5,-15.450077555331,-15.3278877618974,-0.122189793433561,NA
+"small-tree-5-generating-parameters-6",5,6,102006,"Generating parameters",5,-25.6118840122723,-9.38109517548463,-16.2307888367876,NA
+"small-tree-5-fitmultiou-estimate-from-post-6",5,6,102006,"fitmultiOU estimate from post",5,-10.2582879098838,-9.40980835036494,-0.848479559518896,NA
+"small-tree-5-houwie-estimate-from-post-6",5,6,102006,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-tree-5-generating-parameters-7",5,7,102007,"Generating parameters",5,-35.4793705471134,-9.38109517548463,-26.0982753716288,NA
+"small-tree-5-fitmultiou-estimate-from-post-7",5,7,102007,"fitmultiOU estimate from post",5,-41.6482110977592,-9.40980835036494,-32.2384027473943,NA
+"small-tree-5-houwie-estimate-from-post-7",5,7,102007,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-tree-5-generating-parameters-8",5,8,102008,"Generating parameters",5,-37.9826452102642,-9.38109517548463,-28.6015500347796,NA
+"small-tree-5-fitmultiou-estimate-from-post-8",5,8,102008,"fitmultiOU estimate from post",5,-45.3977785878584,-9.40980835036494,-35.9879702374935,NA
+"small-tree-5-houwie-estimate-from-post-8",5,8,102008,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-tree-5-generating-parameters-9",5,9,102009,"Generating parameters",5,-10.2175800829402,-9.38109517548463,-0.836484907455619,NA
+"small-tree-5-fitmultiou-estimate-from-post-9",5,9,102009,"fitmultiOU estimate from post",5,-9.9699491110945,-9.40980835036494,-0.560140760729558,NA
+"small-tree-5-houwie-estimate-from-post-9",5,9,102009,"hOUwie estimate from post",5,-15.3529414665006,-15.3278877618974,-0.0250537046031951,NA
+"small-tree-5-generating-parameters-10",5,10,102010,"Generating parameters",5,-9.9503096416642,-9.38109517548463,-0.569214466179575,NA
+"small-tree-5-fitmultiou-estimate-from-post-10",5,10,102010,"fitmultiOU estimate from post",5,-10.2567113741796,-9.40980835036494,-0.846903023814679,NA
+"small-tree-5-houwie-estimate-from-post-10",5,10,102010,"hOUwie estimate from post",5,-19.8751572239363,-15.3278877618974,-4.54726946203894,NA
+"small-tree-5-generating-parameters-11",5,11,102011,"Generating parameters",5,-9.95319971059363,-9.38109517548463,-0.572104535109,NA
+"small-tree-5-fitmultiou-estimate-from-post-11",5,11,102011,"fitmultiOU estimate from post",5,-10.2582878821074,-9.40980835036494,-0.848479531742482,NA
+"small-tree-5-houwie-estimate-from-post-11",5,11,102011,"hOUwie estimate from post",5,-16.1287280479894,-15.3278877618974,-0.800840286091955,NA
+"small-tree-5-generating-parameters-12",5,12,102012,"Generating parameters",5,-24.1731817516052,-9.38109517548463,-14.7920865761205,NA
+"small-tree-5-fitmultiou-estimate-from-post-12",5,12,102012,"fitmultiOU estimate from post",5,-27.5593628279429,-9.40980835036494,-18.1495544775779,NA
+"small-tree-5-houwie-estimate-from-post-12",5,12,102012,"hOUwie estimate from post",5,-15.3490044487219,-15.3278877618974,-0.0211166868244721,NA
+"small-tree-5-generating-parameters-13",5,13,102013,"Generating parameters",5,-9.95319971059296,-9.38109517548463,-0.572104535108329,NA
+"small-tree-5-fitmultiou-estimate-from-post-13",5,13,102013,"fitmultiOU estimate from post",5,-10.2582878821074,-9.40980835036494,-0.848479531742482,NA
+"small-tree-5-houwie-estimate-from-post-13",5,13,102013,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-tree-5-generating-parameters-14",5,14,102014,"Generating parameters",5,-10.2175807459868,-9.38109517548463,-0.836485570502147,NA
+"small-tree-5-fitmultiou-estimate-from-post-14",5,14,102014,"fitmultiOU estimate from post",5,-9.96994913405673,-9.40980835036494,-0.560140783691786,NA
+"small-tree-5-houwie-estimate-from-post-14",5,14,102014,"hOUwie estimate from post",5,-16.1287280479894,-15.3278877618974,-0.800840286091955,NA
+"small-tree-5-generating-parameters-15",5,15,102015,"Generating parameters",5,-10.2157375322038,-9.38109517548463,-0.8346423567192,NA
+"small-tree-5-fitmultiou-estimate-from-post-15",5,15,102015,"fitmultiOU estimate from post",5,-9.96972039317023,-9.40980835036494,-0.559912042805292,NA
+"small-tree-5-houwie-estimate-from-post-15",5,15,102015,"hOUwie estimate from post",5,-15.9676824533212,-15.3278877618974,-0.639794691423772,NA
+"small-tree-5-generating-parameters-16",5,16,102016,"Generating parameters",5,-24.1731817516052,-9.38109517548463,-14.7920865761205,NA
+"small-tree-5-fitmultiou-estimate-from-post-16",5,16,102016,"fitmultiOU estimate from post",5,-27.5593628279429,-9.40980835036494,-18.1495544775779,NA
+"small-tree-5-houwie-estimate-from-post-16",5,16,102016,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-tree-5-generating-parameters-17",5,17,102017,"Generating parameters",5,-16.5123208273582,-9.38109517548463,-7.13122565187359,NA
+"small-tree-5-fitmultiou-estimate-from-post-17",5,17,102017,"fitmultiOU estimate from post",5,-18.3526550875434,-9.40980835036494,-8.94284673717846,NA
+"small-tree-5-houwie-estimate-from-post-17",5,17,102017,"hOUwie estimate from post",5,-15.4543581579923,-15.3278877618974,-0.126470396094946,NA
+"small-tree-5-generating-parameters-18",5,18,102018,"Generating parameters",5,-16.5127918347735,-9.38109517548463,-7.13169665928888,NA
+"small-tree-5-fitmultiou-estimate-from-post-18",5,18,102018,"fitmultiOU estimate from post",5,-18.3527554564294,-9.40980835036494,-8.94294710606444,NA
+"small-tree-5-houwie-estimate-from-post-18",5,18,102018,"hOUwie estimate from post",5,-16.3640120244043,-15.3278877618974,-1.03612426250694,NA
+"small-tree-5-generating-parameters-19",5,19,102019,"Generating parameters",5,-24.1731920361145,-9.38109517548463,-14.7920968606298,NA
+"small-tree-5-fitmultiou-estimate-from-post-19",5,19,102019,"fitmultiOU estimate from post",5,-27.5593635529772,-9.40980835036494,-18.1495552026123,NA
+"small-tree-5-houwie-estimate-from-post-19",5,19,102019,"hOUwie estimate from post",5,-15.3490044487219,-15.3278877618974,-0.0211166868244721,NA
+"small-tree-5-generating-parameters-20",5,20,102020,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-tree-5-fitmultiou-estimate-from-post-20",5,20,102020,"fitmultiOU estimate from post",5,-9.96994913405674,-9.40980835036494,-0.560140783691804,NA
+"small-tree-5-houwie-estimate-from-post-20",5,20,102020,"hOUwie estimate from post",5,-15.962477111058,-15.3278877618974,-0.634589349160592,NA
+"small-tree-5-generating-parameters-21",5,21,102021,"Generating parameters",5,-23.9603206053294,-9.38109517548463,-14.5792254298447,NA
+"small-tree-5-fitmultiou-estimate-from-post-21",5,21,102021,"fitmultiOU estimate from post",5,-27.4701144113531,-9.40980835036494,-18.0603060609882,NA
+"small-tree-5-houwie-estimate-from-post-21",5,21,102021,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-tree-5-generating-parameters-22",5,22,102022,"Generating parameters",5,-10.2175807459868,-9.38109517548463,-0.836485570502147,NA
+"small-tree-5-fitmultiou-estimate-from-post-22",5,22,102022,"fitmultiOU estimate from post",5,-9.96994913191315,-9.40980835036494,-0.560140781548208,NA
+"small-tree-5-houwie-estimate-from-post-22",5,22,102022,"hOUwie estimate from post",5,-15.3490044487219,-15.3278877618974,-0.0211166868244721,NA
+"small-tree-5-generating-parameters-23",5,23,102023,"Generating parameters",5,-10.2175809521992,-9.38109517548463,-0.836485776714525,NA
+"small-tree-5-fitmultiou-estimate-from-post-23",5,23,102023,"fitmultiOU estimate from post",5,-41.6481513012075,-9.40980835036494,-32.2383429508425,NA
+"small-tree-5-houwie-estimate-from-post-23",5,23,102023,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-tree-5-generating-parameters-24",5,24,102024,"Generating parameters",5,-10.217580952209,-9.38109517548463,-0.83648577672434,NA
+"small-tree-5-fitmultiou-estimate-from-post-24",5,24,102024,"fitmultiOU estimate from post",5,-9.96994913405674,-9.40980835036494,-0.560140783691804,NA
+"small-tree-5-houwie-estimate-from-post-24",5,24,102024,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-tree-5-generating-parameters-25",5,25,102025,"Generating parameters",5,-9.38273068526257,-9.38109517548463,-0.0016355097779428,NA
+"small-tree-5-fitmultiou-estimate-from-post-25",5,25,102025,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-tree-5-houwie-estimate-from-post-25",5,25,102025,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-tree-5-generating-parameters-26",5,26,102026,"Generating parameters",5,-24.1731920361145,-9.38109517548463,-14.7920968606298,NA
+"small-tree-5-fitmultiou-estimate-from-post-26",5,26,102026,"fitmultiOU estimate from post",5,-27.5593635529772,-9.40980835036494,-18.1495552026123,NA
+"small-tree-5-houwie-estimate-from-post-26",5,26,102026,"hOUwie estimate from post",5,-16.3469078747827,-15.3278877618974,-1.01902011288535,NA
+"small-tree-5-generating-parameters-27",5,27,102027,"Generating parameters",5,-10.2175807459966,-9.38109517548463,-0.836485570511961,NA
+"small-tree-5-fitmultiou-estimate-from-post-27",5,27,102027,"fitmultiOU estimate from post",5,-9.96994913405674,-9.40980835036494,-0.560140783691804,NA
+"small-tree-5-houwie-estimate-from-post-27",5,27,102027,"hOUwie estimate from post",5,-15.962477111058,-15.3278877618974,-0.634589349160592,NA
+"small-tree-5-generating-parameters-28",5,28,102028,"Generating parameters",5,-9.95320021960899,-9.38109517548463,-0.572105044124363,NA
+"small-tree-5-fitmultiou-estimate-from-post-28",5,28,102028,"fitmultiOU estimate from post",5,-29.9307303964102,-9.40980835036494,-20.5209220460452,NA
+"small-tree-5-houwie-estimate-from-post-28",5,28,102028,"hOUwie estimate from post",5,-15.9581968756016,-15.3278877618974,-0.630309113704225,NA
+"small-tree-5-generating-parameters-29",5,29,102029,"Generating parameters",5,-9.38353167639573,-9.38109517548463,-0.00243650091109693,NA
+"small-tree-5-fitmultiou-estimate-from-post-29",5,29,102029,"fitmultiOU estimate from post",5,-9.96972039317023,-9.40980835036494,-0.559912042805294,NA
+"small-tree-5-houwie-estimate-from-post-29",5,29,102029,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-tree-5-generating-parameters-30",5,30,102030,"Generating parameters",5,-15.7979987125979,-9.38109517548463,-6.4169035371133,NA
+"small-tree-5-fitmultiou-estimate-from-post-30",5,30,102030,"fitmultiOU estimate from post",5,-16.710023157241,-9.40980835036494,-7.30021480687606,NA
+"small-tree-5-houwie-estimate-from-post-30",5,30,102030,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-tree-15-generating-parameters-1",15,1,112001,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-1",15,1,112001,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-tree-15-houwie-estimate-from-post-1",15,1,112001,"hOUwie estimate from post",15,-15.3352797886918,-15.3278877618974,-0.0073920267943528,NA
+"small-tree-15-generating-parameters-2",15,2,112002,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-2",15,2,112002,"fitmultiOU estimate from post",15,-9.4098083515892,-9.40980835036494,-1.22426335735781e-09,NA
+"small-tree-15-houwie-estimate-from-post-2",15,2,112002,"hOUwie estimate from post",15,-15.3363193424263,-15.3278877618974,-0.00843158052885684,NA
+"small-tree-15-generating-parameters-3",15,3,112003,"Generating parameters",15,-9.38189494654563,-9.38109517548463,-0.000799771061002374,NA
+"small-tree-15-fitmultiou-estimate-from-post-3",15,3,112003,"fitmultiOU estimate from post",15,-9.96876725017792,-9.40980835036494,-0.558958899812978,NA
+"small-tree-15-houwie-estimate-from-post-3",15,3,112003,"hOUwie estimate from post",15,-15.3383891025299,-15.3278877618974,-0.010501340632505,NA
+"small-tree-15-generating-parameters-4",15,4,112004,"Generating parameters",15,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-15-fitmultiou-estimate-from-post-4",15,4,112004,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-15-houwie-estimate-from-post-4",15,4,112004,"hOUwie estimate from post",15,-15.3421019677732,-15.3278877618974,-0.0142142058757742,NA
+"small-tree-15-generating-parameters-5",15,5,112005,"Generating parameters",15,-10.2119803487176,-9.38109517548463,-0.830885173232984,NA
+"small-tree-15-fitmultiou-estimate-from-post-5",15,5,112005,"fitmultiOU estimate from post",15,-9.96853880023533,-9.40980835036494,-0.558730449870387,NA
+"small-tree-15-houwie-estimate-from-post-5",15,5,112005,"hOUwie estimate from post",15,-15.333199541723,-15.3278877618974,-0.00531177982564301,NA
+"small-tree-15-generating-parameters-6",15,6,112006,"Generating parameters",15,-9.95319955227946,-9.38109517548463,-0.572104376794835,NA
+"small-tree-15-fitmultiou-estimate-from-post-6",15,6,112006,"fitmultiOU estimate from post",15,-10.2582878792474,-9.40980835036494,-0.848479528882455,NA
+"small-tree-15-houwie-estimate-from-post-6",15,6,112006,"hOUwie estimate from post",15,-15.3412083399647,-15.3278877618974,-0.0133205780672867,NA
+"small-tree-15-generating-parameters-7",15,7,112007,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-7",15,7,112007,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-tree-15-houwie-estimate-from-post-7",15,7,112007,"hOUwie estimate from post",15,-15.3313918171214,-15.3278877618974,-0.0035040552239991,NA
+"small-tree-15-generating-parameters-8",15,8,112008,"Generating parameters",15,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-15-fitmultiou-estimate-from-post-8",15,8,112008,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-15-houwie-estimate-from-post-8",15,8,112008,"hOUwie estimate from post",15,-15.3477449482688,-15.3278877618974,-0.0198571863713681,NA
+"small-tree-15-generating-parameters-9",15,9,112009,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-tree-15-fitmultiou-estimate-from-post-9",15,9,112009,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-tree-15-houwie-estimate-from-post-9",15,9,112009,"hOUwie estimate from post",15,-15.3405021060051,-15.3278877618974,-0.0126143441077442,NA
+"small-tree-15-generating-parameters-10",15,10,112010,"Generating parameters",15,-9.38189523403177,-9.38109517548463,-0.000800058547140381,NA
+"small-tree-15-fitmultiou-estimate-from-post-10",15,10,112010,"fitmultiOU estimate from post",15,-9.41061473761942,-9.40980835036494,-0.000806387254474572,NA
+"small-tree-15-houwie-estimate-from-post-10",15,10,112010,"hOUwie estimate from post",15,-15.3454720030983,-15.3278877618974,-0.0175842412008649,NA
+"small-tree-15-generating-parameters-11",15,11,112011,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-tree-15-fitmultiou-estimate-from-post-11",15,11,112011,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-tree-15-houwie-estimate-from-post-11",15,11,112011,"hOUwie estimate from post",15,-15.344126956583,-15.3278877618974,-0.0162391946856069,NA
+"small-tree-15-generating-parameters-12",15,12,112012,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-tree-15-fitmultiou-estimate-from-post-12",15,12,112012,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-tree-15-houwie-estimate-from-post-12",15,12,112012,"hOUwie estimate from post",15,-15.3415203780996,-15.3278877618974,-0.0136326162021945,NA
+"small-tree-15-generating-parameters-13",15,13,112013,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-tree-15-fitmultiou-estimate-from-post-13",15,13,112013,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-tree-15-houwie-estimate-from-post-13",15,13,112013,"hOUwie estimate from post",15,-15.3465489250817,-15.3278877618974,-0.0186611631842926,NA
+"small-tree-15-generating-parameters-14",15,14,112014,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-tree-15-fitmultiou-estimate-from-post-14",15,14,112014,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-tree-15-houwie-estimate-from-post-14",15,14,112014,"hOUwie estimate from post",15,-15.3376503935818,-15.3278877618974,-0.00976263168442237,NA
+"small-tree-15-generating-parameters-15",15,15,112015,"Generating parameters",15,-9.38109526482265,-9.38109517548463,-8.93380232014351e-08,NA
+"small-tree-15-fitmultiou-estimate-from-post-15",15,15,112015,"fitmultiOU estimate from post",15,-9.4098083515892,-9.40980835036494,-1.22426335735781e-09,NA
+"small-tree-15-houwie-estimate-from-post-15",15,15,112015,"hOUwie estimate from post",15,-15.3487439985448,-15.3278877618974,-0.0208562366473863,NA
+"small-tree-15-generating-parameters-16",15,16,112016,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-16",15,16,112016,"fitmultiOU estimate from post",15,-9.96853877944602,-9.40980835036494,-0.558730429081075,NA
+"small-tree-15-houwie-estimate-from-post-16",15,16,112016,"hOUwie estimate from post",15,-15.3414413510554,-15.3278877618974,-0.0135535891579721,NA
+"small-tree-15-generating-parameters-17",15,17,112017,"Generating parameters",15,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-15-fitmultiou-estimate-from-post-17",15,17,112017,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-15-houwie-estimate-from-post-17",15,17,112017,"hOUwie estimate from post",15,-15.3427720581597,-15.3278877618974,-0.0148842962623483,NA
+"small-tree-15-generating-parameters-18",15,18,112018,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-18",15,18,112018,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-tree-15-houwie-estimate-from-post-18",15,18,112018,"hOUwie estimate from post",15,-15.338524352319,-15.3278877618974,-0.0106365904216013,NA
+"small-tree-15-generating-parameters-19",15,19,112019,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-tree-15-fitmultiou-estimate-from-post-19",15,19,112019,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-tree-15-houwie-estimate-from-post-19",15,19,112019,"hOUwie estimate from post",15,-15.3373968508065,-15.3278877618974,-0.00950908890908231,NA
+"small-tree-15-generating-parameters-20",15,20,112020,"Generating parameters",15,-9.38109564141724,-9.38109517548463,-4.65932615156817e-07,NA
+"small-tree-15-fitmultiou-estimate-from-post-20",15,20,112020,"fitmultiOU estimate from post",15,-9.4098083647036,-9.40980835036494,-1.43386600370832e-08,NA
+"small-tree-15-houwie-estimate-from-post-20",15,20,112020,"hOUwie estimate from post",15,-15.3443361712246,-15.3278877618974,-0.016448409327241,NA
+"small-tree-15-generating-parameters-21",15,21,112021,"Generating parameters",15,-9.383531298883,-9.38109517548463,-0.00243612339837007,NA
+"small-tree-15-fitmultiou-estimate-from-post-21",15,21,112021,"fitmultiOU estimate from post",15,-10.2582878821074,-9.40980835036494,-0.848479531742482,NA
+"small-tree-15-houwie-estimate-from-post-21",15,21,112021,"hOUwie estimate from post",15,-15.3421275518587,-15.3278877618974,-0.0142397899613478,NA
+"small-tree-15-generating-parameters-22",15,22,112022,"Generating parameters",15,-10.213815983295,-9.38109517548463,-0.832720807810343,NA
+"small-tree-15-fitmultiou-estimate-from-post-22",15,22,112022,"fitmultiOU estimate from post",15,-16.7100019273664,-9.40980835036494,-7.30019357700148,NA
+"small-tree-15-houwie-estimate-from-post-22",15,22,112022,"hOUwie estimate from post",15,-15.3355275544108,-15.3278877618974,-0.00763979251342839,NA
+"small-tree-15-generating-parameters-23",15,23,112023,"Generating parameters",15,-9.94889744046969,-9.38109517548463,-0.567802264985064,NA
+"small-tree-15-fitmultiou-estimate-from-post-23",15,23,112023,"fitmultiOU estimate from post",15,-10.2564066448784,-9.40980835036494,-0.846598294513504,NA
+"small-tree-15-houwie-estimate-from-post-23",15,23,112023,"hOUwie estimate from post",15,-15.3379578332987,-15.3278877618974,-0.0100700714013175,NA
+"small-tree-15-generating-parameters-24",15,24,112024,"Generating parameters",15,-9.38273059577424,-9.38109517548463,-0.00163542028961317,NA
+"small-tree-15-fitmultiou-estimate-from-post-24",15,24,112024,"fitmultiOU estimate from post",15,-9.41061473761942,-9.40980835036494,-0.000806387254474572,NA
+"small-tree-15-houwie-estimate-from-post-24",15,24,112024,"hOUwie estimate from post",15,-15.3358395844733,-15.3278877618974,-0.00795182257594185,NA
+"small-tree-15-generating-parameters-25",15,25,112025,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-tree-15-fitmultiou-estimate-from-post-25",15,25,112025,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-tree-15-houwie-estimate-from-post-25",15,25,112025,"hOUwie estimate from post",15,-15.3363991905896,-15.3278877618974,-0.00851142869222876,NA
+"small-tree-15-generating-parameters-26",15,26,112026,"Generating parameters",15,-9.38109555207899,-9.38109517548463,-3.76594355699922e-07,NA
+"small-tree-15-fitmultiou-estimate-from-post-26",15,26,112026,"fitmultiOU estimate from post",15,-9.40980836347933,-9.40980835036494,-1.31143913506548e-08,NA
+"small-tree-15-houwie-estimate-from-post-26",15,26,112026,"hOUwie estimate from post",15,-15.3385920928094,-15.3278877618974,-0.0107043309120485,NA
+"small-tree-15-generating-parameters-27",15,27,112027,"Generating parameters",15,-10.2157364586921,-9.38109517548463,-0.834641283207475,NA
+"small-tree-15-fitmultiou-estimate-from-post-27",15,27,112027,"fitmultiOU estimate from post",15,-9.96853877730544,-9.40980835036494,-0.558730426940501,NA
+"small-tree-15-houwie-estimate-from-post-27",15,27,112027,"hOUwie estimate from post",15,-15.3426656326869,-15.3278877618974,-0.0147778707894588,NA
+"small-tree-15-generating-parameters-28",15,28,112028,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-tree-15-fitmultiou-estimate-from-post-28",15,28,112028,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-tree-15-houwie-estimate-from-post-28",15,28,112028,"hOUwie estimate from post",15,-15.3485271690838,-15.3278877618974,-0.020639407186394,NA
+"small-tree-15-generating-parameters-29",15,29,112029,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-tree-15-fitmultiou-estimate-from-post-29",15,29,112029,"fitmultiOU estimate from post",15,-9.96994910895089,-9.40980835036494,-0.560140758585945,NA
+"small-tree-15-houwie-estimate-from-post-29",15,29,112029,"hOUwie estimate from post",15,-15.3381492407146,-15.3278877618974,-0.0102614788172026,NA
+"small-tree-15-generating-parameters-30",15,30,112030,"Generating parameters",15,-10.2157364586921,-9.38109517548463,-0.834641283207475,NA
+"small-tree-15-fitmultiou-estimate-from-post-30",15,30,112030,"fitmultiOU estimate from post",15,-16.7100019273664,-9.40980835036494,-7.30019357700148,NA
+"small-tree-15-houwie-estimate-from-post-30",15,30,112030,"hOUwie estimate from post",15,-15.3289870114865,-15.3278877618974,-0.00109924958910845,NA
+"small-tree-100-generating-parameters-1",100,1,197001,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-1",100,1,197001,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-1",100,1,197001,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-2",100,2,197002,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-2",100,2,197002,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-2",100,2,197002,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-3",100,3,197003,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-3",100,3,197003,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-3",100,3,197003,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-4",100,4,197004,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-4",100,4,197004,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-4",100,4,197004,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-5",100,5,197005,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-5",100,5,197005,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-5",100,5,197005,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-6",100,6,197006,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-6",100,6,197006,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-6",100,6,197006,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-7",100,7,197007,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-7",100,7,197007,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-7",100,7,197007,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-8",100,8,197008,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-8",100,8,197008,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-8",100,8,197008,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-9",100,9,197009,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-9",100,9,197009,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-9",100,9,197009,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-10",100,10,197010,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-10",100,10,197010,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-10",100,10,197010,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-11",100,11,197011,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-11",100,11,197011,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-11",100,11,197011,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-12",100,12,197012,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-12",100,12,197012,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-12",100,12,197012,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-13",100,13,197013,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-13",100,13,197013,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-13",100,13,197013,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-14",100,14,197014,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-14",100,14,197014,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-14",100,14,197014,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-15",100,15,197015,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-15",100,15,197015,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-15",100,15,197015,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-16",100,16,197016,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-16",100,16,197016,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-16",100,16,197016,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-17",100,17,197017,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-17",100,17,197017,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-17",100,17,197017,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-18",100,18,197018,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-18",100,18,197018,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-18",100,18,197018,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-19",100,19,197019,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-19",100,19,197019,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-19",100,19,197019,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-20",100,20,197020,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-20",100,20,197020,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-20",100,20,197020,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-21",100,21,197021,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-21",100,21,197021,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-21",100,21,197021,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-22",100,22,197022,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-22",100,22,197022,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-22",100,22,197022,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-23",100,23,197023,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-23",100,23,197023,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-23",100,23,197023,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-24",100,24,197024,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-24",100,24,197024,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-24",100,24,197024,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-25",100,25,197025,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-25",100,25,197025,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-25",100,25,197025,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-26",100,26,197026,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-26",100,26,197026,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-26",100,26,197026,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-27",100,27,197027,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-27",100,27,197027,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-27",100,27,197027,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-28",100,28,197028,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-28",100,28,197028,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-28",100,28,197028,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-29",100,29,197029,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-29",100,29,197029,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-29",100,29,197029,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA
+"small-tree-100-generating-parameters-30",100,30,197030,"Generating parameters",32,-9.38109517548481,-9.38109517548463,-1.77635683940025e-13,NA
+"small-tree-100-fitmultiou-estimate-from-post-30",100,30,197030,"fitmultiOU estimate from post",32,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-tree-100-houwie-estimate-from-post-30",100,30,197030,"hOUwie estimate from post",32,-15.3278877618974,-15.3278877618974,-8.88178419700125e-15,NA

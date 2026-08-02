@@ -1,0 +1,361 @@
+"task_id","proposal","n_sim","repetition","seed","candidate","retained_histories","sampled_loglik","exact_midpoint_loglik","error_from_exact","error"
+"small-proposal-discrete-only-5-generating-parameters-1","discrete-only",5,1,113001,"Generating parameters",5,-9.95319955228767,-9.38109517548463,-0.57210437680304,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-1","discrete-only",5,1,113001,"fitmultiOU estimate from post",5,-10.2582878792474,-9.40980835036494,-0.848479528882478,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-1","discrete-only",5,1,113001,"hOUwie estimate from post",5,-16.3640120244043,-15.3278877618974,-1.03612426250694,NA
+"small-proposal-discrete-only-5-generating-parameters-2","discrete-only",5,2,113002,"Generating parameters",5,-9.38273030805249,-9.38109517548463,-0.00163513256785919,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-2","discrete-only",5,2,113002,"fitmultiOU estimate from post",5,-9.4104839734515,-9.40980835036494,-0.000675623086562993,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-2","discrete-only",5,2,113002,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-proposal-discrete-only-5-generating-parameters-3","discrete-only",5,3,113003,"Generating parameters",5,-25.6118882530598,-9.38109517548463,-16.2307930775751,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-3","discrete-only",5,3,113003,"fitmultiOU estimate from post",5,-29.930722629365,-9.40980835036494,-20.5209142790001,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-3","discrete-only",5,3,113003,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-4","discrete-only",5,4,113004,"Generating parameters",5,-9.9503089762677,-9.38109517548463,-0.569213800783071,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-4","discrete-only",5,4,113004,"fitmultiOU estimate from post",5,-10.2567113741796,-9.40980835036494,-0.846903023814678,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-4","discrete-only",5,4,113004,"hOUwie estimate from post",5,-15.8034668845565,-15.3278877618974,-0.475579122659095,NA
+"small-proposal-discrete-only-5-generating-parameters-5","discrete-only",5,5,113005,"Generating parameters",5,-16.5127918342995,-9.38109517548463,-7.1316966588149,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-5","discrete-only",5,5,113005,"fitmultiOU estimate from post",5,-18.3527554564276,-9.40980835036494,-8.94294710606265,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-5","discrete-only",5,5,113005,"hOUwie estimate from post",5,-16.1262926330455,-15.3278877618974,-0.798404871148058,NA
+"small-proposal-discrete-only-5-generating-parameters-6","discrete-only",5,6,113006,"Generating parameters",5,-9.38353158684033,-9.38109517548463,-0.00243641135570094,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-6","discrete-only",5,6,113006,"fitmultiOU estimate from post",5,-10.2582879098839,-9.40980835036494,-0.848479559518919,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-6","discrete-only",5,6,113006,"hOUwie estimate from post",5,-15.962477111058,-15.3278877618974,-0.634589349160592,NA
+"small-proposal-discrete-only-5-generating-parameters-7","discrete-only",5,7,113007,"Generating parameters",5,-10.213817054747,-9.38109517548463,-0.832721879262392,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-7","discrete-only",5,7,113007,"fitmultiOU estimate from post",5,-9.96876727311306,-9.40980835036494,-0.558958922748118,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-7","discrete-only",5,7,113007,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-8","discrete-only",5,8,113008,"Generating parameters",5,-9.95030964165669,-9.38109517548463,-0.569214466172062,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-8","discrete-only",5,8,113008,"fitmultiOU estimate from post",5,-10.2567113741796,-9.40980835036494,-0.846903023814679,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-8","discrete-only",5,8,113008,"hOUwie estimate from post",5,-17.5895111597709,-15.3278877618974,-2.2616233978735,NA
+"small-proposal-discrete-only-5-generating-parameters-9","discrete-only",5,9,113009,"Generating parameters",5,-10.2138170547479,-9.38109517548463,-0.832721879263264,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-9","discrete-only",5,9,113009,"fitmultiOU estimate from post",5,-16.710023157241,-9.40980835036494,-7.30021480687606,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-9","discrete-only",5,9,113009,"hOUwie estimate from post",5,-15.3529414665006,-15.3278877618974,-0.0250537046031951,NA
+"small-proposal-discrete-only-5-generating-parameters-10","discrete-only",5,10,113010,"Generating parameters",5,-23.9603206053294,-9.38109517548463,-14.5792254298447,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-10","discrete-only",5,10,113010,"fitmultiOU estimate from post",5,-10.2582878821074,-9.40980835036494,-0.848479531742482,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-10","discrete-only",5,10,113010,"hOUwie estimate from post",5,-15.962477111058,-15.3278877618974,-0.634589349160592,NA
+"small-proposal-discrete-only-5-generating-parameters-11","discrete-only",5,11,113011,"Generating parameters",5,-9.95320037791506,-9.38109517548463,-0.57210520243043,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-11","discrete-only",5,11,113011,"fitmultiOU estimate from post",5,-10.2582879127439,-9.40980835036494,-0.848479562378923,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-11","discrete-only",5,11,113011,"hOUwie estimate from post",5,-19.9362237008197,-15.3278877618974,-4.60833593892235,NA
+"small-proposal-discrete-only-5-generating-parameters-12","discrete-only",5,12,113012,"Generating parameters",5,-9.38353167639573,-9.38109517548463,-0.00243650091109693,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-12","discrete-only",5,12,113012,"fitmultiOU estimate from post",5,-10.2582879127439,-9.40980835036494,-0.848479562378923,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-12","discrete-only",5,12,113012,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-13","discrete-only",5,13,113013,"Generating parameters",5,-10.2157375322047,-9.38109517548463,-0.834642356720073,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-13","discrete-only",5,13,113013,"fitmultiOU estimate from post",5,-9.96972039317023,-9.40980835036494,-0.559912042805294,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-13","discrete-only",5,13,113013,"hOUwie estimate from post",5,-15.3487188665802,-15.3278877618974,-0.0208311046827578,NA
+"small-proposal-discrete-only-5-generating-parameters-14","discrete-only",5,14,113014,"Generating parameters",5,-35.4793705471134,-9.38109517548463,-26.0982753716288,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-14","discrete-only",5,14,113014,"fitmultiOU estimate from post",5,-41.6482110977592,-9.40980835036494,-32.2384027473943,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-14","discrete-only",5,14,113014,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-15","discrete-only",5,15,113015,"Generating parameters",5,-10.217580952209,-9.38109517548463,-0.83648577672434,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-15","discrete-only",5,15,113015,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-15","discrete-only",5,15,113015,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-16","discrete-only",5,16,113016,"Generating parameters",5,-10.2175807459957,-9.38109517548463,-0.836485570511087,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-16","discrete-only",5,16,113016,"fitmultiOU estimate from post",5,-9.96994913191315,-9.40980835036494,-0.560140781548208,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-16","discrete-only",5,16,113016,"hOUwie estimate from post",5,-15.3529414665006,-15.3278877618974,-0.0250537046031951,NA
+"small-proposal-discrete-only-5-generating-parameters-17","discrete-only",5,17,113017,"Generating parameters",5,-9.94889826256161,-9.38109517548463,-0.56780308707698,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-17","discrete-only",5,17,113017,"fitmultiOU estimate from post",5,-10.256406678312,-9.40980835036494,-0.846598327947016,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-17","discrete-only",5,17,113017,"hOUwie estimate from post",5,-15.450077555331,-15.3278877618974,-0.122189793433561,NA
+"small-proposal-discrete-only-5-generating-parameters-18","discrete-only",5,18,113018,"Generating parameters",5,-10.2175800829394,-9.38109517548463,-0.836484907454745,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-18","discrete-only",5,18,113018,"fitmultiOU estimate from post",5,-27.5593635529772,-9.40980835036494,-18.1495552026123,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-18","discrete-only",5,18,113018,"hOUwie estimate from post",5,-15.450077555331,-15.3278877618974,-0.122189793433561,NA
+"small-proposal-discrete-only-5-generating-parameters-19","discrete-only",5,19,113019,"Generating parameters",5,-9.95320021960213,-9.38109517548463,-0.572105044117501,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-19","discrete-only",5,19,113019,"fitmultiOU estimate from post",5,-10.2582879127438,-9.40980835036494,-0.8484795623789,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-19","discrete-only",5,19,113019,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-20","discrete-only",5,20,113020,"Generating parameters",5,-9.9532003779082,-9.38109517548463,-0.572105202423568,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-20","discrete-only",5,20,113020,"fitmultiOU estimate from post",5,-10.2582879127438,-9.40980835036494,-0.8484795623789,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-20","discrete-only",5,20,113020,"hOUwie estimate from post",5,-15.8052297758782,-15.3278877618974,-0.477342013980753,NA
+"small-proposal-discrete-only-5-generating-parameters-21","discrete-only",5,21,113021,"Generating parameters",5,-9.38353158684033,-9.38109517548463,-0.00243641135570094,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-21","discrete-only",5,21,113021,"fitmultiOU estimate from post",5,-9.41061473761942,-9.40980835036494,-0.000806387254483454,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-21","discrete-only",5,21,113021,"hOUwie estimate from post",5,-15.9697602919851,-15.3278877618974,-0.641872530087651,NA
+"small-proposal-discrete-only-5-generating-parameters-22","discrete-only",5,22,113022,"Generating parameters",5,-10.2175807459868,-9.38109517548463,-0.836485570502147,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-22","discrete-only",5,22,113022,"fitmultiOU estimate from post",5,-9.968767270972,-9.40980835036494,-0.558958920607056,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-22","discrete-only",5,22,113022,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-proposal-discrete-only-5-generating-parameters-23","discrete-only",5,23,113023,"Generating parameters",5,-9.95030948380758,-9.38109517548463,-0.569214308322955,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-23","discrete-only",5,23,113023,"fitmultiOU estimate from post",5,-16.7100213445542,-9.40980835036494,-7.30021299418924,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-23","discrete-only",5,23,113023,"hOUwie estimate from post",5,-15.450077555331,-15.3278877618974,-0.122189793433561,NA
+"small-proposal-discrete-only-5-generating-parameters-24","discrete-only",5,24,113024,"Generating parameters",5,-24.1731817516052,-9.38109517548463,-14.7920865761205,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-24","discrete-only",5,24,113024,"fitmultiOU estimate from post",5,-27.5593628279429,-9.40980835036494,-18.1495544775779,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-24","discrete-only",5,24,113024,"hOUwie estimate from post",5,-15.3529414665006,-15.3278877618974,-0.0250537046031951,NA
+"small-proposal-discrete-only-5-generating-parameters-25","discrete-only",5,25,113025,"Generating parameters",5,-10.2138168493085,-9.38109517548463,-0.832721673823846,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-25","discrete-only",5,25,113025,"fitmultiOU estimate from post",5,-9.96994913191315,-9.40980835036494,-0.560140781548208,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-25","discrete-only",5,25,113025,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-proposal-discrete-only-5-generating-parameters-26","discrete-only",5,26,113026,"Generating parameters",5,-9.38273068526295,-9.38109517548463,-0.00163550977832294,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-26","discrete-only",5,26,113026,"fitmultiOU estimate from post",5,-10.2579827362059,-9.40980835036494,-0.848174385840968,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-26","discrete-only",5,26,113026,"hOUwie estimate from post",5,-15.4544342179581,-15.3278877618974,-0.126546456060748,NA
+"small-proposal-discrete-only-5-generating-parameters-27","discrete-only",5,27,113027,"Generating parameters",5,-9.95320037790753,-9.38109517548463,-0.572105202422897,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-27","discrete-only",5,27,113027,"fitmultiOU estimate from post",5,-10.2582879127438,-9.40980835036494,-0.8484795623789,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-27","discrete-only",5,27,113027,"hOUwie estimate from post",5,-16.120195313672,-15.3278877618974,-0.792307551774613,NA
+"small-proposal-discrete-only-5-generating-parameters-28","discrete-only",5,28,113028,"Generating parameters",5,-9.95178491586783,-9.38109517548463,-0.570689740383202,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-28","discrete-only",5,28,113028,"fitmultiOU estimate from post",5,-10.2579827362059,-9.40980835036494,-0.848174385840943,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-28","discrete-only",5,28,113028,"hOUwie estimate from post",5,-17.5679182060053,-15.3278877618974,-2.24003044410788,NA
+"small-proposal-discrete-only-5-generating-parameters-29","discrete-only",5,29,113029,"Generating parameters",5,-15.7977135538366,-9.38109517548463,-6.41661837835197,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-29","discrete-only",5,29,113029,"fitmultiOU estimate from post",5,-10.2567113435914,-9.40980835036494,-0.846902993226498,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-29","discrete-only",5,29,113029,"hOUwie estimate from post",5,-15.3529414665006,-15.3278877618974,-0.0250537046031951,NA
+"small-proposal-discrete-only-5-generating-parameters-30","discrete-only",5,30,113030,"Generating parameters",5,-9.9532003779082,-9.38109517548463,-0.572105202423568,NA
+"small-proposal-discrete-only-5-fitmultiou-estimate-from-post-30","discrete-only",5,30,113030,"fitmultiOU estimate from post",5,-10.2567113741796,-9.40980835036494,-0.846903023814679,NA
+"small-proposal-discrete-only-5-houwie-estimate-from-post-30","discrete-only",5,30,113030,"hOUwie estimate from post",5,-15.3490044487219,-15.3278877618974,-0.0211166868244721,NA
+"small-proposal-discrete-only-15-generating-parameters-1","discrete-only",15,1,123001,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-1","discrete-only",15,1,123001,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-1","discrete-only",15,1,123001,"hOUwie estimate from post",15,-15.3379578332987,-15.3278877618974,-0.0100700714013175,NA
+"small-proposal-discrete-only-15-generating-parameters-2","discrete-only",15,2,123002,"Generating parameters",15,-9.95030881841119,-9.38109517548463,-0.569213642926556,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-2","discrete-only",15,2,123002,"fitmultiOU estimate from post",15,-10.2567113407359,-9.40980835036494,-0.846902990370976,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-2","discrete-only",15,2,123002,"hOUwie estimate from post",15,-15.3424854601002,-15.3278877618974,-0.0145976982028149,NA
+"small-proposal-discrete-only-15-generating-parameters-3","discrete-only",15,3,123003,"Generating parameters",15,-9.94889744046969,-9.38109517548463,-0.567802264985064,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-3","discrete-only",15,3,123003,"fitmultiOU estimate from post",15,-10.2564066448784,-9.40980835036494,-0.846598294513504,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-3","discrete-only",15,3,123003,"hOUwie estimate from post",15,-15.3433213978211,-15.3278877618974,-0.0154336359237401,NA
+"small-proposal-discrete-only-15-generating-parameters-4","discrete-only",15,4,123004,"Generating parameters",15,-9.38189485713669,-9.38109517548463,-0.000799681652063455,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-4","discrete-only",15,4,123004,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953010313,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-4","discrete-only",15,4,123004,"hOUwie estimate from post",15,-15.338916580453,-15.3278877618974,-0.0110288185556247,NA
+"small-proposal-discrete-only-15-generating-parameters-5","discrete-only",15,5,123005,"Generating parameters",15,-9.38109517548906,-9.38109517548463,-4.42845760062482e-12,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-5","discrete-only",15,5,123005,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,-3.5527136788005e-15,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-5","discrete-only",15,5,123005,"hOUwie estimate from post",15,-15.344798405726,-15.3278877618974,-0.0169106438286395,NA
+"small-proposal-discrete-only-15-generating-parameters-6","discrete-only",15,6,123006,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-6","discrete-only",15,6,123006,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-6","discrete-only",15,6,123006,"hOUwie estimate from post",15,-15.3360922296147,-15.3278877618974,-0.00820446771727568,NA
+"small-proposal-discrete-only-15-generating-parameters-7","discrete-only",15,7,123007,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-7","discrete-only",15,7,123007,"fitmultiOU estimate from post",15,-9.41061473761942,-9.40980835036494,-0.000806387254474572,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-7","discrete-only",15,7,123007,"hOUwie estimate from post",15,-15.3443361712246,-15.3278877618974,-0.016448409327241,NA
+"small-proposal-discrete-only-15-generating-parameters-8","discrete-only",15,8,123008,"Generating parameters",15,-9.38273059577424,-9.38109517548463,-0.00163542028961317,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-8","discrete-only",15,8,123008,"fitmultiOU estimate from post",15,-9.41048398534967,-9.40980835036494,-0.000675634984727225,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-8","discrete-only",15,8,123008,"hOUwie estimate from post",15,-15.3419332081406,-15.3278877618974,-0.0140454462432018,NA
+"small-proposal-discrete-only-15-generating-parameters-9","discrete-only",15,9,123009,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-9","discrete-only",15,9,123009,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-9","discrete-only",15,9,123009,"hOUwie estimate from post",15,-15.3444154273785,-15.3278877618974,-0.0165276654810658,NA
+"small-proposal-discrete-only-15-generating-parameters-10","discrete-only",15,10,123010,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-10","discrete-only",15,10,123010,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-10","discrete-only",15,10,123010,"hOUwie estimate from post",15,-15.3402617368861,-15.3278877618974,-0.0123739749887228,NA
+"small-proposal-discrete-only-15-generating-parameters-11","discrete-only",15,11,123011,"Generating parameters",15,-9.38109517548944,-9.38109517548463,-4.80859796425648e-12,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-11","discrete-only",15,11,123011,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-11","discrete-only",15,11,123011,"hOUwie estimate from post",15,-15.3478186218517,-15.3278877618974,-0.0199308599542842,NA
+"small-proposal-discrete-only-15-generating-parameters-12","discrete-only",15,12,123012,"Generating parameters",15,-9.38109555207899,-9.38109517548463,-3.76594355699922e-07,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-12","discrete-only",15,12,123012,"fitmultiOU estimate from post",15,-9.41048398534966,-9.40980835036494,-0.000675634984716567,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-12","discrete-only",15,12,123012,"hOUwie estimate from post",15,-15.3450864195114,-15.3278877618974,-0.017198657613994,NA
+"small-proposal-discrete-only-15-generating-parameters-13","discrete-only",15,13,123013,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-13","discrete-only",15,13,123013,"fitmultiOU estimate from post",15,-9.40980835036494,-9.40980835036494,5.32907051820075e-15,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-13","discrete-only",15,13,123013,"hOUwie estimate from post",15,-15.3458993117644,-15.3278877618974,-0.0180115498670244,NA
+"small-proposal-discrete-only-15-generating-parameters-14","discrete-only",15,14,123014,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-14","discrete-only",15,14,123014,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-14","discrete-only",15,14,123014,"hOUwie estimate from post",15,-15.3400240495517,-15.3278877618974,-0.0121362876543341,NA
+"small-proposal-discrete-only-15-generating-parameters-15","discrete-only",15,15,123015,"Generating parameters",15,-9.38109526482265,-9.38109517548463,-8.93380232014351e-08,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-15","discrete-only",15,15,123015,"fitmultiOU estimate from post",15,-9.4098083515892,-9.40980835036494,-1.22426335735781e-09,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-15","discrete-only",15,15,123015,"hOUwie estimate from post",15,-15.3369419569698,-15.3278877618974,-0.00905419507236971,NA
+"small-proposal-discrete-only-15-generating-parameters-16","discrete-only",15,16,123016,"Generating parameters",15,-9.95178409140759,-9.38109517548463,-0.570688915922958,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-16","discrete-only",15,16,123016,"fitmultiOU estimate from post",15,-10.2579827027197,-9.40980835036494,-0.84817435235472,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-16","discrete-only",15,16,123016,"hOUwie estimate from post",15,-15.3373803431102,-15.3278877618974,-0.00949258121276486,NA
+"small-proposal-discrete-only-15-generating-parameters-17","discrete-only",15,17,123017,"Generating parameters",15,-10.2119794843028,-9.38109517548463,-0.830884308818215,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-17","discrete-only",15,17,123017,"fitmultiOU estimate from post",15,-9.96853877730544,-9.40980835036494,-0.558730426940501,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-17","discrete-only",15,17,123017,"hOUwie estimate from post",15,-15.3446326272138,-15.3278877618974,-0.0167448653164346,NA
+"small-proposal-discrete-only-15-generating-parameters-18","discrete-only",15,18,123018,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-18","discrete-only",15,18,123018,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-18","discrete-only",15,18,123018,"hOUwie estimate from post",15,-15.3311637019756,-15.3278877618974,-0.00327594007821475,NA
+"small-proposal-discrete-only-15-generating-parameters-19","discrete-only",15,19,123019,"Generating parameters",15,-9.95178424949715,-9.38109517548463,-0.570689074012524,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-19","discrete-only",15,19,123019,"fitmultiOU estimate from post",15,-10.2579827055788,-9.40980835036494,-0.848174355213875,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-19","discrete-only",15,19,123019,"hOUwie estimate from post",15,-15.3388617891452,-15.3278877618974,-0.0109740272478156,NA
+"small-proposal-discrete-only-15-generating-parameters-20","discrete-only",15,20,123020,"Generating parameters",15,-9.38273030804785,-9.38109517548463,-0.00163513256322112,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-20","discrete-only",15,20,123020,"fitmultiOU estimate from post",15,-9.96876725017792,-9.40980835036494,-0.558958899812978,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-20","discrete-only",15,20,123020,"hOUwie estimate from post",15,-15.3394070858818,-15.3278877618974,-0.0115193239844125,NA
+"small-proposal-discrete-only-15-generating-parameters-21","discrete-only",15,21,123021,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-21","discrete-only",15,21,123021,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-21","discrete-only",15,21,123021,"hOUwie estimate from post",15,-15.3337036644692,-15.3278877618974,-0.0058159025717881,NA
+"small-proposal-discrete-only-15-generating-parameters-22","discrete-only",15,22,123022,"Generating parameters",15,-10.2157364586921,-9.38109517548463,-0.834641283207475,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-22","discrete-only",15,22,123022,"fitmultiOU estimate from post",15,-9.96972036807012,-9.40980835036494,-0.559912017705177,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-22","discrete-only",15,22,123022,"hOUwie estimate from post",15,-15.3374862075478,-15.3278877618974,-0.00959844565035972,NA
+"small-proposal-discrete-only-15-generating-parameters-23","discrete-only",15,23,123023,"Generating parameters",15,-9.38109526482265,-9.38109517548463,-8.93380232014351e-08,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-23","discrete-only",15,23,123023,"fitmultiOU estimate from post",15,-9.40993902865849,-9.40980835036494,-0.000130678293547959,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-23","discrete-only",15,23,123023,"hOUwie estimate from post",15,-15.3384950738188,-15.3278877618974,-0.0106073119213921,NA
+"small-proposal-discrete-only-15-generating-parameters-24","discrete-only",15,24,123024,"Generating parameters",15,-9.38353129887874,-9.38109517548463,-0.00243612339410859,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-24","discrete-only",15,24,123024,"fitmultiOU estimate from post",15,-9.40993901554239,-9.40980835036494,-0.000130665177447753,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-24","discrete-only",15,24,123024,"hOUwie estimate from post",15,-15.3450514384315,-15.3278877618974,-0.0171636765340821,NA
+"small-proposal-discrete-only-15-generating-parameters-25","discrete-only",15,25,123025,"Generating parameters",15,-9.383531209323,-9.38109517548463,-0.00243603383836621,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-25","discrete-only",15,25,123025,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-25","discrete-only",15,25,123025,"hOUwie estimate from post",15,-15.3419384826095,-15.3278877618974,-0.0140507207121363,NA
+"small-proposal-discrete-only-15-generating-parameters-26","discrete-only",15,26,123026,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-26","discrete-only",15,26,123026,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-26","discrete-only",15,26,123026,"hOUwie estimate from post",15,-15.3422450819521,-15.3278877618974,-0.0143573200546587,NA
+"small-proposal-discrete-only-15-generating-parameters-27","discrete-only",15,27,123027,"Generating parameters",15,-9.38273030804785,-9.38109517548463,-0.00163513256322112,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-27","discrete-only",15,27,123027,"fitmultiOU estimate from post",15,-9.4104839734515,-9.40980835036494,-0.000675623086554111,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-27","discrete-only",15,27,123027,"hOUwie estimate from post",15,-15.3410766758213,-15.3278877618974,-0.0131889139238517,NA
+"small-proposal-discrete-only-15-generating-parameters-28","discrete-only",15,28,123028,"Generating parameters",15,-9.38273021856381,-9.38109517548463,-0.00163504307918316,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-28","discrete-only",15,28,123028,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-28","discrete-only",15,28,123028,"hOUwie estimate from post",15,-15.3426656326869,-15.3278877618974,-0.0147778707894588,NA
+"small-proposal-discrete-only-15-generating-parameters-29","discrete-only",15,29,123029,"Generating parameters",15,-10.2157364586921,-9.38109517548463,-0.834641283207475,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-29","discrete-only",15,29,123029,"fitmultiOU estimate from post",15,-9.96972036807012,-9.40980835036494,-0.559912017705177,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-29","discrete-only",15,29,123029,"hOUwie estimate from post",15,-15.3426746328041,-15.3278877618974,-0.0147868709067236,NA
+"small-proposal-discrete-only-15-generating-parameters-30","discrete-only",15,30,123030,"Generating parameters",15,-9.38109526482265,-9.38109517548463,-8.93380232014351e-08,NA
+"small-proposal-discrete-only-15-fitmultiou-estimate-from-post-30","discrete-only",15,30,123030,"fitmultiOU estimate from post",15,-9.4104839734515,-9.40980835036494,-0.000675623086554111,NA
+"small-proposal-discrete-only-15-houwie-estimate-from-post-30","discrete-only",15,30,123030,"hOUwie estimate from post",15,-15.3422723729944,-15.3278877618974,-0.0143846110969772,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-1","continuous-informed-nodes",5,1,123001,"Generating parameters",5,-9.38353129888338,-9.38109517548463,-0.00243612339875021,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-1","continuous-informed-nodes",5,1,123001,"fitmultiOU estimate from post",5,-9.4106147257197,-9.40980835036494,-0.000806375354763134,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-1","continuous-informed-nodes",5,1,123001,"hOUwie estimate from post",5,-15.9598880626035,-15.3278877618974,-0.632000300706119,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-2","continuous-informed-nodes",5,2,123002,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-2","continuous-informed-nodes",5,2,123002,"fitmultiOU estimate from post",5,-9.96994913405674,-9.40980835036494,-0.560140783691804,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-2","continuous-informed-nodes",5,2,123002,"hOUwie estimate from post",5,-15.7986002400804,-15.3278877618974,-0.470712478183035,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-3","continuous-informed-nodes",5,3,123003,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-3","continuous-informed-nodes",5,3,123003,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-3","continuous-informed-nodes",5,3,123003,"hOUwie estimate from post",5,-15.9618136038671,-15.3278877618974,-0.633925841969669,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-4","continuous-informed-nodes",5,4,123004,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-4","continuous-informed-nodes",5,4,123004,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-4","continuous-informed-nodes",5,4,123004,"hOUwie estimate from post",5,-15.9503411911922,-15.3278877618974,-0.622453429294819,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-5","continuous-informed-nodes",5,5,123005,"Generating parameters",5,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-5","continuous-informed-nodes",5,5,123005,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-5","continuous-informed-nodes",5,5,123005,"hOUwie estimate from post",5,-15.9619497520927,-15.3278877618974,-0.634061990195296,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-6","continuous-informed-nodes",5,6,123006,"Generating parameters",5,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-6","continuous-informed-nodes",5,6,123006,"fitmultiOU estimate from post",5,-9.41048398657476,-9.40980835036494,-0.000675636209823693,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-6","continuous-informed-nodes",5,6,123006,"hOUwie estimate from post",5,-17.6363089753898,-15.3278877618974,-2.30842121349238,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-7","continuous-informed-nodes",5,7,123007,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-7","continuous-informed-nodes",5,7,123007,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-7","continuous-informed-nodes",5,7,123007,"hOUwie estimate from post",5,-20.8181336693618,-15.3278877618974,-5.49024590746443,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-8","continuous-informed-nodes",5,8,123008,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-8","continuous-informed-nodes",5,8,123008,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-8","continuous-informed-nodes",5,8,123008,"hOUwie estimate from post",5,-20.8007843427297,-15.3278877618974,-5.4728965808323,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-9","continuous-informed-nodes",5,9,123009,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-9","continuous-informed-nodes",5,9,123009,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-9","continuous-informed-nodes",5,9,123009,"hOUwie estimate from post",5,-19.8999564584014,-15.3278877618974,-4.57206869650398,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-10","continuous-informed-nodes",5,10,123010,"Generating parameters",5,-9.38353167639185,-9.38109517548463,-0.00243650090721559,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-10","continuous-informed-nodes",5,10,123010,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-10","continuous-informed-nodes",5,10,123010,"hOUwie estimate from post",5,-17.5876780799058,-15.3278877618974,-2.25979031800842,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-11","continuous-informed-nodes",5,11,123011,"Generating parameters",5,-9.38353167639573,-9.38109517548463,-0.00243650091109693,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-11","continuous-informed-nodes",5,11,123011,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-11","continuous-informed-nodes",5,11,123011,"hOUwie estimate from post",5,-17.5876780799058,-15.3278877618974,-2.25979031800842,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-12","continuous-informed-nodes",5,12,123012,"Generating parameters",5,-9.38353167639573,-9.38109517548463,-0.00243650091109693,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-12","continuous-informed-nodes",5,12,123012,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-12","continuous-informed-nodes",5,12,123012,"hOUwie estimate from post",5,-19.9085558629156,-15.3278877618974,-4.58066810101824,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-13","continuous-informed-nodes",5,13,123013,"Generating parameters",5,-9.38353129888338,-9.38109517548463,-0.00243612339875021,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-13","continuous-informed-nodes",5,13,123013,"fitmultiOU estimate from post",5,-9.4106147257197,-9.40980835036494,-0.000806375354763134,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-13","continuous-informed-nodes",5,13,123013,"hOUwie estimate from post",5,-16.349202940615,-15.3278877618974,-1.02131517871765,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-14","continuous-informed-nodes",5,14,123014,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-14","continuous-informed-nodes",5,14,123014,"fitmultiOU estimate from post",5,-9.41048398657475,-9.40980835036494,-0.000675636209813035,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-14","continuous-informed-nodes",5,14,123014,"hOUwie estimate from post",5,-20.8007843427297,-15.3278877618974,-5.4728965808323,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-15","continuous-informed-nodes",5,15,123015,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-15","continuous-informed-nodes",5,15,123015,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-15","continuous-informed-nodes",5,15,123015,"hOUwie estimate from post",5,-17.6481160912694,-15.3278877618974,-2.320228329372,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-16","continuous-informed-nodes",5,16,123016,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-16","continuous-informed-nodes",5,16,123016,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-16","continuous-informed-nodes",5,16,123016,"hOUwie estimate from post",5,-20.8007843427297,-15.3278877618974,-5.4728965808323,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-17","continuous-informed-nodes",5,17,123017,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-17","continuous-informed-nodes",5,17,123017,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-17","continuous-informed-nodes",5,17,123017,"hOUwie estimate from post",5,-15.9619497520927,-15.3278877618974,-0.634061990195296,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-18","continuous-informed-nodes",5,18,123018,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-18","continuous-informed-nodes",5,18,123018,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-18","continuous-informed-nodes",5,18,123018,"hOUwie estimate from post",5,-17.6473812818492,-15.3278877618974,-2.31949351995175,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-19","continuous-informed-nodes",5,19,123019,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-19","continuous-informed-nodes",5,19,123019,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-19","continuous-informed-nodes",5,19,123019,"hOUwie estimate from post",5,-16.3352970426733,-15.3278877618974,-1.00740928077593,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-20","continuous-informed-nodes",5,20,123020,"Generating parameters",5,-9.38353129888338,-9.38109517548463,-0.00243612339875021,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-20","continuous-informed-nodes",5,20,123020,"fitmultiOU estimate from post",5,-9.4106147257197,-9.40980835036494,-0.000806375354763134,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-20","continuous-informed-nodes",5,20,123020,"hOUwie estimate from post",5,-15.9598880626035,-15.3278877618974,-0.632000300706119,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-21","continuous-informed-nodes",5,21,123021,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-21","continuous-informed-nodes",5,21,123021,"fitmultiOU estimate from post",5,-9.41048398657476,-9.40980835036494,-0.000675636209823693,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-21","continuous-informed-nodes",5,21,123021,"hOUwie estimate from post",5,-17.6481160912694,-15.3278877618974,-2.320228329372,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-22","continuous-informed-nodes",5,22,123022,"Generating parameters",5,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-22","continuous-informed-nodes",5,22,123022,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-22","continuous-informed-nodes",5,22,123022,"hOUwie estimate from post",5,-20.8181336693618,-15.3278877618974,-5.49024590746443,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-23","continuous-informed-nodes",5,23,123023,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-23","continuous-informed-nodes",5,23,123023,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-23","continuous-informed-nodes",5,23,123023,"hOUwie estimate from post",5,-16.3524486080209,-15.3278877618974,-1.02456084612351,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-24","continuous-informed-nodes",5,24,123024,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-24","continuous-informed-nodes",5,24,123024,"fitmultiOU estimate from post",5,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-24","continuous-informed-nodes",5,24,123024,"hOUwie estimate from post",5,-20.8181336693618,-15.3278877618974,-5.49024590746443,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-25","continuous-informed-nodes",5,25,123025,"Generating parameters",5,-9.38353167639185,-9.38109517548463,-0.00243650090721559,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-25","continuous-informed-nodes",5,25,123025,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-25","continuous-informed-nodes",5,25,123025,"hOUwie estimate from post",5,-17.5869863505985,-15.3278877618974,-2.25909858870112,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-26","continuous-informed-nodes",5,26,123026,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-26","continuous-informed-nodes",5,26,123026,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-26","continuous-informed-nodes",5,26,123026,"hOUwie estimate from post",5,-17.6370356907108,-15.3278877618974,-2.3091479288134,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-27","continuous-informed-nodes",5,27,123027,"Generating parameters",5,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-27","continuous-informed-nodes",5,27,123027,"fitmultiOU estimate from post",5,-9.41061473884468,-9.40980835036494,-0.000806388479739795,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-27","continuous-informed-nodes",5,27,123027,"hOUwie estimate from post",5,-17.5876780799058,-15.3278877618974,-2.25979031800842,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-28","continuous-informed-nodes",5,28,123028,"Generating parameters",5,-9.38353158683607,-9.38109517548463,-0.00243641135143946,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-28","continuous-informed-nodes",5,28,123028,"fitmultiOU estimate from post",5,-9.41061473761942,-9.40980835036494,-0.000806387254483454,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-28","continuous-informed-nodes",5,28,123028,"hOUwie estimate from post",5,-19.8070631114581,-15.3278877618974,-4.47917534956068,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-29","continuous-informed-nodes",5,29,123029,"Generating parameters",5,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-29","continuous-informed-nodes",5,29,123029,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-29","continuous-informed-nodes",5,29,123029,"hOUwie estimate from post",5,-16.3355394485266,-15.3278877618974,-1.0076516866292,NA
+"small-proposal-continuous-informed-nodes-5-generating-parameters-30","continuous-informed-nodes",5,30,123030,"Generating parameters",5,-9.38353167639611,-9.38109517548463,-0.00243650091147707,NA
+"small-proposal-continuous-informed-nodes-5-fitmultiou-estimate-from-post-30","continuous-informed-nodes",5,30,123030,"fitmultiOU estimate from post",5,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-5-houwie-estimate-from-post-30","continuous-informed-nodes",5,30,123030,"hOUwie estimate from post",5,-15.4497616041785,-15.3278877618974,-0.121873842281092,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-1","continuous-informed-nodes",15,1,133001,"Generating parameters",15,-9.3810956414215,-9.38109517548463,-4.65936865978733e-07,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-1","continuous-informed-nodes",15,1,133001,"fitmultiOU estimate from post",15,-9.40993902865849,-9.40980835036494,-0.000130678293547959,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-1","continuous-informed-nodes",15,1,133001,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-2","continuous-informed-nodes",15,2,133002,"Generating parameters",15,-9.38273030804823,-9.38109517548463,-0.00163513256359948,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-2","continuous-informed-nodes",15,2,133002,"fitmultiOU estimate from post",15,-9.4106147257197,-9.40980835036494,-0.000806375354754252,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-2","continuous-informed-nodes",15,2,133002,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-3","continuous-informed-nodes",15,3,133003,"Generating parameters",15,-9.38189494655027,-9.38109517548463,-0.00079977106563689,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-3","continuous-informed-nodes",15,3,133003,"fitmultiOU estimate from post",15,-9.40993901554238,-9.40980835036494,-0.000130665177438871,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-3","continuous-informed-nodes",15,3,133003,"hOUwie estimate from post",15,-15.3412151508925,-15.3278877618974,-0.0133273889951102,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-4","continuous-informed-nodes",15,4,133004,"Generating parameters",15,-9.38189532344575,-9.38109517548463,-0.000800147961124154,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-4","continuous-informed-nodes",15,4,133004,"fitmultiOU estimate from post",15,-9.40993902865849,-9.40980835036494,-0.000130678293547959,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-4","continuous-informed-nodes",15,4,133004,"hOUwie estimate from post",15,-15.4346293137589,-15.3278877618974,-0.106741551861498,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-5","continuous-informed-nodes",15,5,133005,"Generating parameters",15,-9.38109517548944,-9.38109517548463,-4.80859796425648e-12,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-5","continuous-informed-nodes",15,5,133005,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953010313,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-5","continuous-informed-nodes",15,5,133005,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-6","continuous-informed-nodes",15,6,133006,"Generating parameters",15,-9.38353167639185,-9.38109517548463,-0.00243650090721559,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-6","continuous-informed-nodes",15,6,133006,"fitmultiOU estimate from post",15,-9.40993902865849,-9.40980835036494,-0.000130678293547959,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-6","continuous-informed-nodes",15,6,133006,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-7","continuous-informed-nodes",15,7,133007,"Generating parameters",15,-9.38353167639147,-9.38109517548463,-0.00243650090683545,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-7","continuous-informed-nodes",15,7,133007,"fitmultiOU estimate from post",15,-9.40993902865849,-9.40980835036494,-0.000130678293547959,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-7","continuous-informed-nodes",15,7,133007,"hOUwie estimate from post",15,-15.3361341403639,-15.3278877618974,-0.00824637846648812,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-8","continuous-informed-nodes",15,8,133008,"Generating parameters",15,-9.38273068525831,-9.38109517548463,-0.00163550977368487,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-8","continuous-informed-nodes",15,8,133008,"fitmultiOU estimate from post",15,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-8","continuous-informed-nodes",15,8,133008,"hOUwie estimate from post",15,-15.7772185420645,-15.3278877618974,-0.449330780167088,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-9","continuous-informed-nodes",15,9,133009,"Generating parameters",15,-9.38353120932338,-9.38109517548463,-0.00243603383874635,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-9","continuous-informed-nodes",15,9,133009,"fitmultiOU estimate from post",15,-9.40993901431796,-9.40980835036494,-0.000130663953019194,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-9","continuous-informed-nodes",15,9,133009,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-10","continuous-informed-nodes",15,10,133010,"Generating parameters",15,-9.3818953234415,-9.38109517548463,-0.000800147956869779,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-10","continuous-informed-nodes",15,10,133010,"fitmultiOU estimate from post",15,-9.40993902743406,-9.40980835036494,-0.0001306770691194,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-10","continuous-informed-nodes",15,10,133010,"hOUwie estimate from post",15,-15.3351037112747,-15.3278877618974,-0.00721594937731851,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-11","continuous-informed-nodes",15,11,133011,"Generating parameters",15,-9.38353120932764,-9.38109517548463,-0.00243603384300783,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-11","continuous-informed-nodes",15,11,133011,"fitmultiOU estimate from post",15,-9.4104839722264,-9.40980835036494,-0.000675621861457643,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-11","continuous-informed-nodes",15,11,133011,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-12","continuous-informed-nodes",15,12,133012,"Generating parameters",15,-9.38189523403215,-9.38109517548463,-0.000800058547518745,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-12","continuous-informed-nodes",15,12,133012,"fitmultiOU estimate from post",15,-9.41048398534966,-9.40980835036494,-0.000675634984718343,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-12","continuous-informed-nodes",15,12,133012,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-13","continuous-informed-nodes",15,13,133013,"Generating parameters",15,-9.38273030804823,-9.38109517548463,-0.00163513256359948,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-13","continuous-informed-nodes",15,13,133013,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-13","continuous-informed-nodes",15,13,133013,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-14","continuous-informed-nodes",15,14,133014,"Generating parameters",15,-9.38189532344112,-9.38109517548463,-0.000800147956489639,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-14","continuous-informed-nodes",15,14,133014,"fitmultiOU estimate from post",15,-9.40980835158921,-9.40980835036494,-1.22427223914201e-09,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-14","continuous-informed-nodes",15,14,133014,"hOUwie estimate from post",15,-15.3351037112747,-15.3278877618974,-0.00721594937731851,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-15","continuous-informed-nodes",15,15,133015,"Generating parameters",15,-9.38353158683607,-9.38109517548463,-0.00243641135143946,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-15","continuous-informed-nodes",15,15,133015,"fitmultiOU estimate from post",15,-9.40993902743407,-9.40980835036494,-0.000130677069130058,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-15","continuous-informed-nodes",15,15,133015,"hOUwie estimate from post",15,-15.4346293137589,-15.3278877618974,-0.106741551861498,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-16","continuous-informed-nodes",15,16,133016,"Generating parameters",15,-9.38273021856419,-9.38109517548463,-0.0016350430795633,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-16","continuous-informed-nodes",15,16,133016,"fitmultiOU estimate from post",15,-9.4106147257197,-9.40980835036494,-0.000806375354754252,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-16","continuous-informed-nodes",15,16,133016,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-17","continuous-informed-nodes",15,17,133017,"Generating parameters",15,-9.38353167639185,-9.38109517548463,-0.00243650090721559,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-17","continuous-informed-nodes",15,17,133017,"fitmultiOU estimate from post",15,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-17","continuous-informed-nodes",15,17,133017,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-18","continuous-informed-nodes",15,18,133018,"Generating parameters",15,-9.38189485713631,-9.38109517548463,-0.000799681651685091,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-18","continuous-informed-nodes",15,18,133018,"fitmultiOU estimate from post",15,-9.40980835158921,-9.40980835036494,-1.22427223914201e-09,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-18","continuous-informed-nodes",15,18,133018,"hOUwie estimate from post",15,-16.0902215430669,-15.3278877618974,-0.76233378116952,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-19","continuous-informed-nodes",15,19,133019,"Generating parameters",15,-9.38109526482303,-9.38109517548463,-8.93384015654419e-08,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-19","continuous-informed-nodes",15,19,133019,"fitmultiOU estimate from post",15,-9.4098083515892,-9.40980835036494,-1.22426335735781e-09,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-19","continuous-informed-nodes",15,19,133019,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-20","continuous-informed-nodes",15,20,133020,"Generating parameters",15,-9.38109526482728,-9.38109517548463,-8.93426541637155e-08,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-20","continuous-informed-nodes",15,20,133020,"fitmultiOU estimate from post",15,-9.4098083515892,-9.40980835036494,-1.22426335735781e-09,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-20","continuous-informed-nodes",15,20,133020,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-21","continuous-informed-nodes",15,21,133021,"Generating parameters",15,-9.38189523403215,-9.38109517548463,-0.000800058547518745,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-21","continuous-informed-nodes",15,21,133021,"fitmultiOU estimate from post",15,-9.41061473761942,-9.40980835036494,-0.000806387254474572,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-21","continuous-informed-nodes",15,21,133021,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-22","continuous-informed-nodes",15,22,133022,"Generating parameters",15,-9.38109517548519,-9.38109517548463,-5.55999690732278e-13,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-22","continuous-informed-nodes",15,22,133022,"fitmultiOU estimate from post",15,-9.41061472449444,-9.40980835036494,-0.000806374129497911,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-22","continuous-informed-nodes",15,22,133022,"hOUwie estimate from post",15,-15.4346293137589,-15.3278877618974,-0.106741551861498,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-23","continuous-informed-nodes",15,23,133023,"Generating parameters",15,-9.38273068526257,-9.38109517548463,-0.0016355097779428,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-23","continuous-informed-nodes",15,23,133023,"fitmultiOU estimate from post",15,-9.4098083647036,-9.40980835036494,-1.43386600370832e-08,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-23","continuous-informed-nodes",15,23,133023,"hOUwie estimate from post",15,-15.4346293137589,-15.3278877618974,-0.106741551861498,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-24","continuous-informed-nodes",15,24,133024,"Generating parameters",15,-9.38189532344538,-9.38109517548463,-0.00080014796074579,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-24","continuous-informed-nodes",15,24,133024,"fitmultiOU estimate from post",15,-9.4099390286585,-9.40980835036494,-0.000130678293558617,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-24","continuous-informed-nodes",15,24,133024,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-25","continuous-informed-nodes",15,25,133025,"Generating parameters",15,-9.3810956414215,-9.38109517548463,-4.65936865978733e-07,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-25","continuous-informed-nodes",15,25,133025,"fitmultiOU estimate from post",15,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-25","continuous-informed-nodes",15,25,133025,"hOUwie estimate from post",15,-15.3351037112747,-15.3278877618974,-0.00721594937731851,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-26","continuous-informed-nodes",15,26,133026,"Generating parameters",15,-9.38189494654989,-9.38109517548463,-0.000799771065256749,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-26","continuous-informed-nodes",15,26,133026,"fitmultiOU estimate from post",15,-9.40993901554238,-9.40980835036494,-0.000130665177437095,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-26","continuous-informed-nodes",15,26,133026,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-27","continuous-informed-nodes",15,27,133027,"Generating parameters",15,-9.3818953234415,-9.38109517548463,-0.000800147956869779,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-27","continuous-informed-nodes",15,27,133027,"fitmultiOU estimate from post",15,-9.40993902743406,-9.40980835036494,-0.0001306770691194,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-27","continuous-informed-nodes",15,27,133027,"hOUwie estimate from post",15,-15.7772185420645,-15.3278877618974,-0.449330780167088,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-28","continuous-informed-nodes",15,28,133028,"Generating parameters",15,-9.3810956414215,-9.38109517548463,-4.65936865978733e-07,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-28","continuous-informed-nodes",15,28,133028,"fitmultiOU estimate from post",15,-9.40980836470361,-9.40980835036494,-1.43386689188674e-08,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-28","continuous-informed-nodes",15,28,133028,"hOUwie estimate from post",15,-15.3413048494922,-15.3278877618974,-0.013417087594787,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-29","continuous-informed-nodes",15,29,133029,"Generating parameters",15,-9.38273068525831,-9.38109517548463,-0.00163550977368487,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-29","continuous-informed-nodes",15,29,133029,"fitmultiOU estimate from post",15,-9.41061473884467,-9.40980835036494,-0.000806388479730913,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-29","continuous-informed-nodes",15,29,133029,"hOUwie estimate from post",15,-15.3351037112747,-15.3278877618974,-0.00721594937731851,NA
+"small-proposal-continuous-informed-nodes-15-generating-parameters-30","continuous-informed-nodes",15,30,133030,"Generating parameters",15,-9.38353120932726,-9.38109517548463,-0.00243603384262947,NA
+"small-proposal-continuous-informed-nodes-15-fitmultiou-estimate-from-post-30","continuous-informed-nodes",15,30,133030,"fitmultiOU estimate from post",15,-9.40993901431795,-9.40980835036494,-0.000130663953008536,NA
+"small-proposal-continuous-informed-nodes-15-houwie-estimate-from-post-30","continuous-informed-nodes",15,30,133030,"hOUwie estimate from post",15,-15.3350309684808,-15.3278877618974,-0.00714320658336121,NA
