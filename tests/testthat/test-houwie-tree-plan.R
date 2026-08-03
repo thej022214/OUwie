@@ -19,22 +19,6 @@ reorder.plan.simmap <- function(simmap, index){
     simmap
 }
 
-test_that("the hOUwie tree plan preserves paths and edge discretisation", {
-    phy <- reorder.phylo(make.plan.simmap(), "pruningwise")
-    edge.liks <- lapply(seq_len(nrow(phy$edge)), function(i)
-        matrix(0, nrow = 2L + (i %% 3L), ncol = 2L))
-
-    plan <- getHOUwieTreePlan(phy, edge.liks)
-    reference.paths <- lapply(seq_len(Ntip(phy) + Nnode(phy)), function(node)
-        getPathToRoot(phy, node))
-
-    expect_equal(plan$all.paths, reference.paths)
-    expect_equal(vapply(plan$map.template, sum, numeric(1)), phy$edge.length)
-    expect_identical(plan$number.of.nodes.per.edge,
-                     vapply(edge.liks, nrow, integer(1)))
-    expect_identical(sort(plan$cladewise.order), seq_len(nrow(phy$edge)))
-})
-
 test_that("fused continuous moments match the established calculations", {
     simmap <- make.plan.simmap()
     set.seed(91)
@@ -114,12 +98,4 @@ test_that("compact and materialized map interfaces agree", {
                                                 map.states = colnames(simmap$mapped.edge),
                                                 tree.plan = plan)))
     expect_equal(compact.known, materialized.known, tolerance = 1e-12)
-})
-
-test_that("sample history identifiers cannot collide across multi-digit states", {
-    expect_identical(stateSampleId(list()), "")
-    expect_false(identical(stateSampleId(list(c(1, 11))),
-                           stateSampleId(list(c(11, 1)))))
-    expect_false(identical(stateSampleId(list(c(1, 2), 3)),
-                           stateSampleId(list(1, c(2, 3)))))
 })

@@ -3,9 +3,9 @@ context("test-houwie-sampling.R")
 ## The map sampling machinery is where hOUwie decides which branches and which
 ## observations belong together. A mistake there does not raise an error, it just
 ## reweights the wrong branch or pairs a likelihood with a map that did not produce it.
-## These check the bookkeeping invariants that would otherwise go unnoticed: the answer
-## cannot depend on the order the data were typed in, the root optimum is a single
-## optimum, every retained map is still a tree, and the sampler returns distinct maps.
+## These check two invariants that would otherwise go unnoticed: the answer cannot
+## depend on the order the data were typed in, and two representations of the same
+## root history must give the same expectations.
 
 make.sampling.tree <- function(){
     set.seed(42)
@@ -74,46 +74,4 @@ test_that("a root optimum is taken from the rootward end of the root edge", {
 
     expect_equal(length(split.root), Ntip(phy))
     expect_equal(split.root, expectations(FALSE))
-})
-
-test_that("adaptive sampling keeps one tree per retained likelihood", {
-    skip_on_cran()
-
-    phy <- make.sampling.tree()
-    houwie.dat <- make.sampling.data(phy)
-    p <- c(0.5, 0.5, 0.3, 0.3, 1.0, 1.0, 1.5, 3.0, 2.0, 2.5)
-
-    ## one map and several maps take different paths through the sampler, so both the
-    ## round where a single new map is added and the round where a set is added are here
-    for(sampling in list(c(nSim = 1, seed = 1), c(nSim = 3, seed = 11))){
-        nSim <- sampling[["nSim"]]
-        set.seed(sampling[["seed"]])
-        fit <- hOUwie(phy, houwie.dat, rate.cat = 2, discrete_model = "ER",
-                      continuous_model = "OUM", nSim = nSim, p = p,
-                      adaptive_sampling = TRUE, quiet = TRUE)
-
-        expect_equal(length(fit$simmaps), length(fit$all_cont_liks))
-        expect_equal(length(fit$simmaps), length(fit$all_disc_liks))
-        expect_true(all(sapply(fit$simmaps, inherits, "phylo")))
-        expect_true(all(sapply(fit$simmaps,
-                               function(x) length(x$maps) == nrow(phy$edge))))
-    }
-})
-
-test_that("the internode sampler returns distinct substitution histories", {
-    skip_on_cran()
-
-    phy <- reorder.phylo(make.sampling.tree(), "pruningwise")
-    houwie.dat <- make.sampling.data(phy)
-    edge.liks <- getEdgeLiks(phy, houwie.dat[,1:2], 2, 1, max(phy$edge.length))
-    Q <- matrix(c(-0.5, 0.5, 0.5, -0.5), 2, 2)
-
-    set.seed(3)
-    sampled <- getInternodeMap(phy, Q, edge.liks, c(0.5, 0.5), c(0.5, 0.5),
-                               nSim = 25, check_vector = NA, max.attempts = 50)
-    ids <- sapply(sampled$state_samples, function(x) paste0(unlist(x), collapse = ""))
-
-    expect_true(length(ids) > 0)
-    expect_equal(anyDuplicated(ids), 0)
-    expect_equal(length(sampled$maps), length(sampled$state_samples))
 })

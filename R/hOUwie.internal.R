@@ -1478,6 +1478,22 @@ getIP.theta <- function(x, states, index){
   return(ip.theta)
 }
 
+# Sigma squared controls the scale of continuous-trait variation, so its search
+# must start on a scale learned from the trait. Using log(2) / tree height here,
+# as alpha does, makes the initial stationary variance arbitrary and can send the
+# optimizer down the near-Brownian alpha-theta ridge. A tiny positive value keeps
+# log-scale optimization defined when the observed trait is constant or contains
+# fewer than two finite values; checkStartingUBLB will then raise it to any
+# user-supplied lower bound.
+getIP.sigma <- function(x){
+  finite <- x[is.finite(x)]
+  trait.variance <- if(length(finite) > 1) var(finite) else NA_real_
+  if(!is.finite(trait.variance) || trait.variance <= 0){
+    return(.Machine$double.eps)
+  }
+  trait.variance
+}
+
 simCharacterHistory <- function(phy, Q, root.freqs, Q2 = NA, NoI = NA){
   #Randomly choose starting state at root using the root.values as the probability:
   root.value <- sample.int(dim(Q)[2], 1, FALSE, prob=root.freqs/sum(root.freqs))

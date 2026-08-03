@@ -1,5 +1,0 @@
-"task_id","profile","method","tips","data_seed","run_seed","resolution_name","resolution","elapsed_seconds","loglik","error"
-"smoke-eval-houwie-t30-d8-r4","smoke","hOUwie",30,8,12,"sampled histories",4,0.079,-118.689005600425,NA
-"smoke-eval-houwie-t30-d8-r8","smoke","hOUwie",30,8,16,"sampled histories",8,0.203,-134.329016458593,NA
-"smoke-eval-fitmultiou-t30-d8-r10","smoke","fitmultiOU",30,8,18,"discretization levels",10,0.0170000000000001,-62.216709076702,NA
-"smoke-eval-fitmultiou-t30-d8-r15","smoke","fitmultiOU",30,8,23,"discretization levels",15,0.0230000000000001,-63.6771606837916,NA

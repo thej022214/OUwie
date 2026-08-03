@@ -247,8 +247,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
         disc_tips <- hOUwie.dat$data.cor[,2]
       }
       starts.alpha <- rep(log(2)/Tmax, n_p_alpha)
-      # starts.sigma <- rep(var(hOUwie.dat$data.ou[,3]), n_p_sigma)
-      starts.sigma <- rep(log(2)/Tmax, n_p_sigma)
+      starts.sigma <- rep(getIP.sigma(hOUwie.dat$data.ou[,3]), n_p_sigma)
       start.theta <- getIP.theta(hOUwie.dat$data.ou[,3], disc_tips, index.cont[3,])
       start.cor <- rep(10/sum(phy$edge.length), n_p_trans)
       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)
@@ -595,8 +594,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
         disc_tips <- hOUwie.dat$data.cor[,2]
       }
       starts.alpha <- rep(log(2)/Tmax, n_p_alpha)
-      # starts.sigma <- rep(var(hOUwie.dat$data.ou[,3]), n_p_sigma)
-      starts.sigma <- rep(log(2)/Tmax, n_p_sigma)
+      starts.sigma <- rep(getIP.sigma(hOUwie.dat$data.ou[,3]), n_p_sigma)
       start.theta <- getIP.theta(hOUwie.dat$data.ou[,3], disc_tips, index.cont[3,])
       start.cor <- rep(10/sum(simmaps[[1]]$edge.length), n_p_trans)
       starts.basic = c(start.cor, starts.alpha, starts.sigma, start.theta)

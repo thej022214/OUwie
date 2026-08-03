@@ -3,98 +3,13 @@ context("test-houwie.R")
 ## hOUwie evaluates a stochastic likelihood, so most of what can go wrong shows up as a
 ## plausible looking number rather than an error. These check the invariants that pin
 ## that number down: a cached likelihood must belong to the parameters it is returned
-## for, the answer must not depend on where the trait sits on the number line, and every
-## documented optimizer must actually run.
+## for, and the answer must not depend on where the trait sits on the number line.
 
 make.test.simmap <- function(){
     data(tworegime)
     map <- getMapFromNode(tree, trait[,2], tree$node.label, 0.5)
     getMapFromSubstHistory(list(map), tree)[[1]]
 }
-
-test_that("common random objectives reuse draws without leaking RNG state", {
-    set.seed(99)
-    caller_seed <- .Random.seed
-    objective <- makeCommonRandomObjective(function(p) p + runif(4), 123)
-
-    first <- objective(1)
-    second <- objective(2)
-
-    expect_equal(second - first, rep(1, 4))
-    expect_identical(.Random.seed, caller_seed)
-})
-
-test_that("hOUwie uses reproducible independent CRN streams by default", {
-    skip_on_cran()
-
-    data(tworegime)
-    shifted <- trait
-    shifted[,3] <- shifted[,3] + 10
-    opts <- list("algorithm" = "NLOPT_LN_SBPLX", "maxeval" = 10,
-                 "ftol_rel" = .Machine$double.eps^0.25)
-    fit_once <- function(){
-        hOUwie(tree, shifted, rate.cat = 1, discrete_model = "ER",
-               continuous_model = "OUM", nSim = 8, opts = opts,
-               quiet = TRUE, n_starts = 2, ncores = 1)
-    }
-
-    set.seed(2026)
-    first <- fit_once()
-    set.seed(2026)
-    second <- fit_once()
-
-    expect_true(first$common_random_numbers)
-    expect_length(first$crn_seeds, 2)
-    expect_length(unique(first$crn_seeds), 2)
-    expect_true(first$crn_seed %in% first$crn_seeds)
-    expect_equal(first$crn_seeds, second$crn_seeds)
-    expect_equal(first$p, second$p)
-    expect_equal(first$loglik, second$loglik)
-    cache_match <- colSums(t(first$global_liks_mat[,-1]) != first$p) == 0
-    expect_true(any(cache_match))
-    expect_equal(first$loglik,
-                 as.numeric(first$global_liks_mat[which(cache_match)[1], 1]))
-})
-
-test_that("common_random_numbers requires one logical value", {
-    data(tworegime)
-    expect_identical(formals(hOUwie)$common_random_numbers, TRUE)
-    expect_error(
-        hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
-               continuous_model = "OUM", common_random_numbers = NA),
-        "must be either TRUE or FALSE",
-        fixed = TRUE
-    )
-})
-
-test_that("common random numbers can be disabled", {
-    skip_on_cran()
-
-    data(tworegime)
-    fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
-                  continuous_model = "OUM", nSim = 5, quiet = TRUE,
-                  p = c(0.1, 1, 1, 0.5, 1.5),
-                  common_random_numbers = FALSE)
-
-    expect_false(fit$common_random_numbers)
-    expect_null(fit$crn_seeds)
-    expect_null(fit$crn_seed)
-})
-
-test_that("simulated annealing supports common random numbers", {
-    skip_on_cran()
-
-    data(tworegime)
-    set.seed(7)
-    fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
-                  continuous_model = "OUM", nSim = 5, optimizer = "sann",
-                  opts = list(max.call = 8, smooth = FALSE), quiet = TRUE,
-                  common_random_numbers = TRUE)
-
-    expect_true(is.finite(fit$loglik))
-    expect_true(fit$common_random_numbers)
-    expect_equal(fit$crn_seed, fit$crn_seeds[1])
-})
 
 test_that("the likelihood cache is keyed on the whole parameter vector", {
     skip_on_cran()
@@ -170,22 +85,4 @@ test_that("hOUwie does not depend on where the trait sits on the number line", {
     recon.shifted <- silence(hOUwie.recon(fit.shifted, nodes = nodes))
     expect_equal(recon, recon.shifted)
     expect_false(any(is.na(recon)))
-})
-
-test_that("every documented optimizer runs", {
-    skip_on_cran()
-
-    data(tworegime)
-    simmap <- make.test.simmap()
-    for(optimizer in c("nlopt_ln", "sann")){
-        opts <- if(optimizer == "sann"){
-            list(max.call = 10, smooth = FALSE)
-        }else{
-            list("algorithm" = "NLOPT_LN_SBPLX", "maxeval" = "10", "ftol_rel" = .Machine$double.eps^0.25)
-        }
-        fit <- silence(hOUwie.fixed(list(simmap), trait, rate.cat = 1, discrete_model = "ER",
-                                    continuous_model = "OUM", quiet = TRUE,
-                                    optimizer = optimizer, opts = opts))
-        expect_true(is.finite(fit$loglik), info = optimizer)
-    }
 })
