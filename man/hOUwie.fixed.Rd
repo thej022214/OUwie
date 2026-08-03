@@ -30,9 +30,7 @@ hOUwie.fixed(simmaps,
              optimizer           = "nlopt_ln", 
              opts                = NULL, 
              quiet               = FALSE, 
-             sample_tips         = FALSE, 
              sample_nodes        = TRUE, 
-             adaptive_sampling   = FALSE, 
              diagn_msg           = FALSE,
              make_numeric        = TRUE,
              n_starts            = 1, 
@@ -63,9 +61,7 @@ hOUwie.fixed(simmaps,
 \item{optimizer}{One of "nlopt_ln", "nlopt_gn", or "sann" for a local search of parameter space, global search of paramater space, or simmulated annealing. The default is "nlopt_ln".}
 \item{opts}{A list of options to be passed to nloptr.}
 \item{quiet}{A boolean indicating whether or not to print messages.}
-\item{sample_tips}{A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).}
-\item{sample_nodes}{A boolean indicating whether or not to sample node probabilities when generating underlying regimes (see Deatils, but recommended to be set to TRUE).}
-\item{adaptive_sampling}{A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve (recommended TRUE).}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shapes the proposal that draws regime histories. When \code{TRUE}, the default, the trait data below each node is summarised by a Gaussian message and used to weight the regime states drawn there, so histories consistent with the observed trait are sampled more often. This changes only the variance of the likelihood estimate and never its expectation, so it is a cost/accuracy setting rather than a modelling choice; \code{FALSE} draws histories from the discrete character alone and typically needs far more \code{nSim} for the same precision.}
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
 \item{make_numeric}{A boolean indicating whether the given simmap needs to be converted to numeric map edges matching observed character data. Setting this to FALSE can be useful if you are interested in looking at hidden states since you will can have more mapped states than observed states.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
@@ -105,9 +101,9 @@ A named list with the following elements:
 \item{root.station}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated (recommended FALSE).}
 \item{get.root.theta}{A boolean indicating whether the root.theta was included in the model.}
 \item{tip.fog}{Either includes measurement error for each species value ("known"). The default is "none".}
-\item{sample_tips}{A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).}
-\item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
-\item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shaped the history proposal.}
+
+\item{ess}{The effective sample size of the importance weights at the reported optimum, out of \code{nSim}. A value near 1 means a single sampled history carried the whole likelihood and the fit should not be trusted; raise \code{nSim}. It is computed from the weights that were drawn, so it can only report on histories the sampler actually visited.}
 \item{lb_discrete_model}{A vector of lower bounds on discrete character evolution.}
 \item{ub_discrete_model}{A vector of upper bounds on discrete character evolution.}
 \item{lb_continuous_model}{A vector of lower bounds of alpha, sigma square, and theta.}

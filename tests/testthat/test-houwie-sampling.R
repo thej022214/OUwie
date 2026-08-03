@@ -38,7 +38,7 @@ make.root.edge.simmap <- function(phy, split.root){
     simmap
 }
 
-test_that("tip sampling weights each branch with its own species", {
+test_that("the joint proposal weights each branch with its own species", {
     skip_on_cran()
 
     phy <- make.sampling.tree()
@@ -48,7 +48,7 @@ test_that("tip sampling weights each branch with its own species", {
         set.seed(7)
         hOUwie(phy, dat, rate.cat = 2, discrete_model = "ER",
                continuous_model = "OUM", nSim = 10, p = p,
-               sample_tips = TRUE, quiet = TRUE)$loglik
+               sample_nodes = TRUE, quiet = TRUE)$loglik
     }
 
     set.seed(1)
