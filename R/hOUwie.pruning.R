@@ -236,29 +236,37 @@ getTipStateSets <- function(phy, edge_liks_list, nStates){
   sets
 }
 
-# Choose a component ceiling from the data when the caller has not set one.
+# Refuse a pruning run that cannot finish, before anything is allocated.
 #
-# What an objective function has to get right is its error near the optimum, not
-# its error at an arbitrary point, and those differ by orders of magnitude here:
-# on 8 and 12 tips the largest errors sit six hundred to four thousand log units
-# below the optimum, where they are also negative and so only make a bad region
-# look worse. Within 2 log units of the optimum, across OUM, OUV, OUA, OUMV,
-# OUMA, OUMVA and BMS, 16 components hold the error to about 1e-3.
+# The mixture carries one component per regime history, so its size is known in
+# advance: nStates raised to the number of free regime points. On a two-state
+# model that is about four million components at 24 tips and doubles with every
+# further tip, and because each component is three doubles and the products at a
+# node build index vectors of the full length, memory gives out well before time
+# does. A run that would exceed the ceiling is stopped here rather than being
+# allowed to allocate for a minute and take the session with it.
 #
-# What raises the requirement is a tip being ambiguous about its regime rather
-# than the number of regimes: four regimes with unambiguous tips converge to 1e-6
-# by 128 components, while the same tree with tips ambiguous between rate
-# categories decays non-monotonically and is still near 0.03 there. An ambiguous
-# tip is what makes a message genuinely multimodal, and merging is what loses a
-# mode. 32 is where that case reaches the accuracy 16 buys for the unambiguous
-# one.
-#
-# Below 8 the merging manufactures spurious optima, so nothing here goes near it.
-# Measured by tools/benchmarks/houwie-fitmultiou/cap-surface-study.R.
-getDefaultMaxComponents <- function(tip_state_sets){
-  ambiguous <- any(vapply(tip_state_sets,
-                          function(states) length(states) > 1L, logical(1)))
-  if(ambiguous) 32L else 16L
+# The alternative - capping the mixture and merging the excess - is what this
+# replaces. Its error is unbounded: a component carrying little weight in one
+# message can dominate once multiplied by its sibling, so a likelihood stable
+# across several ceilings is not thereby converged, and the resulting surface has
+# been seen to change which model AIC selects.
+checkPruningFeasible <- function(phy, nStates, resolution = 1L,
+                                 max_log2_components = 26){
+  regime_points <- (length(phy$tip.label) - 2L) * max(as.integer(resolution), 1L)
+  log2_components <- regime_points * log2(nStates)
+  if(log2_components > max_log2_components){
+    stop(sprintf(paste0("algorithm = \"pruning\" is exact and its cost is fixed by the data: ",
+                        "%d tips at %d states and resolution %d needs about 2^%.0f mixture components, ",
+                        "past the ceiling of 2^%d this implementation will attempt. ",
+                        "Use algorithm = \"sampling\", or reduce the tree to about %d tips."),
+                 length(phy$tip.label), nStates, as.integer(resolution),
+                 log2_components, max_log2_components,
+                 floor(max_log2_components / (log2(nStates) *
+                                                max(as.integer(resolution), 1L))) + 2L),
+         call. = FALSE)
+  }
+  invisible(TRUE)
 }
 
 #' @param resolution regime points inserted per edge. 1 is hOUwie's own history

@@ -98,11 +98,11 @@ houwieDevFailure <- function(split.liks, reason){
 hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        index.disc, index.cont, root.p,
                        edge_liks_list, nSim, all.paths=NULL, 
-                       sample_tips=FALSE, sample_nodes=FALSE,
-                       adaptive_sampling=FALSE, split.liks=FALSE, 
+                       sample_nodes=TRUE, split.liks=FALSE, 
                        global_liks_mat=NULL, diagn_msg=FALSE,
                        tree.plan=NULL, algorithm="sampling",
-                       resolution=1L, max_components=Inf, tolerance=0){
+                       resolution=1L, max_components=Inf, tolerance=0,
+                       history="midpoint", proposal_temper=1){
   if(is.null(tree.plan)){
     tree.plan <- getHOUwieTreePlan(phy, edge_liks_list, all.paths)
   }
@@ -180,37 +180,16 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     }
     return(-llik_pruned)
   }
-  # altering the conditional probabilities based on jointly sampled decendent species
+  # The continuous factors are built from the messages below each node and are
+  # applied after the discrete conditionals have been propagated, so they are
+  # computed here and used further down rather than folded into edge_liks_list.
+  continuous_node_factors <- NULL
   if(sample_nodes){
-    edge_liks_list <- try(getCherryConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths))
-    if(inherits(edge_liks_list, what="try-error")){
-    #if(class(edge_liks_list) == "try-error"){
-      return(houwieDevFailure(split.liks, "the joint conditional probabilities of the cherries could not be computed"))
-    }
-  }
-  # a way to alter the conditional values of the tips based on current parameeter values (only meaningful if there are multiple rate cats)
-  if(rate.cat > 1 & sample_tips){
-    normal.params <- rbind(theta, sigma.sq)
-    sample.tip.probs <- apply(normal.params, 2, function(x) dnorm(data[,3], x[1], sqrt(x[2])))
-    nTip <- length(phy$tip.label)
-    # phy is pruningwise, so edge i is not the branch leading to tip i, and the density
-    # rows follow the order of data rather than the order of the tips. both the branch
-    # and the observation therefore have to be resolved by species name.
-    for(edge_i in 1:dim(phy$edge)[1]){
-      if(phy$edge[edge_i,2] > nTip){
-        next
-      }
-      species_i <- phy$tip.label[phy$edge[edge_i,2]]
-      data_i <- match(species_i, data[,1])
-      if(is.na(data_i)){
-        next
-      }
-      tip_probs_i <- sample.tip.probs[data_i,]
-      if(all(tip_probs_i == 0)){
-        tip_probs_i <- rep(1, length(tip_probs_i))
-      }
-      sample_tip_i <- edge_liks_list[[edge_i]][1,] * tip_probs_i
-      edge_liks_list[[edge_i]][1,] <- sample_tip_i/sum(sample_tip_i)
+    tip_values <- data[match(phy$tip.label, data[,1]), 3]
+    continuous_node_factors <- try(getContinuousNodeFactors(
+      phy, tip_values, Q, alpha, sigma.sq, theta, temper = proposal_temper), silent = TRUE)
+    if(inherits(continuous_node_factors, what="try-error")){
+      return(houwieDevFailure(split.liks, "the continuous messages used to shape the proposal could not be computed"))
     }
   }
   # get the condtional probabilities based on the discrete values
@@ -218,29 +197,42 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     edge_liks_list[[recon_index]] <- edge_liks_list[[recon_index]] * edge_liks_list_init[[recon_index]]
   }
   conditional_probs <- getConditionalInternodeLik(phy, Q, edge_liks_list)
+  if(!is.null(continuous_node_factors)){
+    conditional_probs <- applyContinuousNodeFactors(conditional_probs, phy,
+                                                    continuous_node_factors)
+  }
   root_liks <- getRootLiks(conditional_probs, Q, root.p)
   if(is.null(root_liks)){
     return(houwieDevFailure(split.liks, "no state at the root has a defined conditional probability"))
   }
   # initial sample
   # sample mappings based on the conditional probabilites (also calculating some time saving probabilities from transitions to and from particular states)
-  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2, tree.plan=tree.plan)
+  # Bridge histories are drawn per parameter evaluation, so the uniformization
+  # tables are built here and shared by every branch of every draw.
+  uni <- NULL
+  if(history == "bridge"){
+    uni <- makeUniformizationTable(Q, max(tree.plan$reduced.edge.length))
+    if(is.null(uni)){
+      return(houwieDevFailure(split.liks, "the transition rates are too large for an exact regime path to be drawn"))
+    }
+  }
+  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2, tree.plan=tree.plan, unique_only=FALSE, uni=uni)
   internode_maps <- internode_maps_and_discrete_probs$maps
   internode_samples <- internode_maps_and_discrete_probs$state_samples
-  check_vector <- vapply(internode_samples, stateSampleId, character(1))
-  # if additional samples are needed (didn't reach nSim), they are taken ~randomly
-  if(length(internode_samples) < nSim){
-    additional_sims <- nSim - length(internode_samples)
-    random_internode_maps_and_discrete_probs <- getInternodeMap(phy, Q * 100, edge_liks_list_init, conditional_probs$root_state, root_liks, additional_sims, check_vector = check_vector, max.attempts=nSim*10, tree.plan=tree.plan)
-    internode_maps <- c(internode_maps, random_internode_maps_and_discrete_probs$maps)
-    internode_samples <- c(internode_samples, random_internode_maps_and_discrete_probs$state_samples)
-    check_vector <- vapply(internode_samples, stateSampleId, character(1))
-  }
+  log_proposal <- internode_maps_and_discrete_probs$log_proposal
+  mapping_ids <- internode_maps_and_discrete_probs$mapping_ids
+  check_vector <- mapping_ids
+  # The draw is now taken with replacement, so it always reaches nSim unless a
+  # history failed outright. The Q * 100 top-up that used to run here proposed
+  # from a different distribution whose density was never recorded, which the
+  # importance weights cannot absorb.
   # calculte the discrete probabilities based on the given Q matrix (Pij already calculated)
   discrete_probs <- lapply(internode_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
   llik_discrete <- unlist(discrete_probs)
   failed_maps <- discrete_probs == -Inf
   llik_discrete <- llik_discrete[!failed_maps]
+  log_proposal <- log_proposal[!failed_maps]
+  mapping_ids <- mapping_ids[!failed_maps]
   if(length(llik_discrete) == 0){
     return(houwieDevFailure(split.liks, "every sampled map has probability zero under the discrete model"))
   }
@@ -253,88 +245,56 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                 algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,
                 map=current.map, tree.plan=tree.plan)
   }
-  simmaps <- if(adaptive_sampling) getMapFromSubstHistory(compact.maps, phy) else NULL
+  simmaps <- NULL
   # if there is no character dependence the map has no influence on continuous likleihood
   character_dependence_check <- all(apply(index.cont, 1, function(x) length(unique(x)) == 1))
   if(character_dependence_check){
     llik_continuous <- continuous.lik(compact.maps[[1]])
     llik_continuous <- rep(llik_continuous, length(compact.maps))
   }else{
-    llik_continuous <- unlist(lapply(compact.maps, continuous.lik))
+    # repeated histories are evaluated once and reused, which is the whole of the
+    # saving that dropping them used to buy, without changing the draw. bridge
+    # histories share only their node states, so two draws with the same id have
+    # different paths and different continuous likelihoods, and reusing one for
+    # the other would be wrong
+    if(is.null(uni)){
+      unique_index <- match(mapping_ids, unique(mapping_ids))
+      unique_liks <- unlist(lapply(compact.maps[!duplicated(unique_index)],
+                                   continuous.lik))
+      llik_continuous <- unique_liks[unique_index]
+    }else{
+      llik_continuous <- unlist(lapply(compact.maps, continuous.lik))
+    }
   }
   # combine probabilities being careful to avoid underflow
   llik_houwies <- llik_discrete + llik_continuous
-  # after calculating the likelihoods of an intial set of maps, we sample potentially good maps
-  if(adaptive_sampling & !character_dependence_check){
-    adaptive_criteria <- FALSE
-    adaptive_count <- 0
-    best_mapping <- simmaps[[which.max(llik_houwies)]]
-    while(!adaptive_criteria){
-      adaptive_count <- adaptive_count + 1
-      if(adaptive_count > 5){
-        adaptive_criteria <- TRUE
-      }
-      # while we wait to meet some criteria
-      # generate a set of expectations based on the best mapping
-      current_ou_expectations <- getOUExpectations(best_mapping, Rate.mat, all.paths)
-      # generate a new conditional probability based on the new expected values
-      edge_liks_list <- try(getAdaptiveConditionals(phy, data, Rate.mat, Q, edge_liks_list_init, tip.paths, current_ou_expectations))
-      if(inherits(edge_liks_list, what="try-error")){
-      #if(class(edge_liks_list) == "try-error"){
-        next
-      }
-      for(recon_index in 1:length(edge_liks_list)){
-        edge_liks_list[[recon_index]] <- edge_liks_list[[recon_index]] * edge_liks_list_init[[recon_index]]
-      }
-      conditional_probs <- getConditionalInternodeLik(phy, Q, edge_liks_list)
-      root_liks <- getRootLiks(conditional_probs, Q, root.p)
-      if(is.null(root_liks)){
-        next
-      }
-      # generate a new set of unique mappings based on the new conditional probabilities
-      internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*2, tree.plan=tree.plan)
-      if(length(internode_maps_and_discrete_probs$maps) == 0){
-        # if no new maps were generated: generate the maps randomly
-        internode_maps_and_discrete_probs <- getInternodeMap(phy, Q*100, edge_liks_list_init, conditional_probs$root_state, root_liks, nSim, check_vector = check_vector, max.attempts=nSim*10, tree.plan=tree.plan)
-      }
-      check_vector <- c(check_vector, vapply(internode_maps_and_discrete_probs$state_samples,
-                                             stateSampleId, character(1)))
-      if(length(internode_maps_and_discrete_probs$maps) > 0){
-        new_simmaps <- getMapFromSubstHistory(internode_maps_and_discrete_probs$maps, phy)
-        compact.maps <- c(compact.maps, internode_maps_and_discrete_probs$maps)
-        # getMapFromSubstHistory returns a bare list for one map and a multiSimmap for
-        # several, so c() would dispatch on class and either splice a simmap's own
-        # components in as elements or nest the two sets. stripping the classes first
-        # keeps one map per element, which is what the likelihoods are sorted alongside.
-        simmaps <- c(unclass(simmaps), unclass(new_simmaps))
-        # evaluate the new mappings' joint likelhood
-        discrete_probs <- lapply(internode_maps_and_discrete_probs$state_samples, function(x) getStateSampleProb(state_sample = x, Pij = internode_maps_and_discrete_probs$Pij, root_liks = root_liks, root_edges = internode_maps_and_discrete_probs$root_edges))
-        continuous_probs <- lapply(internode_maps_and_discrete_probs$maps,
-                                   continuous.lik)
-        new_liks <- unlist(continuous_probs) + unlist(discrete_probs)
-        adaptive_criteria <- max(llik_houwies) > max(new_liks)
-        llik_continuous <- c(llik_continuous, unlist(continuous_probs))
-        llik_discrete <- c(llik_discrete, unlist(discrete_probs))
-        llik_houwies <- llik_discrete + llik_continuous
-      }else{
-        adaptive_criteria <- TRUE
-      }
-      # return to the initial step if some criteria has not been met, else done.
-    }
+  # Importance sampling estimate of L = sum_h P(h | Q) f(x | h). The histories
+  # were drawn from q, not from P(. | Q), so each term carries the weight
+  # P(h | Q) / q(h); dividing by the number of draws is what makes this an
+  # average rather than the subset sum it used to be. Summing the terms without
+  # the weight and without the 1/n effectively weights each history by its own
+  # proposal probability, which rewards parameter values that concentrate the
+  # sampling distribution on few histories.
+  log_terms <- llik_discrete - log_proposal + llik_continuous
+  n_draws <- length(log_terms)
+  finite_terms <- log_terms[is.finite(log_terms)]
+  if(!length(finite_terms)){
+    return(houwieDevFailure(split.liks, "no sampled map has a finite weight"))
   }
-  # find the best nSim mappings after adaptive sampling
-  sorted_likelihoods <- sort(llik_houwies, decreasing = TRUE, index.return = TRUE)
+  max_term <- max(finite_terms)
+  llik_houwie <- max_term + log(sum(exp(log_terms - max_term))) - log(n_draws)
+  # Effective sample size of the normalized weights. This is the number that says
+  # whether the estimate can be believed: at n_eff of 1 a single history carries
+  # the whole likelihood and the proposal is doing nothing.
+  normalized <- exp(log_terms - max_term)
+  normalized[!is.finite(normalized)] <- 0
+  ess <- sum(normalized)^2 / sum(normalized^2)
+
   unsorted_lliks_df <- data.frame(llik_discrete=llik_discrete, llik_continuous=llik_continuous)
-  llik_houwies <- llik_houwies[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
-  llik_discrete <- llik_discrete[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
-  llik_continuous <- llik_continuous[c(na.omit(sorted_likelihoods$ix[1:nSim]))]
+  # the maps themselves are still reported best-first, which only affects output
+  sorted_likelihoods <- sort(llik_houwies, decreasing = TRUE, index.return = TRUE)
   selected.map.index <- c(na.omit(sorted_likelihoods$ix[1:nSim]))
   compact.maps <- compact.maps[selected.map.index]
-  if(adaptive_sampling){
-    simmaps <- simmaps[selected.map.index]
-  }
-  # get the summed probabilities using tricks to prevent underflow
-  llik_houwie <- max(llik_houwies) + log(sum(exp(llik_houwies - max(llik_houwies))))
   llik_discrete_summed <- max(llik_discrete) + log(sum(exp(llik_discrete - max(llik_discrete))))
   llik_continuous_summed <- max(llik_continuous) + log(sum(exp(llik_continuous - max(llik_continuous))))
   if(split.liks){
@@ -348,7 +308,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     if(!is.null(global_liks_mat) && !is.na(cached_llik_houwie)){
       llik_houwie <- cached_llik_houwie
     }
-    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df))
+    return(list(TotalLik = llik_houwie, DiscLik = llik_discrete_summed, ContLik = llik_continuous_summed, llik_discrete=llik_discrete, llik_continuous=llik_continuous, simmaps=simmaps, unsorted_lliks_df=unsorted_lliks_df, ess=ess))
   }
   # every map underflowing leaves max() + log(sum(exp())) as NaN, which the optimizer
   # cannot order against anything. a failed evaluation has to leave here as the same
@@ -376,8 +336,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
 hOUwie.fixed.dev <- function(p, simmaps, data, rate.cat, tip.fog,
                              index.disc, index.cont, root.p, 
                              edge_liks_list, all.paths=NULL, 
-                             sample_tips=FALSE, sample_nodes=FALSE,
-                             split.liks=FALSE, adaptive_sampling=FALSE,
+                             sample_nodes=TRUE, split.liks=FALSE,
                              global_liks_mat=NULL, diagn_msg=FALSE){
   tip.paths <- all.paths[1:length(simmaps[[1]]$tip.label)]
   p <- exp(p)
@@ -548,7 +507,7 @@ runSingleThorough <- function(houwie_obj, new_maps, init_pars){
     warning("Model averaged starting values were not usable for one of the models, default starting values were used instead.")
     ip <- NULL
   }
-  res <- hOUwie.fixed(simmaps = new_maps, data = hOUwie.dat$data.ou, rate.cat = rate.cat, discrete_model = index.disc, continuous_model = index.cont, root.p = root.p, tip.fog = tip.fog, adaptive_sampling = FALSE, make_numeric = FALSE, ip = ip)
+  res <- hOUwie.fixed(simmaps = new_maps, data = hOUwie.dat$data.ou, rate.cat = rate.cat, discrete_model = index.disc, continuous_model = index.cont, root.p = root.p, tip.fog = tip.fog, make_numeric = FALSE, ip = ip)
   return(res)
 }
 
@@ -564,12 +523,22 @@ replaceName <- function(edge, observed_traits){
 }
 
 
-getEdgeLiks <- function(phy, data, n.traits, rate.cat, time_slice){
+# `resolution` counts regime points inserted per edge and matches the argument of
+# the same name on the pruning path: 1 is hOUwie's own history model, in which an
+# edge whose endpoints differ switches at its midpoint. It is expressed per edge
+# rather than per unit time because what the painting has to resolve is where on
+# a branch a shift sits, and time_slice only ever refines branches longer than
+# itself - on a tree whose branches are mostly shorter it changes nothing.
+getEdgeLiks <- function(phy, data, n.traits, rate.cat, time_slice, resolution = 1L){
   edge_liks_list <- vector("list", dim(phy$edge)[1])
   nTip <- length(phy$tip.label)
   for(edge_i in 1:dim(phy$edge)[1]){
     # +2 because we slice the middle of the branch and need 2 terminal nodes (ancestor and descendent)
-    n_slice <- (phy$edge.length[edge_i] %/% time_slice) + 2
+    n_slice <- if(resolution > 1L){
+      as.integer(resolution) + 1L
+    }else{
+      (phy$edge.length[edge_i] %/% time_slice) + 2
+    }
     edge_liks_list[[edge_i]] <- matrix(1, n_slice, n.traits * rate.cat)
     if(phy$edge[edge_i,2] <= nTip){
       tmp <- numeric(n.traits)
@@ -641,7 +610,8 @@ getConditionalInternodeLik <- function(phy, Q, edge_liks_list){
 
 
 getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
-                           check_vector=NULL, max.attempts, tree.plan=NULL){
+                           check_vector=NULL, max.attempts, tree.plan=NULL,
+                           unique_only=TRUE, uni=NULL){
   # set-up
   current.attempts <- 0
   nStates <- dim(Q)[1]
@@ -675,7 +645,7 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
   # rather than being searched for again on every edge of every simulated history
   child_edges <- tree.plan$child.edges
   Map_i <- tree.plan$map.template
-  if(!is.null(check_vector)){
+  if(unique_only && !is.null(check_vector)){
     state_samples <- vector("list", nSim)
     sim_counter <- 0
     while(!(sim_counter >= nSim | current.attempts >= max.attempts)){
@@ -698,12 +668,34 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- vapply(state_samples, stateSampleId, character(1))
-  state_samples <- state_samples[!duplicated(mapping_ids)]
-  mapping_ids <- vapply(state_samples, stateSampleId, character(1))
+  # Dropping repeats turns the draw into a sample without replacement, which no
+  # longer has the proposal density the importance weights assume. Repeats are
+  # kept when unique_only is FALSE and deduplicated only for the evaluation of
+  # the continuous likelihood, which is where the saving actually was.
+  if(unique_only){
+    state_samples <- state_samples[!duplicated(mapping_ids)]
+    mapping_ids <- vapply(state_samples, stateSampleId, character(1))
+  }
   state_samples <- state_samples[!mapping_ids == ""]
-  maps <- lapply(state_samples, function(x) getMapFromStateSample(Map_i, x))
+  if(is.null(uni)){
+    maps <- lapply(state_samples, function(x) getMapFromStateSample(Map_i, x))
+  }else{
+    # a bridge that cannot be represented takes its history out of the draw
+    # rather than being replaced by an approximate path, which would carry a
+    # density the importance weights do not know about
+    maps <- lapply(state_samples, function(x)
+      getMapFromStateSampleBridge(x, phy$edge.length, uni))
+    drawn <- !vapply(maps, is.null, logical(1))
+    maps <- maps[drawn]
+    state_samples <- state_samples[drawn]
+  }
   return(list(state_samples=state_samples, maps = maps, root_edges=root_edges,
-              Pij = Pij, Pj = Pj))
+              Pij = Pij, Pj = Pj,
+              log_proposal = vapply(state_samples,
+                                    function(x) attr(x, "log_proposal"),
+                                    numeric(1)),
+              mapping_ids = vapply(state_samples, stateSampleId,
+                                   character(1))))
 }
 
 getMapFromStateSample <- function(map, state_sample){
@@ -715,10 +707,18 @@ getMapFromStateSample <- function(map, state_sample){
   return(map)
 }
 
+# A history is drawn root-tipward from the conditional probabilities in Pj, so
+# the proposal is not the model. The log density of the draw is accumulated here
+# and returned with it, because the importance weight P(h | Q) / q(h) needs it
+# and it cannot be recovered afterwards: Pj carries the partial likelihoods that
+# tilt the draw, and only the normalizer of each categorical step records how
+# much it tilted. sample() normalizes its prob argument internally, so the same
+# normalization has to be done explicitly to get the density right.
 getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges=NULL){
   # each map will have edges split into equal time portions
   state_samples <- lapply(number_of_nodes_per_edge, function(x) numeric(x))
   root_sample <- sample(1:nStates, 1, prob = root_state)
+  log_proposal <- log(root_state[root_sample]) - log(sum(root_state))
   for(i in root_edge){
     state_samples[[i]][1] <- root_sample
   }
@@ -728,7 +728,10 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
     count <- 2
     n_inter_nodes <- length(state_samples[[edge_i]])
     for(inter_edge_i in (n_inter_nodes-1):1){
-      to <- sample(1:nStates, 1, prob = Pj[[edge_i]][from,,inter_edge_i])
+      step_weights <- Pj[[edge_i]][from,,inter_edge_i]
+      to <- sample(1:nStates, 1, prob = step_weights)
+      log_proposal <- log_proposal + log(step_weights[to]) -
+        log(sum(step_weights))
       from <- state_samples[[edge_i]][count] <- to
       count <- count + 1
     }
@@ -741,6 +744,7 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
       state_samples[[i]][1] <- to
     }
   }
+  attr(state_samples, "log_proposal") <- log_proposal
   return(state_samples)
 }
 
@@ -1099,50 +1103,8 @@ getAllJointProbs<- function(phy, data, rate.cat, time_slice, Q, alpha, sigma.sq,
   return(list(joint_probability_table=joint_probability_table, simmap_list=simmap_list, all_combinations=all_combinations))
 }
 
-# branchwise joint calculations for conditional probabilities
-getOUProbBranch <- function(tip_value, states, pars, bl, init_value, init_var){
-  # states are read from tip to root states[1] = tip value, states[2] = node value
-  times <- c(0, bl/2, bl)
-  alphas <- c(pars[1,states])
-  sigma2s <- c(pars[2,states])
-  thetas <- c(pars[3,states])
-  if(is.null(init_value)){
-    values <- c(thetas[1], thetas)
-  }else{
-    values <- c(init_value, thetas)
-  }
-  # finding the expected value
-  tip_weight <- exp(-((alphas[1] * (times[2] - times[1])) + (alphas[2] * (times[3] - times[2]))))
-  theta_1_weight <- tip_weight * (exp(alphas[1] * times[2]) - exp(alphas[1] * times[1]))
-  theta_2_weight <- tip_weight * (exp(alphas[2] * times[3]) - exp(alphas[2] * times[2]))
-  weights <- c(tip_weight, theta_1_weight, theta_2_weight)/sum(c(tip_weight, theta_1_weight, theta_2_weight))
-  expected_value <- sum(values * weights)
-  # finding the variance 
-  var_weight <- exp(-((2 * alphas[1] * (times[2] - times[1])) + (2 * alphas[2] * (times[2] - times[1]))))
-  var_1 <- sigma2s[1]/(2*alphas[1]) * (exp(2 * alphas[1] * times[2]) - exp(2 * alphas[1] * times[1]))
-  var_2 <- sigma2s[2]/(2*alphas[2]) * (exp(2 * alphas[2] * times[3]) - exp(2 * alphas[2] * times[2]))
-  variance <- (sum(c(var_1, var_2)) * var_weight) + init_var
-  loglik <- dnorm(tip_value, expected_value, sqrt(variance), log = TRUE)
-  return(loglik)
-}
 
-getJointProbBranch <- function(states, tip_value, pars, bl, P_mat, init_value, init_var){
-  coninuous_prob <- getOUProbBranch(tip_value, states, pars, bl, init_value, init_var)
-  discrete_prob <- log(P_mat[states[1], states[2]])
-  joint_prob <- sum(coninuous_prob, discrete_prob)
-  return(joint_prob)
-}
 
-getJointBranchMatrix <- function(possible_internal, possible_external, tip_value, pars, bl, P_mat, init_value=NULL, init_var = 0){
-  cond_matrix <- matrix(NA, dim(P_mat)[1], dim(P_mat)[2])
-  for(i in possible_internal){
-    for(j in possible_external){
-      cond_matrix[i,j] <- getJointProbBranch(c(i,j), tip_value, pars, bl, P_mat, init_value, init_var)
-    }
-  }
-  colnames(cond_matrix) <- rownames(cond_matrix) <- c(1:max(possible_internal))
-  return(cond_matrix)
-}
 
 # a function for getting OU expectations per node and tip: both variance and means
 getOUExpectations <- function(simmap, Rate.mat, tip.paths=NULL){
@@ -1198,153 +1160,9 @@ getOUExpectations <- function(simmap, Rate.mat, tip.paths=NULL){
   return(list(expected_means=expected_values, expected_variances=expected_vars))
 }
 
-combineDesc <- function(P_mat_1, P_mat_2){
-  # P_mat_1 <- node_mat[[1]]
-  # P_mat_2 <- node_mat[[2]]
-  normalized_combined_probs <- vector("list", dim(P_mat_1)[1])
-  for(i in 1:dim(P_mat_1)[1]){
-    combined_probs_i <- P_mat_1[i,] * t(P_mat_2)
-    normalized_combined_probs[[i]] <- t(combined_probs_i)/colSums(combined_probs_i)
-  }
-  normalized_combined_probs <- do.call(rbind, normalized_combined_probs)
-  return(normalized_combined_probs)  
-}
 
 
-# a function for generating an altnerative conditional probabilities (cherry sampling of continuous)
-getCherryConditionals <- function(phy, data, Rate.mat, Q, edge_liks_list,tip.paths){
-  node_ages <- branching.times(phy)
-  dec_liks <- do.call(rbind, lapply(edge_liks_list, function(x) x[1,]))
-  anc <- unique(phy$edge[,1])
-  possible_internal <- 1:dim(Q)[1]
-  for(i in 1:length(anc)){
-    # whatever tip paths are chosen, they must include each of these
-    # i = 3
-    node_edges <- which(phy$edge[,1] == anc[i])
-    bl <- node_ages[names(node_ages) == anc[i]]
-    node_mat <- vector("list", length(node_edges))
-    P_mat <- expm(Q * bl)
-    for(j in 1:length(node_edges)){
-      # j = 1
-      # tips which contain j are shown here
-      tips_from_anc <- which(unlist(lapply(tip.paths, function(x) any(node_edges[j] %in% x))))
-      # tip_sampled <- sample(c(tips_from_anc, tips_from_anc), 1)
-      tip_sampled <- tips_from_anc
-      tip_index <- match(tip_sampled, phy$edge[,2]) # relative to the edge matrix
-      possible_external <- matrix(dec_liks[tip_index,], ncol = length(possible_internal))
-      # possible_external <- which(dec_liks[tip_index,] == 1)
-      # tip_value <- mean(data[data$sp %in% phy$tip.label[tip_sampled],3])
-      tip_values <- c(data[data$sp %in% phy$tip.label[tip_sampled],3])
-      # branch_matrix <- getJointBranchMatrix(possible_internal, possible_external, tip_value, Rate.mat, bl, P_mat)
-      branch_matrices <- vector("list", length(tip_values))
-      for(k in 1:length(tip_values)){
-        branch_matrices[[k]] <- getJointBranchMatrix(possible_internal, which(possible_external[k,] == 1), tip_values[k], Rate.mat, bl, P_mat)
-      }
-      # branch_matrix <- getJointBranchMatrix(possible_internal, possible_internal, tip_value, Rate.mat, bl, P_mat)
-      # the likelihood that the rootward state led to the known tip ward state
-      node_state_liks_list <- lapply(branch_matrices, 
-                                     function(x) apply(x, 1, sum_lliks))
-      node_state_liks_list <- lapply(node_state_liks_list, 
-                                     function(x) exp(x - max(x))/sum(exp(x - max(x))))
-      node_state_liks <- do.call(rbind, node_state_liks_list)
-      node_mat[[j]] <- node_state_liks
-    }
-    node_mat <- lapply(node_mat, colMeans)
-    new_node_mat <- do.call(rbind, node_mat)
-    # new_node_mat <- node_mat[[1]]
-    # for(j in 2:length(node_mat)){
-    #   new_node_mat <- combineDesc(new_node_mat, node_mat[[j]])
-    # }
-    # node_mat contains two (or more lists) of tip samples, what needs to happen now is the combination of the two edges as parent daughters and then the combination of those pairs
-    # node_state_liks <- Reduce("*", node_state_liks_list)
-    # node_state_liks <- apply(branch_matrix, 1, sum_lliks)
-    # node_state_probs <- exp(node_state_liks - max(node_state_liks))/sum(exp(node_state_liks - max(node_state_liks)))
-    # once that node has finished calculating it's conditional probabilitity of each state, we combine the two dec tips
-    # node_mat[node_mat == 0] <- 1e-10
-    # node_cond_prob <- apply(node_mat, 2, prod)
-    node_cond_prob <- colMeans(new_node_mat)
-    # node_state_probs[node_state_probs == 0] <- 1e-10
-    # node_cond_prob <- node_state_probs
-    # this gets place in the edge matrix
-    anc_index <- which(phy$edge[,1] %in% anc[i])
-    dec_index <- which(phy$edge[,2] %in% anc[i])
-    for(k in anc_index){
-      # k = 5
-      edge_liks_list[[k]][dim(edge_liks_list[[k]])[1],] <- node_cond_prob/sum(node_cond_prob)
-    }
-    if(length(dec_index) > 0){
-      for(k in dec_index){
-        edge_liks_list[[k]][1,] <- node_cond_prob/sum(node_cond_prob)
-      }
-    }
-  }
-  return(edge_liks_list)
-}
 
-# a function for generating an altnerative conditional probabilities (adaptive sampling of continuous)
-getAdaptiveConditionals <- function(phy, data, Rate.mat,  Q, edge_liks_list, tip.paths, ou_expectations){
-  node_ages <- branching.times(phy)
-  dec_liks <- do.call(rbind, lapply(edge_liks_list, function(x) x[1,]))
-  anc <- unique(phy$edge[,1])
-  possible_internal <- 1:dim(Q)[1]
-  for(i in 1:length(anc)){
-    # whatever tip paths are chosen, they must include each of these
-    # i = 3
-    anc_value <- ou_expectations$expected_means[names(ou_expectations$expected_means) == anc[i]]
-    anc_var <- ou_expectations$expected_variances[names(ou_expectations$expected_variances) == anc[i]]
-    node_edges <- which(phy$edge[,1] == anc[i])
-    bl <- node_ages[names(node_ages) == anc[i]]
-    node_mat <- vector("list", length(node_edges))
-    P_mat <- expm(Q * bl)
-    for(j in 1:length(node_edges)){
-      # j = 1
-      # tips which contain j are shown here
-      tips_from_anc <- which(unlist(lapply(tip.paths, function(x) node_edges[j] %in% x)))
-      # tips_from_anc <- which(unlist(lapply(tip.paths, function(x) any(node_edges %in% x))))
-      # tip_sampled <- sample(c(tips_from_anc, tips_from_anc), 1)
-      tip_sampled <- tips_from_anc
-      tip_index <- match(tip_sampled, phy$edge[,2]) # relative to the edge matrix
-      possible_external <- matrix(dec_liks[tip_index,], ncol = length(possible_internal))
-      # tip_value <- mean(data[data$sp %in% phy$tip.label[tip_sampled],3])
-      tip_values <- c(data[data$sp %in% phy$tip.label[tip_sampled],3])
-      # branch_matrix <- getJointBranchMatrix(possible_internal, possible_external, tip_value, Rate.mat, bl, P_mat)
-      # branch_matrices <- lapply(tip_values, function(x) getJointBranchMatrix(possible_internal, possible_external, x, Rate.mat, bl, P_mat))
-      branch_matrices <- vector("list", length(tip_values))
-      for(k in 1:length(tip_values)){
-        branch_matrices[[k]] <- getJointBranchMatrix(possible_internal, which(possible_external[k,] == 1), tip_values[k], Rate.mat, bl, P_mat, init_value = anc_value, init_var = anc_var)
-      }
-      # branch_matrix <- getJointBranchMatrix(possible_internal, possible_internal, tip_value, Rate.mat, bl, P_mat, init_value = anc_value, init_var = anc_var)
-      # the likelihood that the rootward state led to the known tip ward state
-      node_state_liks_list <- lapply(branch_matrices, 
-                                     function(x) apply(x, 1, sum_lliks))
-      node_state_liks_list <- lapply(node_state_liks_list, 
-                                     function(x) exp(x - max(x))/sum(exp(x - max(x))))
-      node_state_liks <- do.call(rbind, node_state_liks_list)
-      node_mat[[j]] <- node_state_liks
-    }
-    new_node_mat <- node_mat[[1]]
-    for(j in 2:length(node_mat)){
-      new_node_mat <- combineDesc(new_node_mat, node_mat[[j]])
-    }
-    node_cond_prob <- colMeans(new_node_mat)
-    # once that node has finished calculating it's conditional probabilitity of each state, we combine the two dec tips
-    # node_mat[node_mat == 0] <- 1e-10
-    # node_cond_prob <- apply(node_mat, 2, prod)
-    # this gets place in the edge matrix
-    anc_index <- which(phy$edge[,1] %in% anc[i])
-    dec_index <- which(phy$edge[,2] %in% anc[i])
-    for(k in anc_index){
-      # k = 5
-      edge_liks_list[[k]][dim(edge_liks_list[[k]])[1],] <- node_cond_prob/sum(node_cond_prob)
-    }
-    if(length(dec_index) > 0){
-      for(k in dec_index){
-        edge_liks_list[[k]][1,] <- node_cond_prob/sum(node_cond_prob)
-      }
-    }
-  }
-  return(edge_liks_list)
-}
 
 # get root liks from conditionals
 getRootLiks <- function(conditional_probs, Q, root.p){
@@ -1585,7 +1403,7 @@ getObjTraitShift <- function(houwie_obj){
   return(houwie_obj$trait_shift)
 }
 # organize the houwie output
-getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip.fog, index.disc, index.cont, root.p, nSim, sample_tips, sample_nodes, adaptive_sampling, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values, trait_shift=0){
+getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip.fog, index.disc, index.cont, root.p, nSim, sample_nodes, nStates, discrete_model, continuous_model, time_slice, root.station, get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model,ip, opts, quiet, negative_values, trait_shift=0){
   param.count <- max(index.disc, na.rm = TRUE) + max(index.cont, na.rm = TRUE)
   nb.tip <- length(phy$tip.label)
   solution <- organizeHOUwiePars(pars=pars, index.disc=index.disc, index.cont=index.cont)
@@ -1618,6 +1436,10 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
   }
   obj <- list(
     loglik = liks_houwie$TotalLik,
+    # effective sample size of the importance weights at the reported optimum.
+    # a value near 1 means one sampled history carried the whole likelihood and
+    # nSim should be raised (or the proposal improved) before the fit is trusted
+    ess = liks_houwie$ess,
     DiscLik = liks_houwie$DiscLik,
     ContLik = liks_houwie$ContLik,
     AIC = -2*liks_houwie$TotalLik + 2*param.count,
@@ -1641,9 +1463,7 @@ getHouwieObj <- function(liks_houwie, pars, phy, data, hOUwie.dat, rate.cat, tip
     root.station=root.station, 
     get.root.theta=get.root.theta, 
     tip.fog = tip.fog, 
-    sample_tips = sample_tips,
     sample_nodes = sample_nodes,
-    adaptive_sampling = adaptive_sampling,
     lb_discrete_model=lb_discrete_model, 
     ub_discrete_model=ub_discrete_model,
     lb_continuous_model=lb_continuous_model, 
@@ -1732,12 +1552,6 @@ correct_edge <- function(edge){
   return(new_edge_lengths)
 }
 
-# simple funciton for getting a probability from logliks
-sum_lliks <- function(lliks){
-  lliks[is.na(lliks)] <- -Inf
-  out <- max(lliks, na.rm = TRUE) + log(sum(exp(lliks - max(lliks))))
-  return(out)
-}
 
 # get weighted tip values from a stochastic map reults
 get_tip_values <- function(model){

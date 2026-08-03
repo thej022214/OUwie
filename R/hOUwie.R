@@ -1,21 +1,20 @@
 # set of functions for the hidden rates OU model
 ##### Main exported functions ##### 
-hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, nSim=100, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=FALSE, adaptive_sampling=FALSE, common_random_numbers=TRUE, diagn_msg=FALSE, n_starts = 1, ncores = 1, algorithm=c("sampling", "pruning"), legacy=NULL, resolution=1L, max_components=NULL, tolerance=0){
+hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, nSim=100, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_nodes=TRUE, common_random_numbers=TRUE, diagn_msg=FALSE, n_starts = 1, ncores = 1, algorithm=c("sampling", "pruning"), resolution=1L, history=c("midpoint", "bridge")){
   algorithm <- match.arg(algorithm)
-  if(!is.null(legacy)){
-    if(!is.logical(legacy) || length(legacy) != 1 || is.na(legacy)){
-      stop("legacy must be either TRUE or FALSE.", call. = FALSE)
-    }
-    algorithm <- if(legacy) "sampling" else "pruning"
-  }
+  # "midpoint" is hOUwie's own history model, in which an edge whose endpoints
+  # differ switches at its midpoint. "bridge" draws the within-edge path from the
+  # exact continuous-time process instead; the importance weights are unchanged
+  # because the bridge densities cancel against the proposal.
+  history <- match.arg(history)
   if(algorithm == "pruning"){
     # the pruning path integrates the histories out, so there are no sampled
     # maps for anything downstream of the likelihood to reconstruct from
     if(recon){
       stop("recon is not available with algorithm = \"pruning\": ancestral states are reconstructed from sampled maps, which this path does not produce. Use algorithm = \"sampling\".", call. = FALSE)
     }
-    if(sample_tips || sample_nodes || adaptive_sampling){
-      warning("sample_tips, sample_nodes and adaptive_sampling only shape the proposal used by algorithm = \"sampling\" and are ignored by \"pruning\".", call. = FALSE, immediate. = TRUE)
+    if(!missing(sample_nodes) && sample_nodes || !missing(history)){
+      warning("sample_nodes and history only shape the proposal used by algorithm = \"sampling\" and are ignored by \"pruning\".", call. = FALSE, immediate. = TRUE)
     }
   }
 	if(any(grepl("OUMA|OUMVA|OUVA", continuous_model))) {
@@ -162,18 +161,15 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   checkParameterLength(ip, index.disc, index.cont, "ip")
 
   # an internal data structure (internodes liks matrix) for the dev function
-  edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
+  edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice, resolution)
   tree.plan <- getHOUwieTreePlan(phy, edge_liks_list)
   all.paths <- tree.plan$all.paths
 
-  # the ceiling has to be read off the data rather than fixed in the signature,
-  # because what drives it is whether any tip is ambiguous about its regime
-  if(is.null(max_components)){
-    max_components <- if(algorithm == "pruning"){
-      getDefaultMaxComponents(getTipStateSets(phy, edge_liks_list, nStates))
-    }else{
-      Inf
-    }
+  # the pruning path is exact and only exact: capping the mixture is what would
+  # make it affordable on a large tree, and the error that introduces is
+  # unbounded, so the size is checked up front instead
+  if(algorithm == "pruning"){
+    checkPruningFeasible(phy, nStates, resolution)
   }
 
   # default MLE search options
@@ -279,7 +275,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           global_liks_mat
         }
         objective <- function(p){
-          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=max_components, tolerance=tolerance)
+          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=Inf, tolerance=0, history=history)
         }
         if(common_random_numbers){
           objective <- makeCommonRandomObjective(objective, crn_seeds[start_index])
@@ -332,7 +328,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           global_liks_mat
         }
         objective <- function(p){
-          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=max_components, tolerance=tolerance)
+          hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, global_liks_mat=local_liks_mat, diagn_msg=diagn_msg, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=Inf, tolerance=0, history=history)
         }
         if(common_random_numbers){
           objective <- makeCommonRandomObjective(objective, crn_seeds[start_index])
@@ -370,17 +366,15 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   }
   # preparing output
   final_objective <- function(p){
-    hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=max_components, tolerance=tolerance)
+    hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=Inf, tolerance=0, history=history)
   }
   if(common_random_numbers){
     final_objective <- makeCommonRandomObjective(final_objective, selected_crn_seed)
   }
   liks_houwie <- final_objective(pars)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=phy, data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=nSim, sample_nodes=sample_nodes, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
   houwie_obj$algorithm <- algorithm
   houwie_obj$resolution <- resolution
-  houwie_obj$max_components <- max_components
-  houwie_obj$tolerance <- tolerance
   houwie_obj$common_random_numbers <- common_random_numbers
   houwie_obj$crn_seeds <- if(common_random_numbers) crn_seeds else NULL
   houwie_obj$crn_seed <- if(common_random_numbers) selected_crn_seed else NULL
@@ -408,7 +402,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
 }
 
 
-hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_tips=FALSE, sample_nodes=TRUE, adaptive_sampling=FALSE, diagn_msg=FALSE, make_numeric = TRUE, n_starts = 1, ncores = 1){
+hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_model, null.model=FALSE, root.p="yang", dual = FALSE, collapse = TRUE, root.station=FALSE, get.root.theta=FALSE, tip.fog = "none", lb_discrete_model=NULL, ub_discrete_model=NULL, lb_continuous_model=NULL, ub_continuous_model=NULL, recon=FALSE, nodes="internal", p=NULL, ip=NULL, optimizer="nlopt_ln", opts=NULL, quiet=FALSE, sample_nodes=TRUE, diagn_msg=FALSE, make_numeric = TRUE, n_starts = 1, ncores = 1){
   start_time <- Sys.time()
   data <- matchTipsAndData(simmaps[[1]]$tip.label, data)
   # if the data has negative values, shift it right - we will shift it back later
@@ -616,7 +610,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              index.disc=index.disc, index.cont=index.cont, root.p=root.p,
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths,
       #              sample_tips=sample_tips, split.liks=FALSE)
-      multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
+      multi_out <- mclapply(multiple_starts, function(x) nloptr(x0=log(x), eval_f=hOUwie.fixed.dev, lb=lower, ub=upper, opts=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog,index.disc=index.disc, index.cont=index.cont, root.p=root.p,edge_liks_list=edge_liks_list, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, global_liks_mat=global_liks_mat, diagn_msg=diagn_msg), mc.cores = ncores)
       # a start that failed returns the 1e10 penalty from hOUwie.fixed.dev, and a start
       # whose fork died comes back from mclapply as a try-error with no $objective. NA
       # keeps one entry per start so multi_logliks stays aligned with multi_out.
@@ -656,7 +650,7 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
       #              edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, 
       #              sample_tips=sample_tips, split.liks=FALSE)
       # global_liks_mat belongs to GenSA's ... , not to mclapply's
-      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, diagn_msg=diagn_msg, global_liks_mat=global_liks_mat), mc.cores = ncores)
+      multi_out <- mclapply(multiple_starts, function(x) GenSA(par=log(x), fn=hOUwie.fixed.dev, lower=lower, upper=upper, control=opts, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, diagn_msg=diagn_msg, global_liks_mat=global_liks_mat), mc.cores = ncores)
       multi_logliks <- unlist(lapply(multi_out, function(x){
         if(inherits(x, what="try-error") || is.null(x$value)){
           NA_real_
@@ -680,8 +674,8 @@ hOUwie.fixed <- function(simmaps, data, rate.cat, discrete_model, continuous_mod
     }
   }
   # preparing output
-  liks_houwie <- hOUwie.fixed.dev(p = pars, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=TRUE, global_liks_mat=global_liks_mat)
-  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
+  liks_houwie <- hOUwie.fixed.dev(p = pars, simmaps=simmaps, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=TRUE, global_liks_mat=global_liks_mat)
+  houwie_obj <- getHouwieObj(liks_houwie, pars=exp(pars), phy=simmaps[[1]], data=data, hOUwie.dat=hOUwie.dat, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, nSim=NULL, sample_nodes=sample_nodes, nStates=nStates, discrete_model=discrete_model, continuous_model=continuous_model, time_slice=time_slice, root.station=root.station, get.root.theta=get.root.theta,lb_discrete_model,ub_discrete_model,lb_continuous_model,ub_continuous_model, ip=ip, opts=opts, quiet=quiet, negative_values=negative_values, trait_shift=trait_shift)
   # adding independent model if included
   # if(is.null(p)){
   #   liks_indep <- hOUwie.dev(p = log(starts), phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, sample_tips=sample_tips, split.liks=TRUE)
@@ -716,10 +710,11 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
   index.disc <- houwie_obj$index.disc
   p <- houwie_obj$p
   time_slice <- houwie_obj$time_slice
+  # the reconstruction has to paint regimes at the resolution the fit used, or it
+  # reports a history the reported likelihood never scored
+  resolution <- if(is.null(houwie_obj$resolution)) 1L else houwie_obj$resolution
   state_names <- colnames(houwie_obj$solution.disc)
-  sample_tips <- houwie_obj$sample_tips
   sample_nodes <- houwie_obj$sample_nodes
-  adaptive_sampling <- houwie_obj$adaptive_sampling
   nSim <- houwie_obj$nSim
   # the reconstruction below fixes a node to a state through edge_liks_list and then
   # calls hOUwie.dev, which resimulates nSim maps under that constraint. hOUwie.fixed
@@ -748,7 +743,7 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
   nStates <- getNumberOfStates(hOUwie.dat$data.cor[,2])
   all.paths <- lapply(1:(Nnode(phy) + Ntip(phy)), function(x) getPathToRoot(phy, x))
   # an internal data structure (internodes liks matrix) for the dev function
-  edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice)
+  edge_liks_list <- getEdgeLiks(phy, hOUwie.dat$data.cor, nStates, rate.cat, time_slice, resolution)
   use_common_random_numbers <- isTRUE(houwie_obj$common_random_numbers) && !is.null(houwie_obj$crn_seed)
   if(is.character(nodes[1])){
     if(nodes == "internal"){
@@ -791,7 +786,7 @@ hOUwie.recon <- function(houwie_obj, nodes="all"){
         edge_liks_list_i[[k]][last_row,] <- fix_vector
       }
       recon_objective <- function(p){
-        hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list_i, nSim=nSim, all.paths=all.paths, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, split.liks=FALSE, global_liks_mat=NULL)
+        hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list_i, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, global_liks_mat=NULL)
       }
       if(use_common_random_numbers){
         recon_objective <- makeCommonRandomObjective(recon_objective, houwie_obj$crn_seed)
@@ -897,9 +892,7 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
   index.disc <- houwie_obj$index.disc
   time_slice <- houwie_obj$time_slice
   state_names <- colnames(houwie_obj$solution.disc)
-  sample_tips <- houwie_obj$sample_tips
   sample_nodes <- houwie_obj$sample_nodes
-  adaptive_sampling <- houwie_obj$adaptive_sampling
   common_random_numbers <- isTRUE(houwie_obj$common_random_numbers)
   crn_seed <- houwie_obj$crn_seed
   nSim <- houwie_obj$nSim
@@ -929,7 +922,7 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
 
   houwie_to_run <- function(par){
     evaluate_par <- function(){
-      hOUwie(p = par, phy=phy, data=houwie_obj$data, rate.cat=rate.cat, tip.fog=tip.fog, discrete_model = index.disc, continuous_model = index.cont, root.p=root.p, nSim=nSim, sample_tips=sample_tips, sample_nodes=sample_nodes, adaptive_sampling=adaptive_sampling, common_random_numbers=common_random_numbers, quiet = TRUE)$loglik
+      hOUwie(p = par, phy=phy, data=houwie_obj$data, rate.cat=rate.cat, tip.fog=tip.fog, discrete_model = index.disc, continuous_model = index.cont, root.p=root.p, nSim=nSim, sample_nodes=sample_nodes, common_random_numbers=common_random_numbers, quiet = TRUE)$loglik
     }
     fixed_loglik <- if(common_random_numbers && !is.null(crn_seed)){
       withHOUwieSeed(crn_seed, evaluate_par())
