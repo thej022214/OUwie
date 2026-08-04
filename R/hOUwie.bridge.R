@@ -70,8 +70,9 @@ sampleBranchBridge <- function(init, final, blen, uni){
   weights <- stats::dpois(n_grid, uni$mu * blen) *
     uni$powers[init, final, n_grid + 1L]
   weights[!is.finite(weights)] <- 0
-  if(sum(weights) <= 0) return(NULL)
-  n_events <- sample(n_grid, 1L, prob = weights)
+  drawn <- drawFromWeights(weights)
+  if(drawn == 0L) return(NULL)
+  n_events <- n_grid[drawn]
   if(n_events == 0L){
     # no events at all is only consistent with the endpoints agreeing, which the
     # weights above already enforce because R^0 is the identity
@@ -87,8 +88,9 @@ sampleBranchBridge <- function(init, final, blen, uni){
       # chance of still reaching `final` in the events that remain
       step <- uni$R[states[i], ] * uni$powers[, final, n_events - i + 1L]
       step[!is.finite(step)] <- 0
-      if(sum(step) <= 0) return(NULL)
-      states[i + 1L] <- sample.int(length(step), 1L, prob = step)
+      drawn <- drawFromWeights(step)
+      if(drawn == 0L) return(NULL)
+      states[i + 1L] <- drawn
     }
   }
   durations <- diff(c(0, times, blen))

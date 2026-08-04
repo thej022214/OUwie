@@ -200,6 +200,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   global_liks_mat <- as.data.table(tmp.df)
   crn_seeds <- integer(0)
   selected_crn_seed <- NULL
+  selection_seed <- NULL
   
   # p is organized into 2 groups with the first set being corHMM and the second set being OUwie
   # organized as c(trans.rt, alpha, sigma.sq, theta)
@@ -261,6 +262,19 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     if(common_random_numbers){
       crn_seeds <- sample.int(.Machine$integer.max, length(multiple_starts))
     }
+    if(algorithm != "pruning"){
+      # one seed, drawn before any start runs and used by none of them, on which every
+      # solution is re-scored and the fit is finally reported. See
+      # selectStartOnCommonSeed(). The pruning path integrates the histories exactly,
+      # so its objective carries no draw to select on.
+      selection_seed <- sample.int(.Machine$integer.max, 1)
+      # global_liks_mat is keyed on parameters alone, so a likelihood cached during a
+      # start's own optimisation would be returned here even though it was computed
+      # under that start's seed. Re-scoring must run uncached.
+      selection_objective <- function(p){
+        hOUwie.dev(p=p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=FALSE, global_liks_mat=NULL, diagn_msg=FALSE, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=Inf, tolerance=0, history=history)
+      }
+    }
     if(length(grep("nlopt", optimizer)) == 1){
       # out = nloptr(x0=log(starts), eval_f=hOUwie.dev, lb=lower, ub=upper, opts=opts,
       #              phy=phy, data=hOUwie.dat$data.ou,
@@ -306,11 +320,25 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           return(NULL)
         }
       }
-      out <- multi_out[[which.min(multi_logliks)]]
+      best_start <- which.min(multi_logliks)
+      if(!is.null(selection_seed)){
+        reselected <- selectStartOnCommonSeed(lapply(multi_out, function(x) x$solution), selection_objective, selection_seed)
+        if(!is.null(reselected)){
+          best_start <- reselected$index
+          multi_logliks <- reselected$scores
+        }
+      }
+      out <- multi_out[[best_start]]
       pars <- out$solution
       if(common_random_numbers){
         selected_crn_seed <- out$houwie_crn_seed
-        global_liks_mat <- out$houwie_liks_mat
+        # the winner's cache holds values computed under the winner's own seed, which
+        # is not the seed the fit is reported under once re-scoring has happened.
+        if(is.null(selection_seed)){
+          global_liks_mat <- out$houwie_liks_mat
+        }else{
+          global_liks_mat <- NULL
+        }
       }
     }
     if(length(grep("sann", optimizer)) == 1){
@@ -356,11 +384,23 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
           return(NULL)
         }
       }
-      out <- multi_out[[which.min(multi_logliks)]]
+      best_start <- which.min(multi_logliks)
+      if(!is.null(selection_seed)){
+        reselected <- selectStartOnCommonSeed(lapply(multi_out, function(x) x$par), selection_objective, selection_seed)
+        if(!is.null(reselected)){
+          best_start <- reselected$index
+          multi_logliks <- reselected$scores
+        }
+      }
+      out <- multi_out[[best_start]]
       pars <- out$par
       if(common_random_numbers){
         selected_crn_seed <- out$houwie_crn_seed
-        global_liks_mat <- out$houwie_liks_mat
+        if(is.null(selection_seed)){
+          global_liks_mat <- out$houwie_liks_mat
+        }else{
+          global_liks_mat <- NULL
+        }
       }
     }
   }
@@ -368,7 +408,11 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   final_objective <- function(p){
     hOUwie.dev(p = p, phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, all.paths=all.paths, sample_nodes=sample_nodes, split.liks=TRUE, global_liks_mat=global_liks_mat, diagn_msg=FALSE, tree.plan=tree.plan, algorithm=algorithm, resolution=resolution, max_components=Inf, tolerance=0, history=history)
   }
-  if(common_random_numbers){
+  if(!is.null(selection_seed)){
+    # report the value the starts were compared on, not the value the winning start
+    # optimised its way to under its own draw.
+    final_objective <- makeCommonRandomObjective(final_objective, selection_seed)
+  }else if(common_random_numbers){
     final_objective <- makeCommonRandomObjective(final_objective, selected_crn_seed)
   }
   liks_houwie <- final_objective(pars)
@@ -378,6 +422,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
   houwie_obj$common_random_numbers <- common_random_numbers
   houwie_obj$crn_seeds <- if(common_random_numbers) crn_seeds else NULL
   houwie_obj$crn_seed <- if(common_random_numbers) selected_crn_seed else NULL
+  houwie_obj$selection_seed <- selection_seed
   # adding independent model if included
   # if(is.null(p)){
   #   liks_indep <- hOUwie.dev(p = log(starts), phy=phy, data=hOUwie.dat$data.ou, rate.cat=rate.cat, tip.fog=tip.fog, index.disc=index.disc, index.cont=index.cont, root.p=root.p, edge_liks_list=edge_liks_list, nSim=nSim, tip.paths=tip.paths, sample_tips=sample_tips, split.liks=TRUE)
@@ -1182,8 +1227,19 @@ print.houwie <- function(x, ...){
   print(x$solution.cont)
   cat("\n")
   if(!any(is.na(x$solution.cont[1,]))){
-    cat("\nHalf-life (another way of reporting alpha)\n")
+    # alpha is a rate whose scale only means something against the tree: log(2)/alpha
+    # is the time the expected trait takes to close half the gap to its optimum, which
+    # is directly comparable to branch lengths and to the height of the tree.
+    cat("\nHalf-life (time for the expected trait to move half way to its optimum)\n")
     print(log(2)/x$solution.cont[1,])
+  }
+  if(!any(is.na(x$solution.cont[1:2,]))){
+    # alpha and sigma.sq are only interpretable together: it is sigma^2 / 2 alpha that
+    # sets how far the trait wanders around an optimum, and so whether the thetas are
+    # far enough apart for the regimes to be distinguishable. Undefined without a pull,
+    # since a Brownian process never settles.
+    cat("\nStationary variance (equilibrium variance of the trait around each optimum)\n")
+    print(x$solution.cont[2,]/(2 * x$solution.cont[1,]))
   }
 }
 

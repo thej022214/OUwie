@@ -15,6 +15,19 @@ withHOUwieSeed <- function(seed, code){
   force(code)
 }
 
+# Categorical draw by inverse CDF, returning 0L when no state has positive weight so
+# the caller can bail rather than trap an error out of sample(). getInternodeStateSample
+# inlines this rather than calling it: it draws once per internode of every edge of
+# every history, where even the call overhead is worth removing.
+drawFromWeights <- function(weights){
+  cumulative <- cumsum(weights)
+  total <- cumulative[length(cumulative)]
+  if(!isTRUE(total > 0)){
+    return(0L)
+  }
+  sum(stats::runif(1L) * total > cumulative) + 1L
+}
+
 makeCommonRandomObjective <- function(objective, seed){
   force(objective)
   force(seed)
@@ -23,15 +36,44 @@ makeCommonRandomObjective <- function(objective, seed){
   }
 }
 
-# A sampled history is a list of state sequences, one per edge. Separating both
-# states and edges avoids collisions once state identifiers have more than one digit.
+# Each start optimises against its own stream of sampled histories, so the objective
+# a start finishes on is the value of that start's particular draw. Ranking starts on
+# those values maximises over the random draw as well as over the parameters, and the
+# winner's optimism grows with the number of starts. Re-scoring every solution under
+# one seed shared by all of them separates "which start found the best parameters"
+# from "which start drew the luckiest histories". Returns NULL when nothing could be
+# scored, so the caller can fall back to its own ranking.
+selectStartOnCommonSeed <- function(solutions, objective, seed){
+  scores <- vapply(solutions, function(p){
+    value <- try(withHOUwieSeed(seed, objective(p)), silent = TRUE)
+    # 1e10 is the penalty hOUwie.dev returns for a numerical failure, so a solution
+    # that fails under the shared seed is unrankable rather than merely bad.
+    if(inherits(value, what="try-error") || !is.finite(value) || value >= 1e10){
+      NA_real_
+    }else{
+      as.numeric(value)
+    }
+  }, numeric(1))
+  if(all(is.na(scores))){
+    return(NULL)
+  }
+  list(index = which.min(scores), scores = scores)
+}
+
+# A sampled history is a list of state sequences, one per edge. Every draw on a given
+# tree is cut at the same internodes, so the segment lengths are constant across draws
+# and carry no identifying information; one byte per state is then unambiguous without
+# any separator, which is what makes the collisions this used to guard against
+# impossible. States are small positive integers, so no byte is nul.
 stateSampleId <- function(state.sample){
   if(length(state.sample) == 0L){
     return("")
   }
-  paste(paste(lengths(state.sample), collapse = ","),
-        paste(unlist(state.sample, use.names = FALSE), collapse = ","),
-        sep = "|")
+  states <- unlist(state.sample, use.names = FALSE)
+  if(max(states) > 255L){
+    return(paste(states, collapse = ","))
+  }
+  rawToChar(as.raw(states))
 }
 
 # Compile topology and discretisation metadata that is constant across every
@@ -239,11 +281,18 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   # Keep histories as compact edge-segment lists while evaluating the objective.
   # Full simmap trees and mapped.edge matrices are only needed by downstream output.
   compact.maps <- internode_maps[!failed_maps]
+  # Left to itself OUwie.basic recovers the regime set with unique(unlist(lapply(map,
+  # names))), which walks every segment of every edge in character space once per
+  # draw. The regimes are known here and are the same for every history, so they are
+  # handed over instead. Passing all of them rather than only the ones a particular
+  # history visits also skips the subsetting of Rate.mat and pars, and leaves regime
+  # numbers indexing those directly instead of by position in the visited subset.
+  map.states <- as.character(seq_along(theta))
   continuous.lik <- function(current.map){
     OUwie.basic(phy, data, simmap.tree=TRUE, scaleHeight=FALSE,
                 alpha=alpha, sigma.sq=sigma.sq, theta=theta,
                 algorithm="three.point", tip.paths=tip.paths, tip.fog=tip.fog,
-                map=current.map, tree.plan=tree.plan)
+                map=current.map, map.states=map.states, tree.plan=tree.plan)
   }
   simmaps <- NULL
   # if there is no character dependence the map has no influence on continuous likleihood
@@ -699,10 +748,14 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
 }
 
 getMapFromStateSample <- function(map, state_sample){
-  for(edge_i in 1:length(map)){
-    state_transitions <- rep(state_sample[[edge_i]][-c(1, length(state_sample[[edge_i]]))], each = 2)
-    state_samples_i <- c(state_sample[[edge_i]][1],state_transitions,state_sample[[edge_i]][length(state_sample[[edge_i]])])
-    names(map[[edge_i]]) <- state_samples_i
+  for(edge_i in seq_along(map)){
+    states_i <- state_sample[[edge_i]]
+    n_i <- length(states_i)
+    names(map[[edge_i]]) <- if(n_i > 2L){
+      c(states_i[1L], rep(states_i[-c(1L, n_i)], each = 2L), states_i[n_i])
+    }else{
+      states_i
+    }
   }
   return(map)
 }
@@ -712,13 +765,30 @@ getMapFromStateSample <- function(map, state_sample){
 # and returned with it, because the importance weight P(h | Q) / q(h) needs it
 # and it cannot be recovered afterwards: Pj carries the partial likelihoods that
 # tilt the draw, and only the normalizer of each categorical step records how
-# much it tilted. sample() normalizes its prob argument internally, so the same
-# normalization has to be done explicitly to get the density right.
+# much it tilted. The draw is taken by inverse CDF rather than with sample(), whose
+# argument validation costs more than the draw itself when it runs once per internode
+# of every edge of every history; the cumulative sum it walks also hands back the
+# normalizer the density needs, so nothing is summed twice.
 getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges=NULL){
-  # each map will have edges split into equal time portions
-  state_samples <- lapply(number_of_nodes_per_edge, function(x) numeric(x))
-  root_sample <- sample(1:nStates, 1, prob = root_state)
-  log_proposal <- log(root_state[root_sample]) - log(sum(root_state))
+  # each map will have edges split into equal time portions. States are held as
+  # integers so that indexing with them, and the as.character() that turns them into
+  # map names downstream, both skip a double-to-integer round trip on every draw.
+  state_samples <- lapply(number_of_nodes_per_edge, function(x) integer(x))
+  # one block of uniforms for the whole history: the root draw plus one per internode
+  # step, so the generator is entered once instead of once per state.
+  uniforms <- runif(1L + sum(number_of_nodes_per_edge - 1L))
+  draw_i <- 1L
+
+  cumulative <- cumsum(root_state)
+  total <- cumulative[length(cumulative)]
+  if(!isTRUE(total > 0)){
+    stop("no state at the root has positive conditional probability")
+  }
+  # a state whose weight is zero spans an empty interval of the cumulative sum, so it
+  # can never be drawn and log(weight) below is never -Inf
+  root_sample <- sum(uniforms[draw_i] * total > cumulative) + 1L
+  draw_i <- draw_i + 1L
+  log_proposal <- log(root_state[root_sample]) - log(total)
   for(i in root_edge){
     state_samples[[i]][1] <- root_sample
   }
@@ -729,9 +799,17 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
     n_inter_nodes <- length(state_samples[[edge_i]])
     for(inter_edge_i in (n_inter_nodes-1):1){
       step_weights <- Pj[[edge_i]][from,,inter_edge_i]
-      to <- sample(1:nStates, 1, prob = step_weights)
-      log_proposal <- log_proposal + log(step_weights[to]) -
-        log(sum(step_weights))
+      cumulative <- cumsum(step_weights)
+      total <- cumulative[nStates]
+      if(!isTRUE(total > 0)){
+        stop("no state has positive conditional probability at an internode")
+      }
+      if(draw_i > length(uniforms)){
+        uniforms <- c(uniforms, runif(length(uniforms)))
+      }
+      to <- sum(uniforms[draw_i] * total > cumulative) + 1L
+      draw_i <- draw_i + 1L
+      log_proposal <- log_proposal + log(step_weights[to]) - log(total)
       from <- state_samples[[edge_i]][count] <- to
       count <- count + 1
     }
@@ -750,23 +828,33 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
 
 
 # get path probability internal
+# The step probabilities are read in one matrix-indexing pass. Walking the path with
+# path_states <- path_states[-1] instead reallocated the path on every step, which made
+# a linear traversal quadratic in the number of internodes on the edge.
 getPathStateProb <- function(path_states, p_mat){
-  P <- vector("numeric", length(path_states)-1)
-  for(i in 1:(length(path_states)-1)){
-    P[i] <- p_mat[path_states[1],path_states[2]]
-    path_states <- path_states[-1]
+  n <- length(path_states)
+  if(n < 2L){
+    return(0)
   }
-  return(sum(log(P)))
+  sum(log(p_mat[path_states[-n] + (path_states[-1L] - 1L) * dim(p_mat)[1L]]))
 }
 
 
+# Every from/to step of every edge is turned into a linear position in Pij and read in
+# one pass. The per-edge loop cost a matrix slice of Pij per edge per draw, which is
+# where most of the discrete probability time went.
 getStateSampleProb <- function(state_sample, Pij, root_liks, root_edges){
-  path_probs <- numeric(length(state_sample))
   root_sample <- state_sample[[root_edges[1]]][1] # the root sample
-  for(i in 1:length(state_sample)){
-    path_probs[i] <- getPathStateProb(state_sample[[i]], Pij[,,i])
+  n_steps <- lengths(state_sample) - 1L
+  if(all(n_steps <= 0L)){
+    return(log(root_liks[root_sample]))
   }
-  llik <- sum(path_probs) + log(root_liks[root_sample])
+  nStates <- dim(Pij)[1L]
+  from <- unlist(lapply(state_sample, function(x) x[-length(x)]), use.names = FALSE)
+  to <- unlist(lapply(state_sample, function(x) x[-1L]), use.names = FALSE)
+  edge <- rep.int(seq_along(state_sample), pmax(n_steps, 0L))
+  positions <- from + (to - 1L) * nStates + (edge - 1L) * nStates * nStates
+  llik <- sum(log(Pij[positions])) + log(root_liks[root_sample])
   return(llik)
 }
 

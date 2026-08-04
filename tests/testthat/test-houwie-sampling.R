@@ -75,3 +75,57 @@ test_that("a root optimum is taken from the rootward end of the root edge", {
     expect_equal(length(split.root), Ntip(phy))
     expect_equal(split.root, expectations(FALSE))
 })
+
+test_that("starts are ranked on a shared draw rather than each start's own", {
+    skip_on_cran()
+
+    ## an objective whose value is the parameter plus a draw. Under a seed shared by
+    ## every solution the draw is identical and cancels, so the ranking is the ranking
+    ## of the parameters; under each solution's own seed it is the ranking of the luck.
+    objective <- function(p) p + runif(1, 0, 100)
+    solutions <- list(5, 1, 3)
+
+    for(seed in c(1L, 7L, 99L)){
+        picked <- selectStartOnCommonSeed(solutions, objective, seed)
+        expect_equal(picked$index, 2L)
+        expect_equal(diff(picked$scores), diff(unlist(solutions)))
+    }
+
+    ## a solution that blows up under the shared seed is unrankable, not merely bad
+    failing <- selectStartOnCommonSeed(list(1e10, 4), function(p) p, 1L)
+    expect_equal(failing$index, 2L)
+    expect_true(is.na(failing$scores[1]))
+
+    expect_null(selectStartOnCommonSeed(list(1, 2), function(p) NaN, 1L))
+})
+
+test_that("the inverse-CDF draw has the weights it reports as its density", {
+    skip_on_cran()
+
+    ## the importance weights divide by the proposal density, so a draw whose actual
+    ## frequencies do not match the density it records biases the likelihood silently.
+    ## an off-by-one in the cumulative-sum walk is exactly that kind of error.
+    weights <- c(0.5, 0, 2, 1.5, 0.25)
+    set.seed(1)
+    drawn <- replicate(2e4, drawFromWeights(weights))
+
+    expect_true(all(drawn %in% seq_along(weights)))
+    expect_false(any(drawn == 2L))          # a zero weight spans no interval
+    expect_equal(as.numeric(table(factor(drawn, levels = seq_along(weights))) / 2e4),
+                 weights / sum(weights), tolerance = 0.02)
+
+    ## unnormalised weights are allowed, and nothing drawable means bail rather than error
+    expect_equal(drawFromWeights(c(0, 7, 0)), 2L)
+    expect_equal(drawFromWeights(c(0, 0)), 0L)
+    expect_equal(drawFromWeights(numeric(0)), 0L)
+
+    ## the internode sampler inlines the same walk, so pin the expression itself: each
+    ## state owns the half-open interval of the cumulative sum its weight spans
+    cumulative <- cumsum(weights)
+    total <- cumulative[length(cumulative)]
+    for(u in seq(0, 1 - 1e-9, length.out = 501)){
+        inline <- sum(u * total > cumulative) + 1L
+        expect_equal(inline, findInterval(u * total, cumulative, left.open = FALSE) + 1L)
+        expect_gt(weights[inline], 0)
+    }
+})
