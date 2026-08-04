@@ -15,6 +15,65 @@ withHOUwieSeed <- function(seed, code){
   force(code)
 }
 
+# (alpha, sigma^2) <-> (half-life, stationary variance) is a bijection, and on the log
+# scale the optimizer actually works on it is a shear: log sigma^2 = log V + log 2 +
+# log alpha. The OU likelihood ridges along alpha while sigma^2/(2 alpha) is
+# comparatively well determined (Cressler, Butler & King 2015, Fig. 7), so shearing
+# puts the identified and the unidentified direction on separate axes rather than
+# smearing both across both.
+#
+# Which alpha governs each sigma^2 is what decides whether the reparameterized model is
+# still the model asked for. Since sigma^2_j = V_j * 2 alpha_j, a sigma^2 shared across
+# regimes stays shared only if alpha is constant across those same regimes, i.e. the
+# sigma^2 partition refines the alpha partition. OUM, OUMV and OUMVA all satisfy that.
+# OUMA does not: alpha free per regime with one shared sigma^2 turns into the constraint
+# V_j * alpha_j = constant, which no index pattern can express. Returns NULL when the
+# reparameterization is unavailable, including when there is no alpha at all (BM), where
+# there is no stationary variance to speak of.
+alphaIndexForSigma <- function(index.cont){
+  if(!length(stats::na.omit(index.cont[1,]))){
+    return(NULL)
+  }
+  sigma_ids <- sort(unique(stats::na.omit(index.cont[2,])))
+  if(!length(sigma_ids)){
+    return(NULL)
+  }
+  governing <- vapply(sigma_ids, function(id){
+    alphas <- unique(index.cont[1, which(index.cont[2,] == id)])
+    if(length(alphas) != 1L || is.na(alphas)) NA_integer_ else as.integer(alphas)
+  }, integer(1))
+  if(anyNA(governing)){
+    return(NULL)
+  }
+  stats::setNames(governing, sigma_ids)
+}
+
+# index.cont numbers the alpha, sigma^2 and theta parameters in one sequence, and the
+# fitted vector holds them in that order after the transition rates, so a parameter's
+# index in index.cont is its position in pars once shifted past the discrete block.
+stationaryParPositions <- function(n_p_trans, index.cont){
+  governing <- alphaIndexForSigma(index.cont)
+  list(sigma = n_p_trans + as.integer(names(governing)),
+       alpha_of_sigma = n_p_trans + as.integer(governing),
+       alpha = n_p_trans + sort(unique(as.integer(stats::na.omit(index.cont[1,])))))
+}
+
+toStationaryPars <- function(pars, n_p_trans, index.cont){
+  at <- stationaryParPositions(n_p_trans, index.cont)
+  # sigma^2 is divided by the alpha it is paired with before alpha itself is replaced
+  pars[at$sigma] <- pars[at$sigma]/(2 * pars[at$alpha_of_sigma])
+  pars[at$alpha] <- log(2)/pars[at$alpha]
+  pars
+}
+
+fromStationaryPars <- function(pars, n_p_trans, index.cont){
+  at <- stationaryParPositions(n_p_trans, index.cont)
+  # and alpha is recovered first here, because the stationary variances need it
+  pars[at$alpha] <- log(2)/pars[at$alpha]
+  pars[at$sigma] <- pars[at$sigma] * 2 * pars[at$alpha_of_sigma]
+  pars
+}
+
 # Categorical draw by inverse CDF, returning 0L when no state has positive weight so
 # the caller can bail rather than trap an error out of sample(). getInternodeStateSample
 # inlines this rather than calling it: it draws once per internode of every edge of
@@ -144,7 +203,9 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
                        global_liks_mat=NULL, diagn_msg=FALSE,
                        tree.plan=NULL, algorithm="sampling",
                        resolution=1L, max_components=Inf, tolerance=0,
-                       history="midpoint", proposal_temper=1){
+                       history="midpoint", proposal_temper=1,
+                       proposal_defensive=0.5,
+                       parameterization="alpha-sigma"){
   if(is.null(tree.plan)){
     tree.plan <- getHOUwieTreePlan(phy, edge_liks_list, all.paths)
   }
@@ -178,6 +239,13 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   alpha = Rate.mat[1,]
   sigma.sq = Rate.mat[2,]
   theta = Rate.mat[3,]
+  if(parameterization == "halflife-variance"){
+    # the alpha and sigma rows carry the half-life and the stationary variance on this
+    # path. alpha is shared across regimes, so the per-regime stationary variances map
+    # back elementwise. See toStationaryPars().
+    alpha <- log(2)/alpha
+    sigma.sq <- sigma.sq * 2 * alpha
+  }
   rate <- index.disc
   rate[is.na(rate)] <- k + 1
   Q <- matrix(0, dim(rate)[1], dim(rate)[2])
@@ -239,7 +307,11 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
     edge_liks_list[[recon_index]] <- edge_liks_list[[recon_index]] * edge_liks_list_init[[recon_index]]
   }
   conditional_probs <- getConditionalInternodeLik(phy, Q, edge_liks_list)
+  defensive_probs <- NULL
   if(!is.null(continuous_node_factors)){
+    # the untilted conditionals are kept and become the defensive component of the
+    # proposal mixture, which is what stops a saturated tilt from collapsing the draw
+    defensive_probs <- conditional_probs
     conditional_probs <- applyContinuousNodeFactors(conditional_probs, phy,
                                                     continuous_node_factors)
   }
@@ -258,7 +330,10 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
       return(houwieDevFailure(split.liks, "the transition rates are too large for an exact regime path to be drawn"))
     }
   }
-  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2, tree.plan=tree.plan, unique_only=FALSE, uni=uni)
+  internode_maps_and_discrete_probs <- getInternodeMap(phy, Q, conditional_probs$edge_liks_list, conditional_probs$root_state, root_liks, nSim, check_vector = NA, max.attempts=nSim*2, tree.plan=tree.plan, unique_only=FALSE, uni=uni,
+    defensive_edge_liks_list = if(is.null(defensive_probs)) NULL else defensive_probs$edge_liks_list,
+    defensive_root_state = if(is.null(defensive_probs)) NULL else defensive_probs$root_state,
+    defensive_lambda = proposal_defensive)
   internode_maps <- internode_maps_and_discrete_probs$maps
   internode_samples <- internode_maps_and_discrete_probs$state_samples
   log_proposal <- internode_maps_and_discrete_probs$log_proposal
@@ -338,6 +413,13 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   normalized <- exp(log_terms - max_term)
   normalized[!is.finite(normalized)] <- 0
   ess <- sum(normalized)^2 / sum(normalized^2)
+  # the weight formula returns exactly n when every draw is identical, so a collapsed
+  # proposal reports perfect efficiency. A draw of k distinct histories carries at most
+  # k effective samples whatever the weights say. Bridge histories sharing node states
+  # are still different paths, so the cap only applies where an id really is the history.
+  if(is.null(uni)){
+    ess <- min(ess, length(unique(mapping_ids)))
+  }
 
   unsorted_lliks_df <- data.frame(llik_discrete=llik_discrete, llik_continuous=llik_continuous)
   # the maps themselves are still reported best-first, which only affects output
@@ -658,9 +740,18 @@ getConditionalInternodeLik <- function(phy, Q, edge_liks_list){
 }
 
 
+# defensive_edge_liks_list / defensive_root_state give a second proposal to mix with.
+# Both endpoints of the tilt are bad on their own -- untilted is far too diffuse (ESS
+# near 1 where the trait is informative), fully tilted saturates onto the MAP history --
+# so histories are drawn from q = lambda*q_tilted + (1-lambda)*q_untilted and every
+# history is scored under both components. The mixture density is exact, so the
+# estimator stays unbiased, and the weights are bounded by 1/lambda times the better
+# component's: whichever proposal would have been right, this cannot do much worse.
 getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
                            check_vector=NULL, max.attempts, tree.plan=NULL,
-                           unique_only=TRUE, uni=NULL){
+                           unique_only=TRUE, uni=NULL,
+                           defensive_edge_liks_list=NULL, defensive_root_state=NULL,
+                           defensive_lambda=0.5){
   # set-up
   current.attempts <- 0
   nStates <- dim(Q)[1]
@@ -678,13 +769,20 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     Pij[,,i] <- expm(Q * reduced_edge_length[i])
   }
   # the probability of a descendent being in state j given starting in the row of the Pj matrix
-  Pj <- vector("list", length(phy$edge.length))
-  for(i in 1:length(Pj)){
-    Pj[[i]] <- array(0, c(dim(Q)[1], dim(Q)[2], number_of_nodes_per_edge[i]))
-    for(j in 1:number_of_nodes_per_edge[i]){
-      Pj[[i]][,,j] <- sweep(Pij[,,i], MARGIN = 2, edge_liks_list[[i]][j,], '*') 
+  buildPj <- function(liks){
+    out <- vector("list", length(phy$edge.length))
+    for(i in seq_along(out)){
+      out[[i]] <- array(0, c(dim(Q)[1], dim(Q)[2], number_of_nodes_per_edge[i]))
+      for(j in 1:number_of_nodes_per_edge[i]){
+        out[[i]][,,j] <- sweep(Pij[,,i], MARGIN = 2, liks[[i]][j,], '*')
+      }
     }
+    out
   }
+  Pj <- buildPj(edge_liks_list)
+  # the transitions are shared, so only the sweep against the conditionals differs
+  defensive <- !is.null(defensive_edge_liks_list) && defensive_lambda < 1
+  Pj_defensive <- if(defensive) buildPj(defensive_edge_liks_list) else NULL
   # simulate nSim substitution histories
   rev.pruning.order <- tree.plan$rev.pruning.order
   sub_histories <- vector("list", nSim)
@@ -713,7 +811,14 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
       }
     }
   }else{
-    state_samples <- lapply(1:nSim, function(x) try(getInternodeStateSample(Pj, root_state, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges), silent = TRUE))
+    # which component each history comes from is drawn up front, so the count of draws
+    # per component is itself random in the right way for the mixture density below
+    from_tilted <- if(defensive) stats::runif(nSim) < defensive_lambda else rep(TRUE, nSim)
+    state_samples <- lapply(seq_len(nSim), function(x){
+      Pj_x <- if(from_tilted[x]) Pj else Pj_defensive
+      root_x <- if(from_tilted[x]) root_state else defensive_root_state
+      try(getInternodeStateSample(Pj_x, root_x, root_edges, rev.pruning.order, edge_index, nStates, number_of_nodes_per_edge, child_edges), silent = TRUE)
+    })
     state_samples <- state_samples[unlist(lapply(state_samples, class)) != "try-error"]
   }
   mapping_ids <- vapply(state_samples, stateSampleId, character(1))
@@ -738,11 +843,23 @@ getInternodeMap <- function(phy, Q, edge_liks_list, root_state, root_liks, nSim,
     maps <- maps[drawn]
     state_samples <- state_samples[drawn]
   }
+  # a history's density is its density under the mixture, not under the component it
+  # happened to be drawn from, so each one is scored under both
+  log_proposal <- if(defensive){
+    vapply(state_samples, function(x){
+      lp_tilted <- scoreInternodeStateSample(x, Pj, root_state, root_edges, rev.pruning.order, nStates)
+      lp_plain <- scoreInternodeStateSample(x, Pj_defensive, defensive_root_state, root_edges, rev.pruning.order, nStates)
+      terms <- c(log(defensive_lambda) + lp_tilted, log1p(-defensive_lambda) + lp_plain)
+      terms <- terms[is.finite(terms)]
+      if(!length(terms)) return(-Inf)
+      max(terms) + log(sum(exp(terms - max(terms))))
+    }, numeric(1))
+  }else{
+    vapply(state_samples, function(x) attr(x, "log_proposal"), numeric(1))
+  }
   return(list(state_samples=state_samples, maps = maps, root_edges=root_edges,
               Pij = Pij, Pj = Pj,
-              log_proposal = vapply(state_samples,
-                                    function(x) attr(x, "log_proposal"),
-                                    numeric(1)),
+              log_proposal = log_proposal,
               mapping_ids = vapply(state_samples, stateSampleId,
                                    character(1))))
 }
@@ -826,6 +943,39 @@ getInternodeStateSample <- function(Pj, root_state, root_edge, rev.pruning.order
   return(state_samples)
 }
 
+
+# Density of an already drawn history under a given set of internode conditionals.
+# getInternodeStateSample accumulates this while it draws, but a defensive mixture has
+# to score each history under the component it did *not* come from as well, so the same
+# recursion is available here with the states held fixed. The traversal order is
+# irrelevant when nothing is being sampled; it is kept the same only so the two agree
+# term for term.
+scoreInternodeStateSample <- function(state_samples, Pj, root_state, root_edge,
+                                      rev.pruning.order, nStates){
+  root_sample <- state_samples[[root_edge[1]]][1]
+  total <- sum(root_state)
+  if(!isTRUE(total > 0) || !isTRUE(root_state[root_sample] > 0)){
+    return(-Inf)
+  }
+  log_density <- log(root_state[root_sample]) - log(total)
+  for(edge_i in rev.pruning.order){
+    from <- state_samples[[edge_i]][1]
+    count <- 2L
+    n_inter_nodes <- length(state_samples[[edge_i]])
+    for(inter_edge_i in (n_inter_nodes-1):1){
+      step_weights <- Pj[[edge_i]][from,,inter_edge_i]
+      to <- state_samples[[edge_i]][count]
+      step_total <- sum(step_weights)
+      if(!isTRUE(step_total > 0) || !isTRUE(step_weights[to] > 0)){
+        return(-Inf)
+      }
+      log_density <- log_density + log(step_weights[to]) - log(step_total)
+      from <- to
+      count <- count + 1L
+    }
+  }
+  log_density
+}
 
 # get path probability internal
 # The step probabilities are read in one matrix-indexing pass. Walking the path with
