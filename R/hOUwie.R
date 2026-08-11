@@ -1028,11 +1028,11 @@ getModelTable <- function(model.list, type="BIC"){
     warning("Not all models are of class houwie. These have been removed.")
     model.list <- model.list[unlist(lapply(model.list, function(x) class(x)) == "houwie")]
   }
+  if(length(model.list) < 2){
+    stop("Two or more models are needed to conduct model averaging.", call. = FALSE)
+  }
   if(var(unlist(lapply(model.list, function(x) dim(x$data)[1]))) != 0){
     stop("The number of rows in your data are not the same for all models. Models should not be compared if they are not evaluating the same dataset.", call.=FALSE)
-  }
-  if(length(model.list) == 1){
-    stop("Two or models are needed to conduct model averaging.", call. = FALSE)
   }
   
   ParCount <- unlist(lapply(model.list, function(x) x$param.count))
@@ -1048,7 +1048,11 @@ getModelTable <- function(model.list, type="BIC"){
   return(model_table)
 }
 
-getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC", force=TRUE){
+getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC", force=TRUE, convergence_cutoff=1e5){
+  if(!is.numeric(convergence_cutoff) || length(convergence_cutoff) != 1 ||
+     !is.finite(convergence_cutoff) || convergence_cutoff <= 0){
+    stop("convergence_cutoff must be a single positive finite number.", call. = FALSE)
+  }
   is_houwie <- unlist(lapply(model.list, function(x) inherits(x, what="houwie")))
   if(!all(is_houwie)){
     warning("Some of the input models are not of class houwie, these have been removed.")
@@ -1072,14 +1076,18 @@ getModelAvgParams <- function(model.list, BM_alpha_treatment="zero", type="BIC",
   
   # pull the aic weights
   mods_table <- getModelTable(model.list, type=type)
-  if(diff(range(mods_table[,5])) > 1e5){
+  model_scores <- mods_table[,5]
+  if(diff(range(model_scores)) > convergence_cutoff){
     if(!force){
-      max_aic <- max(mods_table[,5])
-      model.list <- model.list[abs(mods_table[,5] - max_aic)  < 1e5]
+      best_score <- min(model_scores)
+      model.list <- model.list[model_scores - best_score <= convergence_cutoff]
       mods_table <- getModelTable(model.list, type=type)
       mod_names <- names(model.list)
     }else{
-      warning("It is possible that one or more of your models failed to converge. The AIC between the best and worst models exceeds 1e5. Set force=FALSE to automatically remove potentially failed runs.")
+      warning(paste0("It is possible that one or more of your models failed to converge. The ",
+                     type, " difference between the best and worst models exceeds ",
+                     format(convergence_cutoff, scientific=FALSE, trim=TRUE),
+                     ". Set force=FALSE to automatically remove potentially failed runs."))
     }
   }
   AICwts <- mods_table[,7]

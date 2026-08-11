@@ -6,13 +6,15 @@
 getModelAvgParams(model.list, 
                   BM_alpha_treatment = "zero", 
                   type               = "BIC",
-                  force              = TRUE)
+                  force              = TRUE,
+                  convergence_cutoff = 1e5)
 }
 \arguments{
 \item{model.list}{A list of model results from several fits of the \code{hOUwie} model. All elements of the list must be of class "houwie".}
 \item{BM_alpha_treatment}{A boolean indicating whether alpha from BM models should be treated as zero or those models should be removed when averaging alpha values. Currently zero is the only allowed value.}
 \item{type}{One of AIC, BIC, or AICc for use during evaluation of relative model fit. AICc is the best option for datasets with a few number of species.}
 \item{force}{A boolean indicating whether to force potentially failed model fits to be included in the model averaging.}
+\item{convergence_cutoff}{A positive number giving the largest information-criterion difference from the best model that is retained when \code{force = FALSE}. The default is \code{1e5}.}
 }
 \details{
 The AIC weight of each model is first evaluated and used as the weighting for each models' contribution to the overall parameter value (Burnham and Anderson 2002). Tip values are estimated based on the weighted average of the joint probability of the fitted stochastic maps.
