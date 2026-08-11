@@ -30,13 +30,15 @@ hOUwie(phy,
        optimizer           = "nlopt_ln", 
        opts                = NULL, 
        quiet               = FALSE, 
-       sample_tips         = FALSE, 
-       sample_nodes        = FALSE, 
-       adaptive_sampling   = FALSE, 
+       sample_nodes        = TRUE, 
+       common_random_numbers = TRUE,
        diagn_msg           = FALSE,
        n_starts            = 1, 
-       ncores              = 1)
-}       
+       ncores              = 1,
+       algorithm           = c("sampling", "pruning"),
+       resolution          = 1,
+       history             = c("midpoint", "bridge"))
+}
 \arguments{
 \item{phy}{a phylogenetic tree, in \code{ape} \dQuote{phylo} format and with internal nodes labeled denoting the ancestral selective regimes.}
 \item{data}{A data frane containing species information. The first column is always species names matching the tip labels of \code{phy}. The \code{2nd to ith} columns are independent discrete characters. The \code{ith+1} column is the continuous character value. Finally, there can be an \code{ith+2} column for measurement error (optional).}
@@ -62,12 +64,17 @@ hOUwie(phy,
 \item{optimizer}{One of "nlopt_ln", "nlopt_gn", or "sann" for a local search of parameter space, global search of paramater space, or simmulated annealing. The default is "nlopt_ln".}
 \item{opts}{A list of options to be passed to nloptr.}
 \item{quiet}{A boolean indicating whether or not to print messages.}
-\item{sample_tips}{A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).}
-\item{sample_nodes}{A boolean indicating whether or not to sample node probabilities when generating underlying regimes. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.}
-\item{adaptive_sampling}{A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shapes the proposal that draws regime histories. When \code{TRUE}, the default, the trait data below each node is summarised by a Gaussian message and used to weight the regime states drawn there, so histories consistent with the observed trait are sampled more often. This changes only the variance of the likelihood estimate and never its expectation, so it is a cost/accuracy setting rather than a modelling choice; \code{FALSE} draws histories from the discrete character alone and typically needs far more \code{nSim} for the same precision.}
+\item{common_random_numbers}{A boolean indicating whether likelihood evaluations within an optimizer start should reuse the same underlying random-number stream. This is enabled by default; set it to \code{FALSE} to draw a new stream for each evaluation. The stochastic maps are still regenerated and evaluated using the current discrete and continuous parameters. Each optimizer start receives a different stream. Use \code{set.seed()} before calling \code{hOUwie} for reproducibility.}
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
 \item{ncores}{An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.}
+
+\item{algorithm}{How the sum over regime histories is evaluated. \code{"sampling"}, the default, draws \code{nSim} histories and combines them by importance sampling, which is consistent for any tree size. \code{"pruning"} instead sums over every regime history exactly, by propagating a Gaussian mixture up the tree. It carries no Monte Carlo error at all and is the reference the sampling likelihood is validated against, but its cost is fixed by the data rather than chosen: the mixture holds one component per regime history, so it needs \code{nStates^(regime points)} components. On a two-state model that is about four million components at 24 tips and doubles with every further tip, which puts the practical limit near 26. Above that the run is refused rather than attempted. \code{"pruning"} does not produce stochastic maps, so \code{recon} is unavailable with it, and \code{sample_tips}, \code{sample_nodes}, \code{adaptive_sampling} and \code{history} have no effect.}
+
+\item{resolution}{Used only when \code{algorithm = "pruning"}. The number of regime points placed along each edge. \code{1} is the history model the sampling path uses under \code{history = "midpoint"}, in which an edge whose endpoints occupy different regimes switches at its midpoint. Larger values refine towards the continuous-time regime process, first order in the step, but they multiply the number of regime points and so enter the component count as an exponent: at \code{resolution = 2} the size limit above roughly halves in tips.}
+
+\item{history}{Used only when \code{algorithm = "sampling"}. How the regime path within an edge is drawn. \code{"midpoint"}, the default, is the history model of Boyko et al. (2023), in which an edge whose endpoints occupy different regimes switches at its midpoint. \code{"bridge"} instead draws the path from the exact continuous-time process conditional on the states at the two ends of the edge, by uniformization, so a shift may fall anywhere along a branch and a branch may carry any number of shifts. The importance weights are unchanged by this: the density of the drawn path cancels against the proposal that drew it.}
 }
 \details{
 This model is composed of two processes: one that describes the evolution of a discrete character and the other describes the evolution of a continuous character. To model the evolution of a single continuous character we use an Ornstein-Uhlenbeck (OU) model (Hansen 1997; Butler and King 2004; Hansen et al. 2008; Beaulieu et al. 2012; Ho and Ane 2014a). This model combines the stochastic evolution of a trait through time with a deterministic component which models the tendency for a trait to evolve towards an optimum. In this model, the value of a trait, \code{X_t}, is pulled towards an optimum, \code{theta}, at a rate scaled by the parameter \code{alpha}. The optimum, \code{theta}, is a piecewise constant on intervals and takes values in a finite set \code{theta}. This can represent the set of "selective regimes", "regimes", or Simpson's "adaptive zones" (Cressler et al. 2015), though it is consistent with a variety of true underlying microevolutionary models (Hansen 2014). Additionally, random deviations are introduced by Gaussian white noise dB(t), which is distributed as a normal random variable with mean zero and variance equal to \code{sigma^2}. Thus, \code{sigma^2} is a constant describing the rate of stochastic evolution around the optimum. We use the set of extensions introduced by Beaulieu et al. (2012). This allows for multiple primary optima \code{theta} in which both the pull strength (\code{alpha}) and the rate of stochastic evolution (\code{sigma^2}) can vary across the phylogeny. 
@@ -116,9 +123,14 @@ A named list with the following elements:
 \item{root.station}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated (recommended FALSE).}
 \item{get.root.theta}{A boolean indicating whether the root.theta was included in the model.}
 \item{tip.fog}{Either includes tip fog for each species value ("known"). The default is "none".}
-\item{sample_tips}{A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).}
-\item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
-\item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shaped the history proposal.}
+
+\item{ess}{The effective sample size of the importance weights at the reported optimum, out of \code{nSim}. A value near 1 means a single sampled history carried the whole likelihood and the fit should not be trusted; raise \code{nSim}. It is computed from the weights that were drawn, so it can only report on histories the sampler actually visited.}
+\item{common_random_numbers}{Whether common random numbers were enabled for the fit.}
+
+\item{algorithm}{The history-summation algorithm used, \code{"sampling"} or \code{"pruning"}.}
+\item{crn_seeds}{The random-number seed assigned to each optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
+\item{crn_seed}{The random-number seed associated with the selected optimizer start when common random numbers were enabled; otherwise \code{NULL}.}
 \item{lb_discrete_model}{A vector of lower bounds on discrete character evolution.}
 \item{ub_discrete_model}{A vector of upper bounds on discrete character evolution.}
 \item{lb_continuous_model}{A vector of lower bounds of alpha, sigma square, and theta.}
@@ -132,6 +144,53 @@ A named list with the following elements:
 \item{all_cont_liks}{A vector of continuous probabilities in the order of the \code{nSim} simmaps.}
 \item{simmaps}{\code{nSim} stochastic maps from the best fitting hOUwie parameters (to be removed).}
 \item{run_time}{Time to complete the model fit.}
+}
+\examples{
+\dontrun{
+data(tworegime)
+
+# The data are a phylogeny with two painted selective regimes and a data frame
+# whose columns are species, the discrete state, and the continuous trait value.
+head(trait)
+
+# A character dependent model, in which the optimum of the continuous trait
+# depends on the state of the discrete character. nSim sets how many stochastic
+# maps are evaluated per iteration of the likelihood search. These fits take a
+# long time, which is why the examples here are not run automatically.
+cd_model <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                   continuous_model = "OUM", nSim = 25)
+cd_model
+
+# A character independent model with rate heterogeneity. Here the continuous
+# parameters are tied to a hidden state rather than to the observed one.
+ci_model <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER",
+                   continuous_model = "OUM", null.model = TRUE, nSim = 25)
+
+# Common random numbers are enabled by default, making likelihood comparisons
+# within each optimizer start share an underlying random stream. Mappings still
+# respond to the current parameter values. set.seed() makes the assigned streams
+# repeatable. Set common_random_numbers = FALSE to restore independent draws at
+# every likelihood evaluation.
+set.seed(1)
+ci_model_crn <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER",
+                       continuous_model = "OUM", null.model = TRUE, nSim = 25)
+
+# getModelTable summarises the relative fit of a set of models.
+getModelTable(list(CD = cd_model, CID = ci_model))
+
+# Supplying p evaluates the likelihood at a fixed set of parameters rather than
+# searching for them. Parameters follow c(p_trans, p_alpha, p_sigma.squared,
+# p_theta).
+p <- c(0.01664314, 0.39631218, 0.18684476, 2.25121568, 0.82495093)
+fixed_fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                    continuous_model = "OUM", nSim = 25, p = p)
+
+# recon returns marginal reconstructions of the discrete state. Rows are nodes
+# and columns are states, so each row sums to one.
+recon_fit <- hOUwie(tree, trait, rate.cat = 1, discrete_model = "ER",
+                    continuous_model = "OUM", nSim = 25, p = p, recon = TRUE)
+head(recon_fit$recon)
+}
 }
 \references{
 Beaulieu J.M., Jhwueng D.-C., Boettiger C., O'Meara B.C. 2012. Modeling Stabilizing Selection: Expanding the Ornstein--Uhlenbeck Model of Adaptive Evolution. Evolution. 66:2369--2383.

@@ -30,9 +30,7 @@ hOUwie.fixed(simmaps,
              optimizer           = "nlopt_ln", 
              opts                = NULL, 
              quiet               = FALSE, 
-             sample_tips         = FALSE, 
              sample_nodes        = TRUE, 
-             adaptive_sampling   = FALSE, 
              diagn_msg           = FALSE,
              make_numeric        = TRUE,
              n_starts            = 1, 
@@ -56,16 +54,14 @@ hOUwie.fixed(simmaps,
 \item{ub_discrete_model}{A single value for the upper bound of discrete character evolution during the ML search. The default is \code{1/(Tmax*0.0001)}.} 
 \item{lb_continuous_model}{Three values specifying the lower bound of continuous character evolution during the ML search. Should be provided in the order of lower.bound for alpha, sigma squared, theta. The default is \code{c(1e-10, 1e-10, smallest_continuous_value/10)}.} 
 \item{ub_continuous_model}{Three values specifying the upper bound of continuous character evolution during the ML search. Should be provided in the order of upper.bound for alpha, sigma squared, theta. The default is \code{c(log(2)/(0.01 * Tmax), log(2)/(0.01 * Tmax), largest_continuous_value*10)}.} 
-\item{recon}{A boolean indicating whether marginal ancestral state reconstruction should take place following the ML search.}
-\item{nodes}{If \code{recon=TRUE}, a character or vector indicating which nodes should have their discrete ancestral state characters estimated. If a vector, nodes specified will be reconstructed with 1:Ntip representing tip reconstructions and Ntip+1 representing the root. A user can also indicate "all", "internal", or "external" to reconstruct all nodes, ancestral nodes, or extant nodes respectively. Reconstructing tip states ("external") is only useful if hidden states are included in the model.}
+\item{recon}{Retained for compatibility with \code{hOUwie}, but marginal ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps. Setting \code{recon=TRUE} produces a warning and leaves \code{recon} in the returned object as \code{NULL}. Use \code{hOUwie} if ancestral states are needed.}
+\item{nodes}{Retained for compatibility with \code{hOUwie} and unused here, since ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps.}
 \item{p}{A numeric vector of fixed parameters to be optimized. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}}
 \item{ip}{A numeric vector indicating initial parameters to start the ML search. Parameters are organized such following \code{c(p_trans, p_alpha, p_sigma.squared, p_theta)}.}
 \item{optimizer}{One of "nlopt_ln", "nlopt_gn", or "sann" for a local search of parameter space, global search of paramater space, or simmulated annealing. The default is "nlopt_ln".}
 \item{opts}{A list of options to be passed to nloptr.}
 \item{quiet}{A boolean indicating whether or not to print messages.}
-\item{sample_tips}{A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).}
-\item{sample_nodes}{A boolean indicating whether or not to sample node probabilities when generating underlying regimes (see Deatils, but recommended to be set to TRUE).}
-\item{adaptive_sampling}{A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve (recommended TRUE).}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shapes the proposal that draws regime histories. When \code{TRUE}, the default, the trait data below each node is summarised by a Gaussian message and used to weight the regime states drawn there, so histories consistent with the observed trait are sampled more often. This changes only the variance of the likelihood estimate and never its expectation, so it is a cost/accuracy setting rather than a modelling choice; \code{FALSE} draws histories from the discrete character alone and typically needs far more \code{nSim} for the same precision.}
 \item{diagn_msg}{A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.}
 \item{make_numeric}{A boolean indicating whether the given simmap needs to be converted to numeric map edges matching observed character data. Setting this to FALSE can be useful if you are interested in looking at hidden states since you will can have more mapped states than observed states.}
 \item{n_starts}{An integer, specifying the number of trials for fitting the model, using alternative (randomized) starting parameters at each trial. A larger n_starts reduces the risk of landing on a local non-global optimum of the likelihood function, and thus increases the chances of finding the MLE.}
@@ -89,7 +85,7 @@ A named list with the following elements:
 \item{param.count}{Number of parameters in the model.}
 \item{solution.disc}{The maximum likelihood estiamte of the transition rate matrix.}
 \item{solution.cont}{The maximum likelihood estimate of parameters which describe continuous evolution. Each column corresponds to a discrete state and each row is a different continuous model parameter. Estimated continuous parameters include alpha, sigma.squared, and theta.}
-\item{recon}{A data.frame of marginal probabilities of ancestral states given the best fitting model. If ancestral state reconstruction was not specified then \code{NULL}.}
+\item{recon}{Always \code{NULL}. Ancestral state reconstruction requires regimes to be resampled under a node constraint, which a fit conditioned on a fixed set of stochastic maps cannot do. See \code{hOUwie}.}
 \item{index.disc}{An index matrix specifying which discrete model parameters are estimated.}
 \item{index.cont}{An index matrix specifying which continuous model parameters are estimated.}
 \item{phy}{User provided phylogenetic tree.}
@@ -105,9 +101,9 @@ A named list with the following elements:
 \item{root.station}{A boolean indicating whether the starting state, \eqn{\theta_0}{theta_0}, was estimated (recommended FALSE).}
 \item{get.root.theta}{A boolean indicating whether the root.theta was included in the model.}
 \item{tip.fog}{Either includes measurement error for each species value ("known"). The default is "none".}
-\item{sample_tips}{A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).}
-\item{sample_nodes}{A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).}
-\item{adaptive_sampling}{A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).}
+\item{sample_nodes}{A boolean indicating whether the continuous trait shaped the history proposal.}
+
+\item{ess}{The effective sample size of the importance weights at the reported optimum, out of \code{nSim}. A value near 1 means a single sampled history carried the whole likelihood and the fit should not be trusted; raise \code{nSim}. It is computed from the weights that were drawn, so it can only report on histories the sampler actually visited.}
 \item{lb_discrete_model}{A vector of lower bounds on discrete character evolution.}
 \item{ub_discrete_model}{A vector of upper bounds on discrete character evolution.}
 \item{lb_continuous_model}{A vector of lower bounds of alpha, sigma square, and theta.}

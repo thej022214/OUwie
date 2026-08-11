@@ -52,15 +52,118 @@ getPathToRoot <- function(phy, tip){
 }
 
 
+# Compute all continuous-map quantities used by OUwie.basic in one cladewise
+# traversal. This is the deep internal interface used by dynamic hOUwie: callers
+# provide a tree and an edge-segment map and receive the optimum weights, transformed
+# branch variances, and tip attenuation together.
+continuousMapMoments <- function(phy, Rate.mat, pars, root.state,
+		assume.station = TRUE, map = NULL, state.names = NULL,
+		edge.order = NULL) {
+	nTip <- length(phy$tip.label)
+	nState <- ncol(Rate.mat)
+	if(is.null(map)) map <- phy$maps
+	if(is.null(state.names)) state.names <- colnames(phy$mapped.edge)
+	state.index <- stats::setNames(seq_len(nState), state.names)
+	weight.alpha <- Rate.mat[1, ]
+	transform.alpha <- pars[, 3]
+	transform.sigma.sq <- pars[, 2]
+
+	if(is.null(edge.order)){
+		edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	}
+	nNodeTotal <- max(phy$edge)
+
+	# Ato is the integral of alpha from the root. cum.weight stores, for all
+	# regimes at once, the unattenuated optimum contribution along that path.
+	Ato.weight <- numeric(nNodeTotal)
+	Ato.transform <- numeric(nNodeTotal)
+	cum.weight <- matrix(0, nNodeTotal, nState)
+	transformed.variance <- numeric(nrow(phy$edge))
+
+	for(edge.index in edge.order){
+		ancestor <- phy$edge[edge.index, 1]
+		descendant <- phy$edge[edge.index, 2]
+		current.map <- map[[edge.index]]
+		regimes <- unname(state.index[names(current.map)])
+		transform.regimes <- match(names(current.map), rownames(pars))
+		durations <- as.numeric(current.map)
+		current.weight.alpha <- Ato.weight[ancestor]
+		current.transform.alpha <- Ato.transform[ancestor]
+		edge.weight <- numeric(nState)
+		variance <- 0
+
+		for(segment.index in seq_along(durations)){
+			regime <- regimes[segment.index]
+			duration <- durations[segment.index]
+			transform.regime <- transform.regimes[segment.index]
+			segment.weight.alpha <- weight.alpha[regime]
+			segment.transform.alpha <- transform.alpha[transform.regime]
+			segment.sigma.sq <- transform.sigma.sq[transform.regime]
+			end.weight.alpha <- current.weight.alpha +
+				segment.weight.alpha * duration
+			end.transform.alpha <- current.transform.alpha +
+				segment.transform.alpha * duration
+
+			edge.weight[regime] <- edge.weight[regime] +
+				(exp(end.weight.alpha) - exp(current.weight.alpha))
+			if(segment.transform.alpha == 0){
+				variance <- variance + segment.sigma.sq *
+					exp(2 * current.transform.alpha) * duration
+			}else{
+				variance <- variance + segment.sigma.sq *
+					(exp(2 * end.transform.alpha) -
+					 exp(2 * current.transform.alpha)) /
+					(2 * segment.transform.alpha)
+			}
+			current.weight.alpha <- end.weight.alpha
+			current.transform.alpha <- end.transform.alpha
+		}
+
+		Ato.weight[descendant] <- current.weight.alpha
+		Ato.transform[descendant] <- current.transform.alpha
+		cum.weight[descendant, ] <- cum.weight[ancestor, ] + edge.weight
+		transformed.variance[edge.index] <- variance
+	}
+
+	root.attenuation <- exp(-Ato.weight[seq_len(nTip)])
+	W <- cum.weight[seq_len(nTip), , drop = FALSE] * root.attenuation
+	if(assume.station){
+		W[, root.state] <- W[, root.state] + root.attenuation
+	}else{
+		W <- cbind(root.attenuation, W)
+	}
+	W <- W / rowSums(W)
+
+	transformed.tree <- phy
+	transformed.tree$edge.length <- transformed.variance
+	transformed.tree$maps <- NULL
+	transformed.tree$mapped.edge <- NULL
+	attr(transformed.tree, "map.order") <- NULL
+	class(transformed.tree) <- "phylo"
+
+	list(
+		W = W,
+		tree = transformed.tree,
+		diag = stats::setNames(exp(-Ato.transform[seq_len(nTip)]), phy$tip.label)
+	)
+}
+
+
 # transforms the phylogeny based on a set of parameters and a simmap
-transformPhy <- function(phy, map, pars, tip.paths = NULL) {
+transformPhy <- function(phy, map, pars, tip.paths = NULL, edge.order = NULL) {
 	#phy must be of class simmap
 	nTip <- length(phy$tip.label)
 
-	#ensure we traverse edges from root toward tips so Ato[ancestor] is ready
-	phy <- ape::reorder.phylo(phy, "cladewise")
+	#Ato[ancestor] must be filled before the edge below it is visited, so edges are
+	#walked in cladewise order. map and tip.paths are indexed against the tree as the
+	#caller supplied it, so we permute rather than reorder phy and undo it below.
+	ord <- edge.order
+	if(is.null(ord)){
+		ord <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
+	}
+	edge <- phy$edge[ord, , drop = FALSE]
 
-	nEdge <- nrow(phy$edge)
+	nEdge <- nrow(edge)
 	nNodeTot <- nTip + phy$Nnode
 
 	Ato <- numeric(nNodeTot)
@@ -69,10 +172,10 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 	D <- V_Tilde <- numeric(nEdge)
 
 	for (i in 1:nEdge) {
-		anc <- phy$edge[i, 1]
-		des <- phy$edge[i, 2]
-		Map_i <- map[[i]]
-		Acur <- Ato[anc] 
+		anc <- edge[i, 1]
+		des <- edge[i, 2]
+		Map_i <- map[[ord[i]]]
+		Acur <- Ato[anc]
 		w <- 0
 		v <- 0
 		for (j in 1:length(Map_i)) {
@@ -90,8 +193,8 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 			v <- v + tmp.v
 			Acur <- Acur + Alpha_j * dt
 		}
-		V_Tilde[i] <- v
-		D[i] <- w
+		V_Tilde[ord[i]] <- v
+		D[ord[i]] <- w
 		Ato[des] <- Acur
 	}
 	phy$edge.length <- V_Tilde
@@ -108,6 +211,15 @@ transformPhy <- function(phy, map, pars, tip.paths = NULL) {
 			DiagWt[i] <- exp(-sum(D[tip.paths[[i]]]))
 		}
 	}
+	#the transformed edge lengths no longer agree with the regime painting, so maps and
+	#mapped.edge are dropped rather than carried along stale. this also keeps the tree a
+	#plain phylo: three.point.compute reorders what it is handed, and on a simmap that
+	#dispatches to reorderSimmap, which permutes those two elements for nothing.
+	phy$maps <- NULL
+	phy$mapped.edge <- NULL
+	attr(phy, "map.order") <- NULL
+	class(phy) <- "phylo"
+
 	obj <- list(tree = phy, diag = DiagWt)
 	return(obj)
 }
@@ -175,8 +287,6 @@ getOULik <- function(phy, y, X, pars){
   lik <- -as.numeric(Ntip(phy) * log(2 * pi) + comp$logd + (comp$PP - 2 * comp$QP + comp$QQ))/2
   return(lik)
 }
-
-
 
 
 

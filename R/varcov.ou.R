@@ -285,9 +285,8 @@ mat.gen <- function(phy,piece.wise,pp){
 	}
 	diag.elts <- 1 + 0:(n - 1)*(n + 1)
 	mat[diag.elts] <- comp[1:n]
-	
+
 	mat
 }
-
 
 

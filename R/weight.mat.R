@@ -2,9 +2,16 @@
  
 #written by Jeremy M. Beaulieu
 
-weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, root.age = NULL, scaleHeight = FALSE, assume.station = TRUE, shift.point = 0.5){
-	age.table <- MakeAgeTable(phy, root.age = root.age)
-	Tmax <- max(age.table)
+weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE,
+	root.age = NULL, scaleHeight = FALSE, assume.station = TRUE,
+	shift.point = 0.5, map = NULL, state.names = NULL,
+	edge.order = NULL){
+	#Tmax is only read when the tree is being rescaled, and building the age table costs
+	#a node depth traversal on every call, so it is only built when it will be used
+	if(scaleHeight == TRUE){
+		age.table <- MakeAgeTable(phy, root.age = root.age)
+		Tmax <- max(age.table)
+	}
 	n <- max(phy$edge[, 1])
 	ntips <- length(phy$tip.label)
 	
@@ -14,12 +21,13 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	}
 
 	if(simmap.tree == TRUE) {
-		k <- length(colnames(phy$mapped.edge))
+		if(is.null(map)) map <- phy$maps
+		if(is.null(state.names)) state.names <- colnames(phy$mapped.edge)
+		k <- length(state.names)
 	}else{
 		mm <- dim(edges)
 		k <- length(6:mm[2])
 	}
-	pp <- prop.part(phy)
 	alpha <- Rate.mat[1, ]
 
 	root_node <- setdiff(unique(edges[, 2]), unique(edges[, 3]))[1]
@@ -27,94 +35,102 @@ weight.mat <- function(phy, edges, Rate.mat, root.state, simmap.tree = FALSE, ro
 	Ato <- numeric(max_node_id)
 	Ato[root_node] <- 0
 
-	nodevar.root.tot <- rep(0, max(edges[, 3]))
 	nodevar.k <- rep(0, max(edges[, 3]))
 
 	W <- matrix(0, ntips, k)
 
-	for(j in 1:k){
-		n.cov.root.tot <- matrix(0, n, 1)
-		n.cov.k <- matrix(0, n, 1)
-		Ato[] <- 0
-		Ato[root_node] <- 0
-
-		for(i in 1:nrow(edges)){
-			anc <- edges[i, 2]
-			desc <- edges[i, 3]
-
-			#cumulative A at start of the edge
-			Acur <- Ato[anc]
-
-			#per edge increments
-			nodevar.root.tot[i] <- 0
-			nodevar.k[i] <- 0
-
-			if(simmap.tree == TRUE){
-				if(scaleHeight == TRUE) {
-					currentmap <- phy$maps[[i]] / Tmax
-				}else{
-					currentmap <- phy$maps[[i]]
-				}
-				for(regimeindex in 1:length(currentmap)){
-					dt <- as.numeric(currentmap[regimeindex])
-					regimenumber <- which(colnames(phy$mapped.edge) == names(currentmap)[regimeindex])
-					a <- alpha[regimenumber]
-					nodevar.root.tot[i] <- nodevar.root.tot[i] - a * dt
-					if(regimenumber == j){
-						nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a * dt) - exp(Acur))
-					}
-					Acur <- Acur + a * dt
-				}
-			}else{
-				oldtime <- edges[i, 4]
-				newtime <- edges[i, 5]
-				if(anc %in% edges[, 3]){
-					start <- which(edges[, 3] == anc)
-					oldregime <- which(edges[start, 6:(k + 5)] == 1)
-				}else{
-					oldregime <- root.state
-				}
-				newregime <- which(edges[i, 6:(k + 5)] == 1)
-				if(oldregime == newregime){
-					dt <- newtime - oldtime
-					a <- alpha[newregime]
-					nodevar.root.tot[i] <- nodevar.root.tot[i] - a * dt
-					if(newregime == j){
-						nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a * dt) - exp(Acur))
-					}
-					Acur <- Acur + a * dt
-
-				}else{
-					shifttime <- newtime - ((newtime - oldtime) * shift.point)
-					# epoch 1 - oldregime
-					dt1 <- shifttime - oldtime
-					a1 <- alpha[oldregime]
-					nodevar.root.tot[i] <- nodevar.root.tot[i] - a1 * dt1
-					if(oldregime == j){
-						nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a1 * dt1) - exp(Acur))
-					}
-					Acur <- Acur + a1 * dt1
-					#epoch 2 - newregime
-					dt2 <- newtime - shifttime
-					a2 <- alpha[newregime]
-					nodevar.root.tot[i] <- nodevar.root.tot[i] - a2 * dt2
-					if(newregime == j){
-						nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a2 * dt2) - exp(Acur))
-					}
-					Acur <- Acur + a2 * dt2
-				}
-			}
-			n.cov.k[desc, ] <- nodevar.k[i]
-			n.cov.root.tot[desc, ] <- nodevar.root.tot[i]
-
-			Ato[desc] <- Acur
-		}
-		w.k <- mat.gen(phy, n.cov.k, pp)
-		w.root.tot <- mat.gen(phy, n.cov.root.tot, pp)
-		W[, j] <- exp(diag(w.root.tot)) * diag(w.k)
+	#Ato[ancestor] must be filled before the edge below it is visited. edges and
+	#phy$maps share an index, so we visit that index in cladewise order. a NULL
+	#root.state drops a row from edges above, so bound the traversal by what is left.
+	if(is.null(edge.order)){
+		edge.order <- ape::reorder.phylo(phy, "cladewise", index.only = TRUE)
 	}
-	w.root.tot <- mat.gen(phy, n.cov.root.tot, pp)
-	w_root <- exp(diag(w.root.tot))
+	edge.order <- edge.order[edge.order <= nrow(edges)]
+
+	#the regime and duration of each epoch and the Ato accumulation are all the same for
+	#every regime j, so they are built once here instead of being recomputed k times
+	#inside the loop below
+	seg.regime <- vector("list", nrow(edges))
+	seg.dt <- vector("list", nrow(edges))
+	Astart <- numeric(nrow(edges))
+
+	for(i in edge.order){
+		anc <- edges[i, 2]
+		desc <- edges[i, 3]
+
+		#cumulative A at start of the edge
+		Acur <- Ato[anc]
+		Astart[i] <- Acur
+
+		if(simmap.tree == TRUE){
+			if(scaleHeight == TRUE) {
+				currentmap <- map[[i]] / Tmax
+			}else{
+				currentmap <- map[[i]]
+			}
+			regimes <- numeric(length(currentmap))
+			dts <- numeric(length(currentmap))
+			for(regimeindex in 1:length(currentmap)){
+				dts[regimeindex] <- as.numeric(currentmap[regimeindex])
+				regimes[regimeindex] <- which(state.names == names(currentmap)[regimeindex])
+			}
+		}else{
+			oldtime <- edges[i, 4]
+			newtime <- edges[i, 5]
+			if(anc %in% edges[, 3]){
+				start <- which(edges[, 3] == anc)
+				oldregime <- which(edges[start, 6:(k + 5)] == 1)
+			}else{
+				oldregime <- root.state
+			}
+			newregime <- which(edges[i, 6:(k + 5)] == 1)
+			if(oldregime == newregime){
+				regimes <- newregime
+				dts <- newtime - oldtime
+			}else{
+				shifttime <- newtime - ((newtime - oldtime) * shift.point)
+				# epoch 1 - oldregime, epoch 2 - newregime
+				regimes <- c(oldregime, newregime)
+				dts <- c(shifttime - oldtime, newtime - shifttime)
+			}
+		}
+
+		for(regimeindex in seq_along(dts)){
+			a <- alpha[regimes[regimeindex]]
+			Acur <- Acur + a * dts[regimeindex]
+		}
+
+		seg.regime[[i]] <- regimes
+		seg.dt[[i]] <- dts
+
+		Ato[desc] <- Acur
+	}
+
+	#the root to tip total is just the accumulated alpha time, which Ato already holds,
+	#so it needs no second traversal of its own
+	w_root <- exp(-Ato[1:ntips])
+
+	#only nodevar.k depends on the regime being weighted. the root to tip sum of the
+	#per edge contributions is accumulated in the same cladewise pass that builds them.
+	cum.k <- numeric(max_node_id)
+	for(j in 1:k){
+		cum.k[] <- 0
+		for(i in edge.order){
+			Acur <- Astart[i]
+			nodevar.k[i] <- 0
+			regimes <- seg.regime[[i]]
+			dts <- seg.dt[[i]]
+			for(regimeindex in seq_along(dts)){
+				a <- alpha[regimes[regimeindex]]
+				if(regimes[regimeindex] == j){
+					nodevar.k[i] <- nodevar.k[i] + (exp(Acur + a * dts[regimeindex]) - exp(Acur))
+				}
+				Acur <- Acur + a * dts[regimeindex]
+			}
+			cum.k[edges[i, 3]] <- cum.k[edges[i, 2]] + nodevar.k[i]
+		}
+		W[, j] <- w_root * cum.k[1:ntips]
+	}
 
 	if (assume.station == TRUE) {
 		W[, root.state] <- W[, root.state] + w_root
@@ -274,4 +290,3 @@ mat.gen<-function(phy,piece.wise,pp){
 	
 	mat
 }
-
