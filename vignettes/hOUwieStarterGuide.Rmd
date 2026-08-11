@@ -1,7 +1,6 @@
 ---
 title: "hOUwie User Guide"
-author: ".  "
-date: "11/07/2022"
+author: "James Boyko"
 output:
   pdf_document:
     fig_caption: yes
@@ -109,10 +108,12 @@ print(getModelTable(model_set))
 So BMV (variable sigma model) is currently the best fitting model. But, we are biasing ourselves towards finding correlation because we may be misconstruing evidence of rate heterogeneity as evidence of correlation. The problem is that all of our current null models do not allow for any rate variation or optima variation. On the other hand, correlated models do allow for rate variation linked to the focal character. So, if there is a signal of rate heterogeneity then we may choose a correlated model because it allows for rate variation even if it is not linked to the focal character (i.e., actually correlated). We can account for this with CID+ models which allow for variable parameter models without it being linked to an observed character. To do this we simply set null.model to TRUE.
 
 ```{r}
-p_bmv_cid <- c(2.915276e+02, 5.319353e-03, 1.728115e-04, 5.529171e+00, 2.053390e-01, 1.666330e-01, 1.318453e+00)
+p_bmv_cid <- c(2.915276e+02, 5.319353e-03, 1.728115e-04, 5.529171e+00, 
+               2.053390e-01, 1.666330e-01, 1.318453e+00)
 pp_bmv_cid <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER", null.model = TRUE,
                 continuous_model = "BMV", nSim = 25, p = p_bmv_cid)
-p_oum_cid <- c(3.206646e+02, 1.639380e-02, 1.172179e-03, 1.639380e+00, 1.977996e-01, 2.080072e-01, 3.560215e-01, 1.518203e+00)
+p_oum_cid <- c(3.206646e+02, 1.639380e-02, 1.172179e-03, 1.639380e+00, 
+               1.977996e-01, 2.080072e-01, 3.560215e-01, 1.518203e+00)
 pp_oum_cid <- hOUwie(tree, trait, rate.cat = 2, discrete_model = "ER", null.model = TRUE,
                 continuous_model = "OUM", nSim = 25, p = p_oum_cid)
 ```
@@ -182,7 +183,9 @@ plot(tree, show.tip.label = FALSE, x.lim = c(0, 4), no.margin = TRUE)
 tiplabels(pch = 21, col = flower_data$scent, cex = 0.75, offset = 0.02)
 tiplabels(pch = 16, col = flower_data$color, cex = 0.75, offset = 0.05)
 proportions <- dat$data$x/max(dat$data$x)
-plotting_matrix <- matrix(c(rep(3.6, length(tree$tip.label)), 1:length(tree$tip.label), 3.6 + (0.4 * proportions), 1:length(tree$tip.label)), ncol = 4)
+plotting_matrix <- matrix(c(rep(3.6, length(tree$tip.label)), 
+                    1:length(tree$tip.label), 3.6 + (0.4 * proportions), 
+                    1:length(tree$tip.label)), ncol = 4)
 for(i in 1:64){
   lines(t(matrix(plotting_matrix[i,], 2, 2)), lwd = 2, col = "darkgrey")
 }
@@ -195,7 +198,8 @@ So it seems that there may be some correlation between flower color and optimal 
 There are several functions which can aid you create a custom set of models. Here we will be focusing on custom continuous models, but similar things can be done for discrete models (for discrete models see the corHMM vignette). Let's start with the our simplest model BM1.
 
 ```{r}
-ou1_structure <- getOUParamStructure(model = "OU1", nObsState = 4, rate.cat = 1, null.model = FALSE)
+ou1_structure <- getOUParamStructure(model = "OU1", nObsState = 4, rate.cat = 1, 
+                                     null.model = FALSE)
 print(ou1_structure)
 ```
 

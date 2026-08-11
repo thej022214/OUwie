@@ -1,10 +1,13 @@
 ---
 title: "hOUwie performance and stability improvements"
-output: rmarkdown::html_vignette
+author: "James Boyko"
+output:
+  pdf_document:
+    fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{hOUwie performance and stability improvements}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+   %\VignetteIndexEntry{hOUwie performance and stability improvements}
+   \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}

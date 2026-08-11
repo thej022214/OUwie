@@ -13,7 +13,7 @@ OUwie <- function(phy, data, model=c("BM1","BMS","OU1","OUM","OUMV","OUMA","OUMV
 	
 	if(model %in% c("OUMA", "OUMVA", "OUVA")) {
 		if(quiet == FALSE){
-			warning("Please cite Lau et al. (2026) for use of multiple alpha models. See Calculation Update vignette for details.", call.=FALSE, immediate.=TRUE)
+			warning("Please cite Lau et al. (2026) published in MEE for use of multiple alpha models. See Calculation Update vignette for details.", call.=FALSE, immediate.=TRUE)
 		}
 	}
 

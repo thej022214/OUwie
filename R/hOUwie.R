@@ -23,7 +23,7 @@ hOUwie <- function(phy, data, rate.cat, discrete_model, continuous_model, null.m
     }
   }
 	if(any(grepl("OUMA|OUMVA|OUVA", continuous_model))) {
-		warning("Please cite Lau et al. (2026) for use of multiple alpha models. See Calculation Update vignette for details.", call.=FALSE, immediate.=TRUE)	
+		warning("Please cite Lau et al. (2026) published in MEE for use of multiple alpha models. See Calculation Update vignette for details.", call.=FALSE, immediate.=TRUE)	
 	}
   if(!is.logical(common_random_numbers) || length(common_random_numbers) != 1 || is.na(common_random_numbers)){
     stop("common_random_numbers must be either TRUE or FALSE.", call. = FALSE)
