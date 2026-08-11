@@ -14,7 +14,6 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache=FALSE)
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=75),tidy=TRUE)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -255,7 +254,7 @@ m1_fit <- hOUwie(tree, flower_data, rate.cat = 1, discrete_model = "ER",
                 continuous_model = m1_structure, nSim = 50, p = p_m1)
 p_m2 <- c(1, 3, 1.5, 5, 10) # note: not the mle
 m2_fit <- hOUwie(tree, flower_data, rate.cat = 1, discrete_model = "ER", 
-                continuous_model = m2_structure, nSim = 50, p = p_m1, adaptive_sampling = TRUE)
+                continuous_model = m2_structure, nSim = 50, p = p_m2)
 p_m3 <- c(1, 3, 2, 5, 11, 6, 12) # note: not the mle
 m3_fit <- hOUwie(tree, flower_data, rate.cat = 1, discrete_model = "ER", 
                 continuous_model = m3_structure, nSim = 50, p = p_m3)
@@ -288,7 +287,6 @@ How many species are you running? It's going to depend a lot on the number of sp
 
 ### Why is hOUwie so slow?
 It's a simulation approach. So we have to simulate many underlying discrete regimes in order to integrate over the uncertainty deep in time of any particular discrete regime. This is a very important step, but given that there are very few high probability regime mappings doing an exhaustive search isn't necessary. The other thing I will say is that I implemented A LOT of tricks to make this go faster. Our stochastic mapping procedure is very fast, calculating conditional probabilities only once and never double calculating anything unnecessarily (maybe some exceptions I missed). I also implemented the brilliant three.point of Ho and Ane (2014) which calculates the continuous character probability incredibly quickly. If you're unconvinced by the speed of this implementation run OUwie with algorithm = three.point compared to invert. Nonetheless, my goal is to make hOUwie faster by calculating the correct expectation, variance, and covariance for the joint process. Until then, we're stuck with simulation. 
-
 
 
 

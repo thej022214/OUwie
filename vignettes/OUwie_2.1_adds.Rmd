@@ -14,7 +14,6 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache=FALSE)
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=75),tidy=TRUE)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -236,4 +235,3 @@ Ho, L.S.T., and C. Ane. 2013. Asymptotic theory with hierarchical autocorrelatio
 Ho, L.S.T., and C. Ane. 2014a. Intrinsic inference difficulties for trait evolution with Ornstein-Uhlenbeck models. Methods in Ecology and Evolution, 5: 1133-1146.
 
 Ho, L.S.T., and C. Ane. 2014b. A linear-time algorithm for Gaussian and non-Gaussian trait evolution models. Systematic Biology, 63:397-408.
-

@@ -14,7 +14,6 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache=FALSE)
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=75),tidy=TRUE)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
