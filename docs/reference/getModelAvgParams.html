@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -33,6 +33,9 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwiePerformance.html">hOUwie performance and stability improvements</a>
     </li>
     <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
@@ -69,7 +72,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getModelAvgParams</span><span class="op">(</span><span class="va">model.list</span>, </span>
 <span>                  BM_alpha_treatment <span class="op">=</span> <span class="st">"zero"</span>, </span>
 <span>                  type               <span class="op">=</span> <span class="st">"BIC"</span>,</span>
-<span>                  force              <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>                  force              <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                  convergence_cutoff <span class="op">=</span> <span class="fl">1e5</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -87,6 +91,9 @@
 
 <dt id="arg-force">force<a class="anchor" aria-label="anchor" href="#arg-force"></a></dt>
 <dd><p>A boolean indicating whether to force potentially failed model fits to be included in the model averaging.</p></dd>
+
+<dt id="arg-convergence-cutoff">convergence_cutoff<a class="anchor" aria-label="anchor" href="#arg-convergence-cutoff"></a></dt>
+<dd><p>A positive number giving the largest information-criterion difference from the best model that is retained when <code>force = FALSE</code>. The default is <code>1e5</code>.</p></dd>
 
 </dl></div>
     <div id="details">
@@ -144,11 +151,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeremy Beaulieu.</p>
+  <p></p><p>Developed by Jeremy M. Beaulieu, Brian O’Meara.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ This function takes as main input a phylogenetic tree and a data.frame containin
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -34,6 +34,9 @@ This function takes as main input a phylogenetic tree and a data.frame containin
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwiePerformance.html">hOUwie performance and stability improvements</a>
     </li>
     <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
@@ -92,12 +95,16 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 <span>       optimizer           <span class="op">=</span> <span class="st">"nlopt_ln"</span>, </span>
 <span>       opts                <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>       quiet               <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>       sample_tips         <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>       sample_nodes        <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>       adaptive_sampling   <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>       sample_nodes        <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>       common_random_numbers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>       diagn_msg           <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>       n_starts            <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>       ncores              <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span>       ncores              <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>       algorithm           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sampling"</span>, <span class="st">"pruning"</span><span class="op">)</span>,</span>
+<span>       resolution          <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>       history             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="st">"bridge"</span><span class="op">)</span>,</span>
+<span>       proposal_defensive  <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>       parameterization    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"alpha-sigma"</span>, <span class="st">"halflife-variance"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -176,14 +183,11 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
 <dd><p>A boolean indicating whether or not to print messages.</p></dd>
 
-<dt id="arg-sample-tips">sample_tips<a class="anchor" aria-label="anchor" href="#arg-sample-tips"></a></dt>
-<dd><p>A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).</p></dd>
-
 <dt id="arg-sample-nodes">sample_nodes<a class="anchor" aria-label="anchor" href="#arg-sample-nodes"></a></dt>
-<dd><p>A boolean indicating whether or not to sample node probabilities when generating underlying regimes. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.</p></dd>
+<dd><p>A boolean indicating whether the continuous trait shapes the proposal that draws regime histories. When <code>TRUE</code>, the default, the trait data below each node is summarised by a Gaussian message and used to weight the regime states drawn there, so histories consistent with the observed trait are sampled more often. This changes only the variance of the likelihood estimate and never its expectation, so it is a cost/accuracy setting rather than a modelling choice; <code>FALSE</code> draws histories from the discrete character alone and typically needs far more <code>nSim</code> for the same precision.</p></dd>
 
-<dt id="arg-adaptive-sampling">adaptive_sampling<a class="anchor" aria-label="anchor" href="#arg-adaptive-sampling"></a></dt>
-<dd><p>A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve. Recommended that this is set to TRUE when evaluating character independent models, but can be set to FALSE for character dependent models.</p></dd>
+<dt id="arg-common-random-numbers">common_random_numbers<a class="anchor" aria-label="anchor" href="#arg-common-random-numbers"></a></dt>
+<dd><p>A boolean indicating whether likelihood evaluations within an optimizer start should reuse the same underlying random-number stream. This is enabled by default; set it to <code>FALSE</code> to draw a new stream for each evaluation. The stochastic maps are still regenerated and evaluated using the current discrete and continuous parameters. Each optimizer start receives a different stream. Use <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> before calling <code>hOUwie</code> for reproducibility.</p></dd>
 
 <dt id="arg-diagn-msg">diagn_msg<a class="anchor" aria-label="anchor" href="#arg-diagn-msg"></a></dt>
 <dd><p>A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.</p></dd>
@@ -193,6 +197,26 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 
 <dt id="arg-ncores">ncores<a class="anchor" aria-label="anchor" href="#arg-ncores"></a></dt>
 <dd><p>An integer, specifying the number of cores for running multiple fitting n_starts in parallel. Should generally not exceed the number of CPU cores on a machine, but must be a least 1.</p></dd>
+
+
+<dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
+<dd><p>How the sum over regime histories is evaluated. <code>"sampling"</code>, the default, draws <code>nSim</code> histories and combines them by importance sampling, which is consistent for any tree size. <code>"pruning"</code> instead sums over every regime history exactly, by propagating a Gaussian mixture up the tree. It carries no Monte Carlo error at all and is the reference the sampling likelihood is validated against, but its cost is fixed by the data rather than chosen: the mixture holds one component per regime history, so it needs <code>nStates^(regime points)</code> components. On a two-state model that is about four million components at 24 tips and doubles with every further tip, which puts the practical limit near 26. Above that the run is refused rather than attempted. <code>"pruning"</code> does not produce stochastic maps, so <code>recon</code> is unavailable with it, and <code>sample_nodes</code> and <code>history</code> have no effect.</p></dd>
+
+
+<dt id="arg-resolution">resolution<a class="anchor" aria-label="anchor" href="#arg-resolution"></a></dt>
+<dd><p>Used only when <code>algorithm = "pruning"</code>. The number of regime points placed along each edge. <code>1</code> is the history model the sampling path uses under <code>history = "midpoint"</code>, in which an edge whose endpoints occupy different regimes switches at its midpoint. Larger values refine towards the continuous-time regime process, first order in the step, but they multiply the number of regime points and so enter the component count as an exponent: at <code>resolution = 2</code> the size limit above roughly halves in tips.</p></dd>
+
+
+<dt id="arg-history">history<a class="anchor" aria-label="anchor" href="#arg-history"></a></dt>
+<dd><p>Used only when <code>algorithm = "sampling"</code>. How the regime path within an edge is drawn. <code>"midpoint"</code>, the default, is the history model of Boyko et al. (2023), in which an edge whose endpoints occupy different regimes switches at its midpoint. <code>"bridge"</code> instead draws the path from the exact continuous-time process conditional on the states at the two ends of the edge, by uniformization, so a shift may fall anywhere along a branch and a branch may carry any number of shifts. The importance weights are unchanged by this: the density of the drawn path cancels against the proposal that drew it.</p></dd>
+
+
+<dt id="arg-proposal-defensive">proposal_defensive<a class="anchor" aria-label="anchor" href="#arg-proposal-defensive"></a></dt>
+<dd><p>Used only when <code>algorithm = "sampling"</code> and <code>sample_nodes = TRUE</code>. The proportion of histories drawn from the continuous-trait-informed proposal rather than the discrete-only defensive proposal. The default, <code>0.5</code>, mixes them equally to reduce weight degeneracy without allowing the trait-informed proposal to collapse onto a single history.</p></dd>
+
+
+<dt id="arg-parameterization">parameterization<a class="anchor" aria-label="anchor" href="#arg-parameterization"></a></dt>
+<dd><p>The coordinates used during optimization. <code>"alpha-sigma"</code>, the default, optimizes the OU pull strength and diffusion variance directly. <code>"halflife-variance"</code> instead optimizes half-life, <code>log(2) / alpha</code>, and stationary variance, <code>sigma^2 / (2 * alpha)</code>, then converts estimates back for reporting. The alternative is unavailable for Brownian models and for models in which a shared <code>sigma^2</code> is governed by different <code>alpha</code> values.</p></dd>
 
 </dl></div>
     <div id="details">
@@ -204,7 +228,7 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 <p><code>discrete_model</code> defines the model between discrete states. This option controls the number of independent rates and the correspondence between independent and dependent rates. If a character, then it must be one of "ER", "SYM", "ARD". If an integer matrix, then it defines a custom parametric structure for the transition rates, by mapping entries of the transition matrix to a set of independent transition-rate parameters (numbered 1,2, and so on). All cells with the number 3 represent transitions that have the same estimated rate. Additionally, ambiguities (polymorphic taxa or taxa missing data) are assigned likelihoods following Felsenstein (2004, p. 255). Taxa with missing data are coded “?” with all states observed at a tip. Polymorphic taxa are coded with states separated by an “&amp;”. For example, if a trait has four states and taxon A is observed to be in state 1 and 3, the character would be coded as “1&amp;3”. Missing data are treated as ambiguous for all states, thus all states for taxa missing data are assigned a likelihood of 1.0 (some software may incorrectly assign a likelihood of 1.0/number of possible states; note this if comparing likelihoods). For example, for a four-state character (i.e. DNA), a taxon missing data will have likelihoods of all four states equal to 1.0 [e.g. L(A)=1.0, L(C)=1.0, L(G)=1.0, L(T)=1.0].</p>
 <p><code>continuous_model</code> option controls the number of independent continuous model parameters and the correspondence between continuous model parameters and underlying regime. If a character, then it must be one of "BM1", "BMV", "OU1", "OUM", "OUA", "OUV", "OUMV", "OUMA", "OUVA", or "OUMVA". These correspond to allowing theta ("OUM"), sigma_square ("BMV", "OUV"), or alpha ("OUA") to vary. If an integer matrix, then it defines a custom parametric structure for the transition rates, by mapping entries of the continuous model parameters to the states of the underlying regimes. Note that when some taxa have phenotypic values below 0, we add 50 to all continuous trait values to assist the optimization, but the estimated parameter values will be scaled back to the original values.</p>
 <p>Note (Sept. 4): From feedback from a user, we have concerns about the likelihood function  for the OUMA and OUMVA models. As of Sept. 4, 2025, we recommend not using these models for now, but we expect the situation to be resolved soon (either with corrected likelihood functions or a definite proof that they are ok as is). That said, we leave these as options for reproducibility and debugging. If you do use them, be sure to note the package version and report this in your work.</p>
-<p>For each set of parameters evaluated during the maximum likelihood search, a set of stochastic mappings are generated to evaluate the discrete and continuous likelihoods. To do this efficiently, we first approximate of the conditional state probabilities at nodes. This is what happens if <code>sample_nodes=TRUE</code>. The conditional state probability, unlike the more common marginal reconstruction or joint state reconstruction, calculates the probability that a node has a particular state value conditioned only on the observations of its descendants. For a particular focal node, we calculate the probability of the observing all pairwise descendant values given the OU model parameters, integrated over all possible rootward node states, and observed tipward discrete states. This process is repeated for each iteration of parameters if <code>adaptive_sample=TRUE</code>, in which case it is repeated until the joint likelihood for a given set of mappings does not improve. We recommend that both of these arugements are set to TRUE for character independent models because it is often very difficult to generate mappings based soley on a discrete process that are good when the discrete character is predicted to be unlinked to the continuous character (i.e., when you're fitting a character independent model). In the case of a character dependent model, the continuous and discrete character are expected to influence one another and actually basing maps on the discrete character only (setting sample_nodes and adaptive_sampling to FALSE) can work fairly well.</p>
+<p>For each set of parameters evaluated during the maximum likelihood search, a set of stochastic mappings is generated to evaluate the discrete and continuous likelihoods. To do this efficiently, we first approximate the conditional state probabilities at nodes. This is what happens if <code>sample_nodes=TRUE</code>. The conditional state probability, unlike the more common marginal reconstruction or joint state reconstruction, calculates the probability that a node has a particular state value conditioned only on the observations of its descendants. For a particular focal node, we calculate the probability of observing all pairwise descendant values given the OU model parameters, integrated over all possible rootward node states and observed tipward discrete states. This trait-informed proposal is mixed with a discrete-only defensive proposal according to <code>proposal_defensive</code>; the mixture improves sampling efficiency while preserving a consistent importance-sampling estimate.</p>
 <p>IMPORTANT NOTE: The algorithm used to calculate the likelihood described in Beaulieu et al. (2012) involves matrix inversion – a computationally costly procedure. Therefore, we implement a linear-time computation of the likelihood of Gaussian trait models following (Ho and Ane 2014). For this we rely on changes in the most recent version of the phylolm package which is only available on github (not CRAN). Therefore, in order for hOUwie to function properly make sure that the most recent version of phylolm is installed which can be done by running the following code: <code>devtools::install_github("lamho86/phylolm")</code>. For more information on phylolm installation see: https://github.com/lamho86/phylolm.</p>
     </div>
     <div id="value">
@@ -285,14 +309,25 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 <dt>tip.fog</dt>
 <dd><p>Either includes tip fog for each species value ("known"). The default is "none".</p></dd>
 
-<dt>sample_tips</dt>
-<dd><p>A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).</p></dd>
-
 <dt>sample_nodes</dt>
-<dd><p>A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).</p></dd>
+<dd><p>A boolean indicating whether the continuous trait shaped the history proposal.</p></dd>
 
-<dt>adaptive_sampling</dt>
-<dd><p>A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).</p></dd>
+
+<dt>ess</dt>
+<dd><p>The effective sample size of the importance weights at the reported optimum, out of <code>nSim</code>. A value near 1 means a single sampled history carried the whole likelihood and the fit should not be trusted; raise <code>nSim</code>. It is computed from the weights that were drawn, so it can only report on histories the sampler actually visited.</p></dd>
+
+<dt>common_random_numbers</dt>
+<dd><p>Whether common random numbers were enabled for the fit.</p></dd>
+
+
+<dt>algorithm</dt>
+<dd><p>The history-summation algorithm used, <code>"sampling"</code> or <code>"pruning"</code>.</p></dd>
+
+<dt>crn_seeds</dt>
+<dd><p>The random-number seed assigned to each optimizer start when common random numbers were enabled; otherwise <code>NULL</code>.</p></dd>
+
+<dt>crn_seed</dt>
+<dd><p>The random-number seed associated with the selected optimizer start when common random numbers were enabled; otherwise <code>NULL</code>.</p></dd>
 
 <dt>lb_discrete_model</dt>
 <dd><p>A vector of lower bounds on discrete character evolution.</p></dd>
@@ -352,6 +387,55 @@ This function takes as main input a phylogenetic tree and a data.frame containin
     <p>James D. Boyko</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tworegime</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The data are a phylogeny with two painted selective regimes and a data frame</span></span></span>
+<span class="r-in"><span><span class="co"># whose columns are species, the discrete state, and the continuous trait value.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trait</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A character dependent model, in which the optimum of the continuous trait</span></span></span>
+<span class="r-in"><span><span class="co"># depends on the state of the discrete character. nSim sets how many stochastic</span></span></span>
+<span class="r-in"><span><span class="co"># maps are evaluated per iteration of the likelihood search. These fits take a</span></span></span>
+<span class="r-in"><span><span class="co"># long time, which is why the examples here are not run automatically.</span></span></span>
+<span class="r-in"><span><span class="va">cd_model</span> <span class="op">&lt;-</span> <span class="fu">hOUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>,</span></span>
+<span class="r-in"><span>                   continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cd_model</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A character independent model with rate heterogeneity. Here the continuous</span></span></span>
+<span class="r-in"><span><span class="co"># parameters are tied to a hidden state rather than to the observed one.</span></span></span>
+<span class="r-in"><span><span class="va">ci_model</span> <span class="op">&lt;-</span> <span class="fu">hOUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">2</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>,</span></span>
+<span class="r-in"><span>                   continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, null.model <span class="op">=</span> <span class="cn">TRUE</span>, nSim <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Common random numbers are enabled by default, making likelihood comparisons</span></span></span>
+<span class="r-in"><span><span class="co"># within each optimizer start share an underlying random stream. Mappings still</span></span></span>
+<span class="r-in"><span><span class="co"># respond to the current parameter values. set.seed() makes the assigned streams</span></span></span>
+<span class="r-in"><span><span class="co"># repeatable. Set common_random_numbers = FALSE to restore independent draws at</span></span></span>
+<span class="r-in"><span><span class="co"># every likelihood evaluation.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ci_model_crn</span> <span class="op">&lt;-</span> <span class="fu">hOUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">2</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>,</span></span>
+<span class="r-in"><span>                       continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, null.model <span class="op">=</span> <span class="cn">TRUE</span>, nSim <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># getModelTable summarises the relative fit of a set of models.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getModelTable.html">getModelTable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>CD <span class="op">=</span> <span class="va">cd_model</span>, CID <span class="op">=</span> <span class="va">ci_model</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Supplying p evaluates the likelihood at a fixed set of parameters rather than</span></span></span>
+<span class="r-in"><span><span class="co"># searching for them. Parameters follow c(p_trans, p_alpha, p_sigma.squared,</span></span></span>
+<span class="r-in"><span><span class="co"># p_theta).</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01664314</span>, <span class="fl">0.39631218</span>, <span class="fl">0.18684476</span>, <span class="fl">2.25121568</span>, <span class="fl">0.82495093</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fixed_fit</span> <span class="op">&lt;-</span> <span class="fu">hOUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>,</span></span>
+<span class="r-in"><span>                    continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># recon returns marginal reconstructions of the discrete state. Rows are nodes</span></span></span>
+<span class="r-in"><span><span class="co"># and columns are states, so each row sums to one.</span></span></span>
+<span class="r-in"><span><span class="va">recon_fit</span> <span class="op">&lt;-</span> <span class="fu">hOUwie</span><span class="op">(</span><span class="va">tree</span>, <span class="va">trait</span>, rate.cat <span class="op">=</span> <span class="fl">1</span>, discrete_model <span class="op">=</span> <span class="st">"ER"</span>,</span></span>
+<span class="r-in"><span>                    continuous_model <span class="op">=</span> <span class="st">"OUM"</span>, nSim <span class="op">=</span> <span class="fl">25</span>, p <span class="op">=</span> <span class="va">p</span>, recon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">recon_fit</span><span class="op">$</span><span class="va">recon</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -360,11 +444,11 @@ This function takes as main input a phylogenetic tree and a data.frame containin
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeremy Beaulieu.</p>
+  <p></p><p>Developed by Jeremy M. Beaulieu, Brian O’Meara.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -33,6 +33,9 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwiePerformance.html">hOUwie performance and stability improvements</a>
     </li>
     <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
@@ -173,9 +176,113 @@
 <span class="r-in"><span><span class="va">best_neglnL</span> <span class="op">&lt;-</span> <span class="va">optimized_results</span><span class="op">$</span><span class="va">objective</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">dented_results</span> <span class="op">&lt;-</span> <span class="fu">dent_walk</span><span class="op">(</span>par<span class="op">=</span><span class="va">best_par</span>, fn<span class="op">=</span><span class="va">dnorm_to_run</span>, best_neglnL<span class="op">=</span><span class="va">best_neglnL</span>, sims<span class="op">=</span><span class="va">sims</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dent_walk(par = best_par, fn = dnorm_to_run, best_neglnL = best_neglnL,     sims = sims):</span> could not find function "dent_walk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 50"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 6 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 17.07602</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 100"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 10 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.95104</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 150"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 18 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 200"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 24 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 250"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 32 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 300"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 42 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 350"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 48 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 400"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 55 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 450"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 58 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 500"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 68 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 550"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 77 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 600"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 90 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 650"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 99 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 700"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 106 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 750"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 116 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 800"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 128 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 850"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 142 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 900"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 154 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 950"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 164 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.91344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.4501 17.29485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 1000"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 174 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL     mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 142.6182 16.90843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 144.5195 17.29485</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dented_results</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'dented_results' not found</span>
+<span class="r-plt img"><img src="dent_walk-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multivariate case</span></span></span>
 <span class="r-in"><span><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Lognormal.html" class="external-link">rlnorm</a></span><span class="op">(</span><span class="fl">100</span>, meanlog<span class="op">=</span><span class="fl">1</span>, sdlog<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
@@ -189,9 +296,112 @@
 <span class="r-in"><span><span class="va">best_neglnL</span> <span class="op">&lt;-</span> <span class="va">optimized_results</span><span class="op">$</span><span class="va">value</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">dented_results</span> <span class="op">&lt;-</span> <span class="fu">dent_walk</span><span class="op">(</span>par<span class="op">=</span><span class="va">best_par</span>, fn<span class="op">=</span><span class="va">dlnorm_to_run</span>, best_neglnL<span class="op">=</span><span class="va">best_neglnL</span>, sims<span class="op">=</span><span class="va">sims</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dent_walk(par = best_par, fn = dlnorm_to_run, best_neglnL = best_neglnL,     sims = sims):</span> could not find function "dent_walk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 50"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 20 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.9657083 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3208 1.3999136 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "increasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 100"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 29 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.9657083 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3450 1.5449791 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 150"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 45 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.8222937 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3450 1.5449791 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "increasing proposal width for some parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 200"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 58 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.8222937 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 250"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 68 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.8222937 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 300"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 82 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.8222937 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 350"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 95 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.6897976 2.853762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.610972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "increasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 400"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 105 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL  meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.638462 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.553952 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 450"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 114 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL  meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.395771 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.553952 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 500"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 123 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL  meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.395771 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.553952 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 550"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 131 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL  meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.395771 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.553952 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 600"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 139 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 650"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 146 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "decreasing proposal width for all parameters"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 700"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 153 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 750"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 165 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 800"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 170 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 850"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 183 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.784415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 900"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 189 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.757891</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 950"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 199 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.757891</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Done replicate 1000"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "CI of values (the 211 replicates within 2 neglnL of the optimum)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        neglnL   meanlog    sdlog</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 353.3707 0.3408285 2.757891</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 355.3701 1.5539521 3.648617</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dented_results</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'dented_results' not found</span>
+<span class="r-plt img"><img src="dent_walk-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>
@@ -202,11 +412,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeremy Beaulieu.</p>
+  <p></p><p>Developed by Jeremy M. Beaulieu, Brian O’Meara.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

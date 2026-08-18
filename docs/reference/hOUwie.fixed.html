@@ -18,7 +18,7 @@ This function takes as main input a list of stochastic maps and a data.frame con
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -34,6 +34,9 @@ This function takes as main input a list of stochastic maps and a data.frame con
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwiePerformance.html">hOUwie performance and stability improvements</a>
     </li>
     <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
@@ -91,9 +94,7 @@ This function takes as main input a list of stochastic maps and a data.frame con
 <span>             optimizer           <span class="op">=</span> <span class="st">"nlopt_ln"</span>, </span>
 <span>             opts                <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>             quiet               <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>             sample_tips         <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>             sample_nodes        <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>             adaptive_sampling   <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>             diagn_msg           <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             make_numeric        <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>             n_starts            <span class="op">=</span> <span class="fl">1</span>, </span>
@@ -153,10 +154,10 @@ This function takes as main input a list of stochastic maps and a data.frame con
 <dd><p>Three values specifying the upper bound of continuous character evolution during the ML search. Should be provided in the order of upper.bound for alpha, sigma squared, theta. The default is <code>c(log(2)/(0.01 * Tmax), log(2)/(0.01 * Tmax), largest_continuous_value*10)</code>.</p></dd>
 
 <dt id="arg-recon">recon<a class="anchor" aria-label="anchor" href="#arg-recon"></a></dt>
-<dd><p>A boolean indicating whether marginal ancestral state reconstruction should take place following the ML search.</p></dd>
+<dd><p>Retained for compatibility with <code>hOUwie</code>, but marginal ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps. Setting <code>recon=TRUE</code> produces a warning and leaves <code>recon</code> in the returned object as <code>NULL</code>. Use <code>hOUwie</code> if ancestral states are needed.</p></dd>
 
 <dt id="arg-nodes">nodes<a class="anchor" aria-label="anchor" href="#arg-nodes"></a></dt>
-<dd><p>If <code>recon=TRUE</code>, a character or vector indicating which nodes should have their discrete ancestral state characters estimated. If a vector, nodes specified will be reconstructed with 1:Ntip representing tip reconstructions and Ntip+1 representing the root. A user can also indicate "all", "internal", or "external" to reconstruct all nodes, ancestral nodes, or extant nodes respectively. Reconstructing tip states ("external") is only useful if hidden states are included in the model.</p></dd>
+<dd><p>Retained for compatibility with <code>hOUwie</code> and unused here, since ancestral state reconstruction is not available for a fit conditioned on a fixed set of stochastic maps.</p></dd>
 
 <dt id="arg-p">p<a class="anchor" aria-label="anchor" href="#arg-p"></a></dt>
 <dd><p>A numeric vector of fixed parameters to be optimized. Parameters are organized such following <code>c(p_trans, p_alpha, p_sigma.squared, p_theta)</code></p></dd>
@@ -173,14 +174,8 @@ This function takes as main input a list of stochastic maps and a data.frame con
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
 <dd><p>A boolean indicating whether or not to print messages.</p></dd>
 
-<dt id="arg-sample-tips">sample_tips<a class="anchor" aria-label="anchor" href="#arg-sample-tips"></a></dt>
-<dd><p>A boolean indicating whether or not to sample tip probabilities when generating underlying regimes (see Deatils, but recommended to be set to FALSE).</p></dd>
-
 <dt id="arg-sample-nodes">sample_nodes<a class="anchor" aria-label="anchor" href="#arg-sample-nodes"></a></dt>
-<dd><p>A boolean indicating whether or not to sample node probabilities when generating underlying regimes (see Deatils, but recommended to be set to TRUE).</p></dd>
-
-<dt id="arg-adaptive-sampling">adaptive_sampling<a class="anchor" aria-label="anchor" href="#arg-adaptive-sampling"></a></dt>
-<dd><p>A boolean indicating whether each iteration will continue sampling stochastic maps until the likelihood of a set of parameters does not improve (recommended TRUE).</p></dd>
+<dd><p>A boolean indicating whether the continuous trait shapes the proposal that draws regime histories. When <code>TRUE</code>, the default, the trait data below each node is summarised by a Gaussian message and used to weight the regime states drawn there, so histories consistent with the observed trait are sampled more often. This changes only the variance of the likelihood estimate and never its expectation, so it is a cost/accuracy setting rather than a modelling choice; <code>FALSE</code> draws histories from the discrete character alone and typically needs far more <code>nSim</code> for the same precision.</p></dd>
 
 <dt id="arg-diagn-msg">diagn_msg<a class="anchor" aria-label="anchor" href="#arg-diagn-msg"></a></dt>
 <dd><p>A boolean indiciating whether a message of loglikelihoods and parameters should be printed at each iteration. Can be useful for diagnosing problems.</p></dd>
@@ -231,7 +226,7 @@ This function takes as main input a list of stochastic maps and a data.frame con
 <dd><p>The maximum likelihood estimate of parameters which describe continuous evolution. Each column corresponds to a discrete state and each row is a different continuous model parameter. Estimated continuous parameters include alpha, sigma.squared, and theta.</p></dd>
 
 <dt>recon</dt>
-<dd><p>A data.frame of marginal probabilities of ancestral states given the best fitting model. If ancestral state reconstruction was not specified then <code>NULL</code>.</p></dd>
+<dd><p>Always <code>NULL</code>. Ancestral state reconstruction requires regimes to be resampled under a node constraint, which a fit conditioned on a fixed set of stochastic maps cannot do. See <code>hOUwie</code>.</p></dd>
 
 <dt>index.disc</dt>
 <dd><p>An index matrix specifying which discrete model parameters are estimated.</p></dd>
@@ -278,14 +273,12 @@ This function takes as main input a list of stochastic maps and a data.frame con
 <dt>tip.fog</dt>
 <dd><p>Either includes measurement error for each species value ("known"). The default is "none".</p></dd>
 
-<dt>sample_tips</dt>
-<dd><p>A boolean indicating whether tips probabilities were sampled each iteration (recommended FALSE).</p></dd>
-
 <dt>sample_nodes</dt>
-<dd><p>A boolean indicating whether node probabilities were sampled each iteration (recommended TRUE).</p></dd>
+<dd><p>A boolean indicating whether the continuous trait shaped the history proposal.</p></dd>
 
-<dt>adaptive_sampling</dt>
-<dd><p>A boolean indicating whether each iteration continued sampling stochastic maps until the likelihood of a set of parameters did not improve (recommended TRUE).</p></dd>
+
+<dt>ess</dt>
+<dd><p>The effective sample size of the importance weights at the reported optimum, out of <code>nSim</code>. A value near 1 means a single sampled history carried the whole likelihood and the fit should not be trusted; raise <code>nSim</code>. It is computed from the weights that were drawn, so it can only report on histories the sampler actually visited.</p></dd>
 
 <dt>lb_discrete_model</dt>
 <dd><p>A vector of lower bounds on discrete character evolution.</p></dd>
@@ -350,11 +343,11 @@ This function takes as main input a list of stochastic maps and a data.frame con
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeremy Beaulieu.</p>
+  <p></p><p>Developed by Jeremy M. Beaulieu, Brian O’Meara.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ This takes any values that are better (lower) than the desired negative log like
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OUwie</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.02</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -34,6 +34,9 @@ This takes any values that are better (lower) than the desired negative log like
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/calculationUpdate.html">Calculation Update</a>
+    </li>
+    <li>
+      <a href="../articles/hOUwiePerformance.html">hOUwie performance and stability improvements</a>
     </li>
     <li>
       <a href="../articles/hOUwieStarterGuide.html">hOUwie User Guide</a>
@@ -107,7 +110,6 @@ This takes any values that are better (lower) than the desired negative log like
 <span class="r-in"><span>  <span class="va">results_normal</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">dnorm_to_run</span><span class="op">(</span><span class="va">possible_means</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, sims<span class="op">=</span><span class="va">sims</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">results_dented</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">dent_likelihood</span><span class="op">(</span><span class="va">results_normal</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, best_neglnL<span class="op">=</span><span class="va">best_neglnL</span>, delta<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dent_likelihood(results_normal[i], best_neglnL = best_neglnL,     delta = 2):</span> could not find function "dent_likelihood"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">possible_means</span>, <span class="va">results_normal</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">possible_means</span>, <span class="va">results_dented</span><span class="op">)</span></span></span>
@@ -122,11 +124,11 @@ This takes any values that are better (lower) than the desired negative log like
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeremy Beaulieu.</p>
+  <p></p><p>Developed by Jeremy M. Beaulieu, Brian O’Meara.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
