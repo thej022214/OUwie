@@ -10,7 +10,7 @@ attach.stub.taxon <- function(node, phy, tip.name=NULL) {
   if(is.null(tip.name)) {
     tip.name <- paste0("node_", node)
   }
-  return(ape::bind.tree(phy, structure(list(edge = structure(c(2L, 1L), .Dim = 1:2), tip.label = tip.name, Nnode = 1L, edge.length = 0), .Names = c("edge", "tip.label", "Nnode", "edge.length"), class = "phylo"), where=node))
+  return(ape::bind.tree(phy, structure(list(edge = matrix(c(2L, 1L), nrow = 1), tip.label = tip.name, Nnode = 1L, edge.length = 0), class = "phylo"), where=node))
 }
 
 attach.stub.taxa <- function(phy) {

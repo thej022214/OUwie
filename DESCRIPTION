@@ -1,6 +1,6 @@
 Package: OUwie
 Version: 3.0.3
-Date: 2026-07-30
+Date: 2026-09-15
 Title: Analysis of Evolutionary Rates in an OU Framework
 Authors@R: c(
     person(given = c("Jeremy", "M."),

@@ -6,3 +6,5 @@
 ^\.DS_Store$
 ^.*\.Rhistory$
 ^tools$
+^vignettes/.*\.pdf$
+^vignettes/.*\.html$
