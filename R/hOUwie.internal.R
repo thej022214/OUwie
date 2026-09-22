@@ -394,8 +394,7 @@ hOUwie.dev <- function(p, phy, data, rate.cat, tip.fog,
   llik_houwies <- llik_discrete + llik_continuous
   # Importance sampling estimate of L = sum_h P(h | Q) f(x | h). The histories
   # were drawn from q, not from P(. | Q), so each term carries the weight
-  # P(h | Q) / q(h); dividing by the number of draws is what makes this an
-  # average rather than the subset sum it used to be. Summing the terms without
+  # P(h | Q) / q(h) Summing the terms without
   # the weight and without the 1/n effectively weights each history by its own
   # proposal probability, which rewards parameter values that concentrate the
   # sampling distribution on few histories.
@@ -1366,32 +1365,22 @@ getOUExpectations <- function(simmap, Rate.mat, tip.paths=NULL){
     alpha_values <- Rate.mat[1, as.numeric(names(branch_lengths_i))]
     sigma_values <- Rate.mat[2, as.numeric(names(branch_lengths_i))]
     theta_values <- Rate.mat[3, as.numeric(names(branch_lengths_i))]
+    # alpha has to be integrated along the path: each segment decays by the alpha of
+    # every segment tipward of it, not by its own alpha times the distance from the root
+    segment_decay <- alpha_values * branch_lengths_i
+    decay_to_tip <- rev(cumsum(rev(segment_decay))) - segment_decay # decay from each segment's tipward end
     # get the ancestral weight value
-    ancestral_weight <- exp(-sum(branch_lengths_i * alpha_values))
-    # get the ancestral weight variance
-    ancestral_var <- exp(-sum(2 * branch_lengths_i * alpha_values))
+    ancestral_weight <- exp(-sum(segment_decay))
     # get the weight of each theta per branch
-    dist_from_root_i <- c(0, cumsum(branch_lengths_i))
-    var_weights <- theta_weights <- vector("numeric", length(dist_from_root_i))
-    for(j in 2:length(dist_from_root_i)){
-      # doing means
-      time_2_j <- exp(dist_from_root_i[j] * alpha_values[j-1])
-      time_1_j <- exp(dist_from_root_i[j-1] * alpha_values[j-1])
-      weight_j <- ancestral_weight * (time_2_j - time_1_j)
-      theta_weights[j] <- weight_j
-      # doing variance
-      var_2 <- exp(2 * dist_from_root_i[j] * alpha_values[j-1])
-      var_1 <- exp(2 * dist_from_root_i[j-1] * alpha_values[j-1])
-      var_weights[j] <- (sigma_values[j-1]/(2 * alpha_values[j-1])) * (var_2 - var_1)
-    }
+    theta_weights <- c(ancestral_weight, exp(-decay_to_tip) * -expm1(-segment_decay))
+    var_weights <- (sigma_values/(2 * alpha_values)) * exp(-2 * decay_to_tip) * -expm1(-2 * segment_decay)
     # doing the means
-    theta_weights[1] <- ancestral_weight # add the ancestral weight 
-    theta_weights <- theta_weights/sum(theta_weights) # standardize the weights to sum to one 
+    theta_weights <- theta_weights/sum(theta_weights) # standardize the weights to sum to one
     theta_values <- c(Rate.mat[3, root_state], theta_values) # add the root theta to the branch values
     expected_value <- sum(theta_values * theta_weights)
     expected_values[i] <- expected_value
     # doing the variance
-    expected_vars[i] <- sum(var_weights) * ancestral_var
+    expected_vars[i] <- sum(var_weights)
   }
   expected_values[expected_values == 0] <- Rate.mat[3, root_state] # add the root as an expecation
   names(expected_vars) <- names(expected_values) <- 1:(nTip*2-1) # named by node number
