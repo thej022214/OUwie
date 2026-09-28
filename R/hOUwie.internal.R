@@ -1523,20 +1523,21 @@ getIP.theta <- function(x, states, index){
   return(ip.theta)
 }
 
-# Sigma squared controls the scale of continuous-trait variation, so its search
-# must start on a scale learned from the trait. Using log(2) / tree height here,
-# as alpha does, makes the initial stationary variance arbitrary and can send the
-# optimizer down the near-Brownian alpha-theta ridge. A tiny positive value keeps
-# log-scale optimization defined when the observed trait is constant or contains
-# fewer than two finite values; checkStartingUBLB will then raise it to any
-# user-supplied lower bound.
-getIP.sigma <- function(x){
-  finite <- x[is.finite(x)]
-  trait.variance <- if(length(finite) > 1) var(finite) else NA_real_
-  if(!is.finite(trait.variance) || trait.variance <= 0){
+# Sigma squared is a rate, trait units squared per unit time, so its search starts
+# from the mean squared independent contrast, which is the Brownian rate estimated
+# from the data. This is the start OUwie uses. Starting at the raw trait variance
+# instead leaves out the time scale, and on a tall tree the search then climbs alpha
+# to its upper bound and stalls on a white-noise optimum far below BM1. A tiny
+# positive value keeps log-scale optimization defined when the contrasts cannot be
+# computed or are all zero; checkStartingUBLB will then raise it to any user-supplied
+# lower bound.
+getIP.sigma <- function(x, species, phy){
+  x <- stats::setNames(x, species)[phy$tip.label]
+  sigma <- tryCatch(mean(ape::pic(x, phy)^2), error = function(e) NA_real_)
+  if(!is.finite(sigma) || sigma <= 0){
     return(.Machine$double.eps)
   }
-  trait.variance
+  sigma
 }
 
 simCharacterHistory <- function(phy, Q, root.freqs, Q2 = NA, NoI = NA){
