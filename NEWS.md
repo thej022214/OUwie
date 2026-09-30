@@ -1,3 +1,12 @@
+# OUwie 3.0.4
+
+* `hOUwie()` now starts sigma^2 from the mean squared independent contrast, as
+  `OUwie()` does, instead of the raw trait variance. On tall trees the old start
+  could drive alpha to its upper bound and stall far below BM1.
+* `hOUwie()` default `root.p` is now `"maddfitz"` (was `"yang"`).
+* Fixed the OU expected means and variances along paths with more than one
+  alpha, which feed the model-averaged values from `getModelAvgParams()`.
+
 # OUwie 3.0.3
 
 * `hOUwie()` likelihoods changed for all models (importance sampling replaces
