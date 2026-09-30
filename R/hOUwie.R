@@ -984,7 +984,10 @@ hOUwie.walk <- function(houwie_obj, delta=2, nsteps=1000, print_freq=50, lower_b
   n_p_alpha <- length(unique(na.omit(index.cont[1,])))
   n_p_sigma <- length(unique(na.omit(index.cont[2,])))
   n_p_theta <- length(unique(na.omit(index.cont[3,])))
-  names(best_par) <- c(paste0("rate", "_", 1:n_p_trans), paste0("alpha", "_", 1:n_p_alpha), paste0("sigma2", "_", 1:n_p_sigma), paste0("theta", "_", 1:n_p_theta))
+  # BM models have no alpha, and a block with no parameters must contribute no names:
+  # 1:0 is c(1, 0), and paste0 turns a zero-length index into a single "alpha_"
+  block_names <- function(prefix, n) if(n > 0) paste0(prefix, "_", seq_len(n)) else character(0)
+  names(best_par) <- c(block_names("rate", n_p_trans), block_names("alpha", n_p_alpha), block_names("sigma2", n_p_sigma), block_names("theta", n_p_theta))
   best_neglnL <- -houwie_obj$loglik
   # dent_propose rejects a proposal when any parameter is outside the bounds, not just the
   # one it perturbed, so a scalar lower bound of zero is also applied to the thetas.

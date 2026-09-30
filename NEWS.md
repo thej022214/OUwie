@@ -6,6 +6,7 @@
 * `hOUwie()` default `root.p` is now `"maddfitz"` (was `"yang"`).
 * Fixed the OU expected means and variances along paths with more than one
   alpha, which feed the model-averaged values from `getModelAvgParams()`.
+* `hOUwie.walk()` no longer fails on models without alpha (BM1, BMV).
 
 # OUwie 3.0.3
 
